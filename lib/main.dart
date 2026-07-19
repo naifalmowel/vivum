@@ -1,0 +1,80 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'theme/app_theme.dart';
+import 'l10n/translations.dart';
+import 'screens/home_screen.dart';
+import 'screens/about_screen.dart';
+import 'screens/services_screen.dart';
+import 'screens/portfolio_screen.dart';
+import 'screens/process_screen.dart';
+import 'screens/contact_screen.dart';
+import 'widgets/scaffold_shell.dart';
+
+void main() {
+  Animate.restartOnHotReload = true;
+  runApp(const VivumApp());
+}
+
+final _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    ShellRoute(
+      builder: (context, state, child) => ScaffoldShell(child: child),
+      routes: [
+        GoRoute(path: '/', builder: (c, s) => const HomeScreen()),
+        GoRoute(path: '/about', builder: (c, s) => const AboutScreen()),
+        GoRoute(path: '/services', builder: (c, s) => const ServicesScreen()),
+        GoRoute(path: '/portfolio', builder: (c, s) => const PortfolioScreen()),
+        GoRoute(path: '/process', builder: (c, s) => const ProcessScreen()),
+        GoRoute(path: '/contact', builder: (c, s) => const ContactScreen()),
+      ],
+    ),
+  ],
+);
+
+class VivumApp extends StatefulWidget {
+  const VivumApp({super.key});
+
+  @override
+  State<VivumApp> createState() => _VivumAppState();
+}
+
+class _VivumAppState extends State<VivumApp> {
+  String _lang = 'en';
+  ThemeMode _themeMode = ThemeMode.dark;
+
+  void _toggleLang() => setState(() => _lang = _lang == 'en' ? 'ar' : 'en');
+  void _toggleTheme() => setState(() => 
+    _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppProvider(
+      lang: _lang,
+      themeMode: _themeMode,
+      onToggleLang: _toggleLang,
+      onToggleTheme: _toggleTheme,
+      child: Builder(
+        builder: (context) {
+          final appProvider = AppProvider.of(context);
+          return MaterialApp.router(
+            title: 'VIVUM Digital Agency',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: appProvider.themeMode,
+            routerConfig: _router,
+            builder: (context, child) {
+              return Directionality(
+                // Force LTR direction regardless of language for consistent UI layout
+                textDirection: TextDirection.ltr,
+                child: child!,
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
