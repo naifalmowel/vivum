@@ -5,6 +5,8 @@ import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/section_reveal.dart';
 
+import '../widgets/footer.dart';
+
 class ProcessScreen extends StatelessWidget {
   const ProcessScreen({super.key});
 
@@ -23,6 +25,7 @@ class ProcessScreen extends StatelessWidget {
     ];
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Hero
         Container(
@@ -84,6 +87,7 @@ class ProcessScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 80),
+        const VivumFooter(),
       ],
     );
   }

@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 class AppProvider extends InheritedWidget {
   final String lang;
   final ThemeMode themeMode;
+  final bool isAdminMode;
   final VoidCallback onToggleLang;
   final VoidCallback onToggleTheme;
+  final VoidCallback onToggleAdmin;
 
   const AppProvider({
     super.key,
     required this.lang,
     required this.themeMode,
+    required this.isAdminMode,
     required this.onToggleLang,
     required this.onToggleTheme,
+    required this.onToggleAdmin,
     required super.child,
   });
 
@@ -28,10 +32,7 @@ class AppProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AppProvider old) => 
-      old.lang != lang || old.themeMode != themeMode;
-
-  // For backward compatibility during migration
-  static AppProvider ofLegacy(BuildContext context) => of(context);
+      old.lang != lang || old.themeMode != themeMode || old.isAdminMode != isAdminMode;
 
   static const _en = {
     // Nav
@@ -71,6 +72,28 @@ class AppProvider extends InheritedWidget {
     'services.it.title': 'IT Solutions',
     'services.it.desc': 'Business email, cloud services, technical support, and digital infrastructure consulting.',
     'services.learn': 'Learn More',
+
+    // Pricing & Packages
+    'pricing.starting': 'Starting from',
+    'pricing.website': 'Website',
+    'pricing.branding': 'Branding',
+    'pricing.ai': 'AI & Automation',
+    'pricing.custom': 'Custom Quote',
+    'pricing.aed': 'AED',
+
+    'pkg.starter.title': 'Business Launch',
+    'pkg.starter.price': '3,500',
+    'pkg.starter.desc': 'Perfect for small businesses, startups, and new offices looking for a strong digital start.',
+    'pkg.business.title': 'Growth & Identity',
+    'pkg.business.price': '7,500',
+    'pkg.business.desc': 'Our most popular package. A complete solution for businesses ready to scale their presence.',
+    'pkg.premium.title': 'Enterprise Custom',
+    'pkg.premium.price': '15,000+',
+    'pkg.premium.desc': 'Custom high-end solutions with advanced technology, automation, and full support.',
+    'pkg.ai.title': 'AI Business Suite',
+    'pkg.ai.price': '4,000 - 8,000',
+    'pkg.ai.monthly': ' + 500 - 1,500/mo',
+    'pkg.ai.desc': 'Unique AI-powered automation to set your business apart from the competition.',
 
     // Portfolio
     'portfolio.title': 'Our Work',
@@ -155,6 +178,28 @@ class AppProvider extends InheritedWidget {
     'services.it.desc': 'البريد المؤسسي، الخدمات السحابية، الدعم التقني، واستشارات البنية التحتية.',
     'services.learn': 'اعرف أكثر',
 
+    // Pricing & Packages
+    'pricing.starting': 'يبدأ من',
+    'pricing.website': 'المواقع الإلكترونية',
+    'pricing.branding': 'الهوية البصرية',
+    'pricing.ai': 'الذكاء الاصطناعي',
+    'pricing.custom': 'عرض سعر مخصص',
+    'pricing.aed': 'درهم',
+
+    'pkg.starter.title': 'انطلاق الأعمال',
+    'pkg.starter.price': '3,500',
+    'pkg.starter.desc': 'مثالية للشركات الصغيرة، الشركات الناشئة، والمكاتب الجديدة التي تبحث عن بداية رقمية قوية.',
+    'pkg.business.title': 'النمو والهوية',
+    'pkg.business.price': '7,500',
+    'pkg.business.desc': 'الباقة الأكثر طلباً. حل متكامل للشركات المستعدة لتوسيع حضورها الرقمي بشكل احترافي.',
+    'pkg.premium.title': 'حلول مخصصة للشركات',
+    'pkg.premium.price': '15,000+',
+    'pkg.premium.desc': 'حلول مخصصة عالية المستوى مع تقنيات متقدمة وأتمتة ودعم كامل.',
+    'pkg.ai.title': 'باقة AI للأعمال',
+    'pkg.ai.price': '4,000 - 8,000',
+    'pkg.ai.monthly': ' + 500 - 1,500/ش',
+    'pkg.ai.desc': 'أتمتة فريدة مدعومة بالذكاء الاصطناعي لتجعل عملك متميزاً عن آلاف المنافسين.',
+
     // Portfolio
     'portfolio.title': 'أعمالنا',
     'portfolio.sub': 'دراسات حالة من أنحاء المنطقة',
@@ -200,5 +245,4 @@ class AppProvider extends InheritedWidget {
   };
 }
 
-// Keep alias for easier migration
 typedef LanguageProvider = AppProvider;

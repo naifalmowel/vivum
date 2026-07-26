@@ -5,6 +5,8 @@ import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/section_reveal.dart';
 
+import '../widgets/footer.dart';
+
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
@@ -15,6 +17,7 @@ class AboutScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Hero
         Container(
@@ -157,6 +160,7 @@ class AboutScreen extends StatelessWidget {
             ],
           ),
         ),
+        const VivumFooter(),
       ],
     );
   }

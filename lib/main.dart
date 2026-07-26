@@ -1,6 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'theme/app_theme.dart';
 import 'l10n/translations.dart';
 import 'screens/home_screen.dart';
@@ -11,7 +15,28 @@ import 'screens/process_screen.dart';
 import 'screens/contact_screen.dart';
 import 'widgets/scaffold_shell.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
+  // If you are using web, you might need to pass options:
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: FirebaseOptions( apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
+        authDomain: "vivum-d2907.firebaseapp.com",
+        projectId: "vivum-d2907",
+        storageBucket: "vivum-d2907.firebasestorage.app",
+        messagingSenderId: "899371078453",
+        appId: "1:899371078453:web:f96fb357e3603473f1727c",
+        measurementId: "G-E7C1ZV11L7")
+  );
+
+  await Supabase.initialize(
+    url: 'https://gosqrnkrebpdqvhazugw.supabase.co',
+    publishableKey: 'sb_publishable_N0iUuNR5DD-yKtgCqcXglg_K2ySU9pj', 
+    debug: false,
+  );
+
   Animate.restartOnHotReload = true;
   runApp(const VivumApp());
 }
@@ -43,24 +68,31 @@ class VivumApp extends StatefulWidget {
 class _VivumAppState extends State<VivumApp> {
   String _lang = 'en';
   ThemeMode _themeMode = ThemeMode.dark;
+  bool _isAdminMode = false;
 
   void _toggleLang() => setState(() => _lang = _lang == 'en' ? 'ar' : 'en');
   void _toggleTheme() => setState(() => 
     _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+  void _toggleAdmin() => setState(() => _isAdminMode = !_isAdminMode);
 
   @override
   Widget build(BuildContext context) {
     return AppProvider(
       lang: _lang,
       themeMode: _themeMode,
+      isAdminMode: _isAdminMode,
       onToggleLang: _toggleLang,
       onToggleTheme: _toggleTheme,
+      onToggleAdmin: _toggleAdmin,
       child: Builder(
         builder: (context) {
           final appProvider = AppProvider.of(context);
           return MaterialApp.router(
             title: 'VIVUM Digital Agency',
             debugShowCheckedModeBanner: false,
+            scrollBehavior: const MaterialScrollBehavior().copyWith(
+              dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.trackpad},
+            ),
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: appProvider.themeMode,

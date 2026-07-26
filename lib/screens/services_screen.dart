@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/section_reveal.dart';
+
+import '../widgets/footer.dart';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
@@ -50,11 +53,12 @@ class ServicesScreen extends StatelessWidget {
     ];
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Page Hero
         Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
+          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
           decoration: BoxDecoration(
             gradient: VivumColors.heroGradient(lp.isDark),
           ),
@@ -76,17 +80,263 @@ class ServicesScreen extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
           child: Column(
-            children: categories.asMap().entries.map((e) => Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: SectionReveal(
-                key: ValueKey(e.key),
-                delay: Duration(milliseconds: e.key * 100),
-                child: _ServiceCategoryCard(cat: e.value, lp: lp, isEven: e.key % 2 == 0),
-              ),
-            )).toList(),
+            children: [
+              ...categories.asMap().entries.map((e) => Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: SectionReveal(
+                  key: ValueKey(e.key),
+                  delay: Duration(milliseconds: e.key * 100),
+                  child: _ServiceCategoryCard(cat: e.value, lp: lp, isEven: e.key % 2 == 0),
+                ),
+              )),
+              const SizedBox(height: 100),
+              _PricingSummary(lp: lp),
+              const SizedBox(height: 100),
+              _PackagesSection(lp: lp),
+            ],
+          ),
+        ),
+        const VivumFooter(),
+      ],
+    );
+  }
+}
+
+class _PricingSummary extends StatelessWidget {
+  final AppProvider lp;
+  const _PricingSummary({required this.lp});
+
+  @override
+  Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 900;
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+        SectionReveal(
+          child: Column(children: [
+            const _Label('PRICING'),
+            const SizedBox(height: 12),
+            Text(lp.t('pricing.starting'),
+                style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
+          ]),
+        ),
+        const SizedBox(height: 48),
+        isWide 
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _PriceItem(label: lp.t('pricing.website'), price: '2,500'),
+                _PriceDivider(),
+                _PriceItem(label: lp.t('pricing.branding'), price: '2,000'),
+                _PriceDivider(),
+                _PriceItem(label: lp.t('pricing.ai'), price: lp.t('pricing.custom'), isCustom: true),
+              ],
+            )
+          : Column(
+              children: [
+                _PriceItem(label: lp.t('pricing.website'), price: '2,500'),
+                const SizedBox(height: 24),
+                _PriceItem(label: lp.t('pricing.branding'), price: '2,000'),
+                const SizedBox(height: 24),
+                _PriceItem(label: lp.t('pricing.ai'), price: lp.t('pricing.custom'), isCustom: true),
+              ],
+            ),
+      ],
+    );
+  }
+}
+
+class _PriceDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40, width: 1,
+      margin: const EdgeInsets.symmetric(horizontal: 40),
+      color: Theme.of(context).dividerColor,
+    );
+  }
+}
+
+class _PriceItem extends StatelessWidget {
+  final String label, price;
+  final bool isCustom;
+  const _PriceItem({required this.label, required this.price, this.isCustom = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final lp = AppProvider.of(context);
+    return Column(
+      children: [
+        Text(label, style: theme.textTheme.bodyMedium),
+        const SizedBox(height: 8),
+        RichText(
+          text: TextSpan(
+            style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800, color: VivumColors.teal),
+            children: [
+              if (!isCustom) TextSpan(text: '${lp.t('pricing.aed')} ', style: theme.textTheme.titleMedium?.copyWith(color: VivumColors.teal)),
+              TextSpan(text: price),
+            ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PackagesSection extends StatelessWidget {
+  final AppProvider lp;
+  const _PackagesSection({required this.lp});
+
+  @override
+  Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 900;
+    final theme = Theme.of(context);
+
+    final pkgs = [
+      (
+        'pkg.starter.title', 'pkg.starter.price', '', 'pkg.starter.desc', 
+        [lp.isAr ? 'موقع صفحة واحدة' : 'One-page Website', lp.isAr ? 'هوية بصرية مصغرة' : 'Brand Mini Guide', 'Google Business'], 
+        VivumColors.teal, false
+      ),
+      (
+        'pkg.business.title', 'pkg.business.price', '', 'pkg.business.desc', 
+        [lp.isAr ? 'موقع متكامل (8 صفحات)' : 'Full Website (8 pages)', lp.isAr ? 'هوية بصرية كاملة' : 'Full Brand Identity', 'Social Media Kit'], 
+        VivumColors.amber, true
+      ),
+      (
+        'pkg.premium.title', 'pkg.premium.price', '', 'pkg.premium.desc', 
+        ['Custom Website', 'AI Chatbot', 'WhatsApp Automation', 'CRM Integration'], 
+        VivumColors.teal, false
+      ),
+      (
+        'pkg.ai.title', 'pkg.ai.price', 'pkg.ai.monthly', 'pkg.ai.desc', 
+        ['WhatsApp AI Assistant', 'Lead Collection', 'Auto FAQ', '24/7 Support Bot'], 
+        VivumColors.amber, false
+      ),
+    ];
+
+    return Column(
+      children: [
+        SectionReveal(
+          child: Column(children: [
+            const _Label('VIVUM PACKAGES'),
+            const SizedBox(height: 12),
+            Text(lp.isAr ? 'اختر الباقة المناسبة لنموك' : 'Choose Your Growth Package',
+                style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
+          ]),
+        ),
+        const SizedBox(height: 64),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: isWide ? 4 : 1,
+            crossAxisSpacing: 24,
+            mainAxisSpacing: 24,
+            mainAxisExtent: isWide ? 580 : 540,
+          ),
+          itemCount: pkgs.length,
+          itemBuilder: (context, i) {
+            final p = pkgs[i];
+            return _PackageCard(
+              title: lp.t(p.$1), price: p.$2, monthly: p.$3, desc: lp.t(p.$4),
+              features: p.$5, accent: p.$6, isPopular: p.$7, lp: lp,
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _PackageCard extends StatelessWidget {
+  final String title, price, monthly, desc;
+  final List<String> features;
+  final Color accent;
+  final bool isPopular;
+  final AppProvider lp;
+
+  const _PackageCard({
+    required this.title, required this.price, required this.monthly, required this.desc,
+    required this.features, required this.accent, required this.isPopular, required this.lp,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isPopular ? accent : theme.dividerColor, width: isPopular ? 2 : 1),
+        boxShadow: [
+          if (isPopular) BoxShadow(color: accent.withValues(alpha: 0.1), blurRadius: 30, spreadRadius: 5),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (isPopular) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(12)),
+              child: Text(lp.isAr ? 'الأكثر طلباً' : 'MOST POPULAR', 
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 12),
+          ],
+          Text(title, style: theme.textTheme.titleLarge),
+          const SizedBox(height: 16),
+          RichText(
+            text: TextSpan(
+              style: theme.textTheme.headlineMedium?.copyWith(color: accent, fontWeight: FontWeight.w800),
+              children: [
+                TextSpan(text: '${lp.t('pricing.aed')} ', style: theme.textTheme.titleSmall?.copyWith(color: accent)),
+                TextSpan(text: lp.t(price)),
+                if (monthly.isNotEmpty) TextSpan(text: lp.t(monthly), style: theme.textTheme.bodySmall?.copyWith(color: accent, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(desc, style: theme.textTheme.bodySmall, maxLines: 3),
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 24),
+          Expanded(
+            child: ListView(
+              physics: const NeverScrollableScrollPhysics(),
+              children: features.map((f) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle_outline_rounded, size: 16, color: accent),
+                    const SizedBox(width: 10),
+                    Expanded(child: Text(f, style: theme.textTheme.bodyMedium)),
+                  ],
+                ),
+              )).toList(),
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => context.go('/contact'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isPopular ? accent : Colors.transparent,
+                foregroundColor: isPopular ? Colors.white : theme.colorScheme.onSurface,
+                side: isPopular ? BorderSide.none : BorderSide(color: theme.dividerColor),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(lp.t('nav.start')),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

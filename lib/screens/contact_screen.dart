@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
+import '../widgets/footer.dart';
 import '../widgets/section_reveal.dart';
 import '../widgets/glow_button.dart';
 
@@ -43,6 +44,7 @@ class _ContactScreenState extends State<ContactScreen> {
     final theme = Theme.of(context);
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Hero
         Container(
@@ -101,6 +103,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 ),
         ),
         const SizedBox(height: 40),
+        const VivumFooter(),
       ],
     );
   }

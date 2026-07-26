@@ -48,6 +48,9 @@ class _VivumNavbarState extends State<VivumNavbar> {
                 // Logo
                 InkWell(
                   onTap: () => context.go('/'),
+                  onLongPress: () {
+                    app.onToggleAdmin();
+                  },
                   borderRadius: BorderRadius.circular(8),
                   child: const _VivumLogoText(),
                 ),
@@ -136,7 +139,7 @@ class _VivumLogoText extends StatelessWidget {
     final theme = Theme.of(context);
     return RichText(
       text: TextSpan(
-        style: GoogleFonts.syne(
+        style: GoogleFonts.acme(
           fontSize: 24, fontWeight: FontWeight.w800,
           color: theme.colorScheme.onSurface,
         ),

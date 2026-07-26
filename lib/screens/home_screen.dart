@@ -8,6 +8,8 @@ import '../widgets/particle_painter.dart';
 import '../widgets/glow_button.dart';
 import '../widgets/section_reveal.dart';
 
+import '../widgets/footer.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -15,6 +17,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final lp = AppProvider.of(context);
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _HeroSection(lp: lp),
         _ServicesPreview(lp: lp),
@@ -22,6 +25,7 @@ class HomeScreen extends StatelessWidget {
         _PortfolioTeaser(lp: lp),
         _WhyVivum(lp: lp),
         _CtaBanner(lp: lp),
+        const VivumFooter(),
       ],
     );
   }
@@ -40,10 +44,9 @@ class _HeroSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: size.height * 0.92,
+      constraints: BoxConstraints(minHeight: size.height * 0.92),
       decoration: BoxDecoration(gradient: VivumColors.heroGradient(lp.isDark)),
       child: Stack(
-        fit: StackFit.expand,
         children: [
           // Animated particle background
           const Positioned.fill(child: ParticleBackground()),
@@ -70,22 +73,23 @@ class _HeroSection extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: isWide ? 80 : 24,
-              vertical: 80,
+              vertical: isWide ? 80 : 60,
             ),
             child: isWide
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(flex: 5, child: _HeroText(lp: lp)),
-                      Expanded(flex: 4, child: const HeroOrbit()),
+                      const Expanded(flex: 4, child: HeroOrbit()),
                     ],
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       _HeroText(lp: lp),
                       const SizedBox(height: 40),
-                      const Expanded(child: HeroOrbit()),
+                      const SizedBox(height: 320, child: HeroOrbit()),
                     ],
                   ),
           ),
@@ -566,7 +570,7 @@ class _WhyVivum extends StatelessWidget {
     final pillars = [
       (Icons.palette_outlined, 'about.creative', 'about.creative.desc', VivumColors.teal),
       (Icons.code_rounded, 'about.tech', 'about.tech.desc', VivumColors.amber),
-      (Icons.psychology_outlined, 'about.ai', 'about.ai.desc', VivumColors.teal),
+      (Icons.psychology_outlined, 'pkg.ai.title', 'pkg.ai.desc', VivumColors.teal),
     ];
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),

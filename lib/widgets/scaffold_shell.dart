@@ -23,12 +23,7 @@ class ScaffoldShell extends StatelessWidget {
           const VivumNavbar(),
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  child,
-                  const VivumFooter(),
-                ],
-              ),
+              child: child,
             ),
           ),
         ],
