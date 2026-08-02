@@ -22,7 +22,8 @@ void main() async {
   // If you are using web, you might need to pass options:
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Firebase.initializeApp(
-    options: FirebaseOptions( apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
+    options: FirebaseOptions(
+        apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
         authDomain: "vivum-d2907.firebaseapp.com",
         projectId: "vivum-d2907",
         storageBucket: "vivum-d2907.firebasestorage.app",

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="VIVUM Digital Agency - Creative Design, Technology & AI for UAE, Saudi Arabia, Syria">
+  <meta name="keywords" content="digital agency, UAE, Saudi Arabia, Syria, web design, AI, branding">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="VIVUM Digital Agency">
+  <meta property="og:description" content="Building Digital Experiences That Help Businesses Grow">
+  <title>VIVUM Digital Agency</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #07091A;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #07091A;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    .loader-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+    .loader-logo span.teal { color: #00B5CC; }
+    .loader-logo span.amber { color: #F5A61A; }
+    .loader-bar {
+      width: 120px;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      margin-top: 24px;
+      overflow: hidden;
+    }
+    .loader-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00B5CC, #F5A61A);
+      border-radius: 2px;
+      animation: loadfill 1.8s ease forwards;
+    }
+    @keyframes loadfill {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="loader-logo">vi<span class="teal">v</span>um<span class="amber">.</span></div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function() {
+      var loader = document.getElementById('loading');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(function() { loader.remove(); }, 600);
+      }
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

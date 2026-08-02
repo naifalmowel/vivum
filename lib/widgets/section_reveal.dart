@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+/// Optimized version of SectionReveal.
+/// Uses simple Fade and faster durations to minimize "scroll jitter".
 class SectionReveal extends StatefulWidget {
   final Widget child;
   final Duration delay;
@@ -23,67 +25,43 @@ class _SectionRevealState extends State<SectionReveal> {
 
   @override
   Widget build(BuildContext context) {
-    final slide = widget.slideFrom ?? const Offset(0, 40);
+    // We use a simpler animation structure for performance.
     return VisibilityDetector(
       key: widget.key ?? UniqueKey(),
       onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.15 && !_visible) {
+        if (info.visibleFraction > 0.1 && !_visible) {
           setState(() => _visible = true);
         }
       },
       child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 700),
+        duration: 500.ms, // Faster duration
         opacity: _visible ? 1.0 : 0.0,
-        child: AnimatedSlide(
-          duration: const Duration(milliseconds: 700),
-          offset: _visible ? Offset.zero : Offset(slide.dx / 400, slide.dy / 400),
-          curve: Curves.easeOutCubic,
-          child: widget.child,
-        ),
+        curve: Curves.easeOut,
+        child: widget.child,
       ),
     );
   }
 }
 
-class StaggerReveal extends StatefulWidget {
+class StaggerReveal extends StatelessWidget {
   final List<Widget> children;
   final Duration staggerDelay;
-  final Duration itemDuration;
 
   const StaggerReveal({
     super.key,
     required this.children,
-    this.staggerDelay = const Duration(milliseconds: 100),
-    this.itemDuration = const Duration(milliseconds: 600),
+    this.staggerDelay = const Duration(milliseconds: 50),
   });
 
   @override
-  State<StaggerReveal> createState() => _StaggerRevealState();
-}
-
-class _StaggerRevealState extends State<StaggerReveal> {
-  bool _triggered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final Key visibilityKey = widget.key ?? UniqueKey();
-    return VisibilityDetector(
-      key: visibilityKey,
-      onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.1 && !_triggered) {
-          setState(() => _triggered = true);
-        }
-      },
-      child: Column(
-        children: [
-          for (int i = 0; i < widget.children.length; i++)
-            widget.children[i]
-                .animate(target: _triggered ? 1.0 : 0.0)
-                .fadeIn(duration: widget.itemDuration, delay: widget.staggerDelay * i)
-                .slideY(begin: 0.08, duration: widget.itemDuration,
-                    delay: widget.staggerDelay * i, curve: Curves.easeOutCubic),
-        ],
-      ),
+    return Column(
+      children: children.asMap().entries.map((e) {
+        return SectionReveal(
+          delay: staggerDelay * e.key,
+          child: e.value,
+        );
+      }).toList(),
     );
   }
 }

@@ -9,6 +9,8 @@ import '../widgets/glow_button.dart';
 import '../widgets/section_reveal.dart';
 
 import '../widgets/footer.dart';
+import '../widgets/project_widgets.dart';
+import '../services/database_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,7 +51,7 @@ class _HeroSection extends StatelessWidget {
       child: Stack(
         children: [
           // Animated particle background
-          const Positioned.fill(child: ParticleBackground()),
+          const Positioned.fill(child: RepaintBoundary(child: ParticleBackground())),
           // Radial glow
           Positioned(
             top: size.height * 0.05,
@@ -80,7 +82,7 @@ class _HeroSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(flex: 5, child: _HeroText(lp: lp)),
-                      const Expanded(flex: 4, child: HeroOrbit()),
+                      const Expanded(flex: 4, child: RepaintBoundary(child: HeroOrbit())),
                     ],
                   )
                 : Column(
@@ -89,7 +91,7 @@ class _HeroSection extends StatelessWidget {
                     children: [
                       _HeroText(lp: lp),
                       const SizedBox(height: 40),
-                      const SizedBox(height: 320, child: HeroOrbit()),
+                      const SizedBox(height: 320, child: RepaintBoundary(child: HeroOrbit())),
                     ],
                   ),
           ),
@@ -136,10 +138,10 @@ class _HeroText extends StatelessWidget {
             Text(lp.t('hero.badge'),
                 style: GoogleFonts.inter(
                     fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: VivumColors.teal)),
           ]),
-        ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3),
+        ),
         const SizedBox(height: 28),
         // Headline lines
         RichText(
@@ -157,12 +159,12 @@ class _HeroText extends StatelessWidget {
               ),
             ],
           ),
-        ).animate().fadeIn(delay: 350.ms, duration: 700.ms).slideY(begin: 0.2),
+        ),
         const SizedBox(height: 24),
         Text(
           lp.t('hero.sub'),
           style: theme.textTheme.bodyLarge,
-        ).animate().fadeIn(delay: 550.ms, duration: 700.ms),
+        ),
         const SizedBox(height: 40),
         Wrap(
           spacing: 16,
@@ -172,7 +174,7 @@ class _HeroText extends StatelessWidget {
               label: lp.t('hero.cta2'),
               onTap: () => context.go('/contact'),
               variant: ButtonVariant.amber,
-              icon: const Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
+              icon: Icon(lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 18, color: Colors.white),
             ),
             VivumButton(
               label: lp.t('hero.cta1'),
@@ -180,7 +182,7 @@ class _HeroText extends StatelessWidget {
               variant: ButtonVariant.outline,
             ),
           ],
-        ).animate().fadeIn(delay: 700.ms, duration: 700.ms).slideY(begin: 0.2),
+        ),
         const SizedBox(height: 56),
         // Scroll indicator
         Column(
@@ -201,9 +203,9 @@ class _HeroText extends StatelessWidget {
               ),
             ),
           ],
-        ).animate().fadeIn(delay: 1200.ms),
+        ),
       ],
-    );
+    ).animate().fadeIn(duration: 800.ms);
   }
 }
 
@@ -215,6 +217,7 @@ class _ServicesPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isWide = MediaQuery.of(context).size.width > 768;
+    final theme = Theme.of(context);
     final services = [
       (Icons.palette_outlined, 'services.brand.title', 'services.brand.desc', VivumColors.teal),
       (Icons.devices_outlined, 'services.digital.title', 'services.digital.desc', VivumColors.amber),
@@ -224,6 +227,9 @@ class _ServicesPreview extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
+      decoration: BoxDecoration(
+        color: lp.isDark ? Colors.transparent : theme.colorScheme.surface,
+      ),
       child: Column(
         children: [
           SectionReveal(
@@ -239,24 +245,35 @@ class _ServicesPreview extends StatelessWidget {
           ),
           const SizedBox(height: 64),
           isWide
-              ? Row(
-                  children: services.asMap().entries.map((e) => Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(right: e.key < services.length - 1 ? 20 : 0),
-                      child: SectionReveal(
-                        delay: Duration(milliseconds: e.key * 120),
-                        child: _ServiceCard(
-                          icon: e.value.$1, titleKey: e.value.$2,
-                          descKey: e.value.$3, accent: e.value.$4, lp: lp,
+              ? IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: services.asMap().entries.map((e) => Expanded(
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.only(
+                          end: e.key < services.length - 1 ? 20 : 0,
+                        ),
+                        child: SectionReveal(
+                          delay: Duration(milliseconds: e.key * 120),
+                          child: GestureDetector(
+                            onTap: () => context.go('/services'),
+                            child: _ServiceCard(
+                              icon: e.value.$1, titleKey: e.value.$2,
+                              descKey: e.value.$3, accent: e.value.$4, lp: lp,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  )).toList(),
+                    )).toList(),
+                  ),
                 )
               : Column(
                   children: services.map((s) => Padding(
                     padding: const EdgeInsets.only(bottom: 20),
-                    child: _ServiceCard(icon: s.$1, titleKey: s.$2, descKey: s.$3, accent: s.$4, lp: lp),
+                    child: GestureDetector(
+                      onTap: () => context.go('/services'),
+                      child: _ServiceCard(icon: s.$1, titleKey: s.$2, descKey: s.$3, accent: s.$4, lp: lp),
+                    ),
                   )).toList(),
                 ),
         ],
@@ -293,16 +310,18 @@ class _ServiceCardState extends State<_ServiceCard> {
               ? theme.colorScheme.surface.withValues(alpha: 0.8) 
               : theme.colorScheme.surface,
           border: Border.all(
-            color: _hovered ? widget.accent.withValues(alpha: 0.4) : theme.dividerColor,
+            color: _hovered ? widget.accent.withValues(alpha: 0.4) : theme.dividerColor.withValues(alpha: 0.5),
           ),
           borderRadius: BorderRadius.circular(20),
-          boxShadow: _hovered
-              ? [BoxShadow(
-                  color: widget.accent.withValues(alpha: isDark ? 0.1 : 0.05), 
-                  blurRadius: 24, 
-                  spreadRadius: 0,
-                  offset: const Offset(0, 8))]
-              : [],
+          boxShadow: [
+            BoxShadow(
+              color: _hovered 
+                  ? widget.accent.withValues(alpha: isDark ? 0.15 : 0.1)
+                  : theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02), 
+              blurRadius: _hovered ? 32 : 20, 
+              spreadRadius: 0,
+              offset: Offset(0, _hovered ? 12 : 6))
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +346,7 @@ class _ServiceCardState extends State<_ServiceCard> {
               Text(widget.lp.t('services.learn'),
                 style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: widget.accent)),
               const SizedBox(width: 6),
-              Icon(Icons.arrow_forward_rounded, size: 14, color: widget.accent),
+              Icon(widget.lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 14, color: widget.accent),
             ]),
           ],
         ),
@@ -349,20 +368,20 @@ class _StatsSection extends StatelessWidget {
       ('50+', 'stats.projects'), ('3', 'stats.markets'),
       ('5+', 'stats.years'), ('100%', 'stats.satisfaction'),
     ];
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
       padding: EdgeInsets.symmetric(vertical: isWide ? 60 : 40, horizontal: isWide ? 40 : 20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        border: Border.all(color: theme.dividerColor),
-        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
-          if (theme.brightness == Brightness.light)
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 40,
-              offset: const Offset(0, 10),
-            )
+          BoxShadow(
+            color: theme.shadowColor.withValues(alpha: isDark ? 0.1 : 0.08),
+            blurRadius: 40,
+            offset: const Offset(0, 12),
+          )
         ],
       ),
       child: SectionReveal(
@@ -371,10 +390,16 @@ class _StatsSection extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: stats.map((s) => _StatItem(value: s.$1, labelKey: s.$2, lp: lp)).toList(),
               )
-            : Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 40, runSpacing: 32,
-                children: stats.map((s) => _StatItem(value: s.$1, labelKey: s.$2, lp: lp)).toList(),
+            : Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 40, 
+                  runSpacing: 32,
+                  children: stats.map((s) => ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: 140),
+                    child: _StatItem(value: s.$1, labelKey: s.$2, lp: lp),
+                  )).toList(),
+                ),
               ),
       ),
     );
@@ -394,7 +419,7 @@ class _StatItem extends StatelessWidget {
           colors: [VivumColors.amber, VivumColors.teal],
         ).createShader(bounds),
         child: Text(value, style: GoogleFonts.syne(
-          fontSize: 52, fontWeight: FontWeight.w800, color: Colors.white)),
+          fontSize: 42, fontWeight: FontWeight.w800, color: Colors.white)),
       ),
       const SizedBox(height: 8),
       Text(lp.t(labelKey), style: theme.textTheme.bodyMedium),
@@ -407,155 +432,83 @@ class _PortfolioTeaser extends StatelessWidget {
   final AppProvider lp;
   const _PortfolioTeaser({required this.lp});
 
-  static const _projects = [
-    ('Real Estate Brand & Website', 'Real Estate • UAE', [VivumColors.teal, Color(0xFF006B7A)]),
-    ('AI Customer Service Bot', 'AI & Automation • UAE', [VivumColors.amber, Color(0xFF6B3800)]),
-    ('E-commerce Platform', 'Retail • Saudi Arabia', [Color(0xFF3A3D7A), Color(0xFF2B2D5E)]),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final isWide = MediaQuery.of(context).size.width > 900;
     final theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
+      decoration: BoxDecoration(
+        color: lp.isDark ? Colors.transparent : VivumColors.lightBGAlt,
+      ),
       child: Column(
         children: [
-          SectionReveal(child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const _SectionLabel('SELECTED WORK'),
-                const SizedBox(height: 12),
-                Text(lp.t('portfolio.title'),
-                  style: theme.textTheme.displaySmall),
-              ]),
-              TextButton.icon(
-                onPressed: () => context.go('/portfolio'),
-                icon: const Icon(Icons.arrow_forward_rounded, color: VivumColors.teal),
-                label: Text(lp.t('portfolio.view'),
-                  style: GoogleFonts.inter(color: VivumColors.teal, fontWeight: FontWeight.w600)),
-              ),
-            ],
-          )),
+          SectionReveal(
+            child: isWide
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _PortfolioHeader(lp: lp, theme: theme),
+                      _ViewAllButton(lp: lp),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      _PortfolioHeader(lp: lp, theme: theme, centered: true),
+                      const SizedBox(height: 16),
+                      _ViewAllButton(lp: lp),
+                    ],
+                  ),
+          ),
           const SizedBox(height: 48),
-          isWide
-              ? Row(
-                  children: _projects.asMap().entries.map((e) => Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(right: e.key < _projects.length - 1 ? 20 : 0),
-                      child: SectionReveal(
-                        delay: Duration(milliseconds: e.key * 150),
-                        child: _ProjectCard(title: e.value.$1, subtitle: e.value.$2, colors: e.value.$3, lp: lp),
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: DatabaseService.getProjectsStream(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final data = snapshot.data ?? [];
+              final projects = data.take(3).map((m) => Project.fromMap(m)).toList();
+
+              if (projects.isEmpty) {
+                return const Center(child: Text('No projects found.'));
+              }
+
+              return isWide
+                  ? IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: projects.asMap().entries.map((e) => Expanded(
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.only(
+                              end: e.key < projects.length - 1 ? 20 : 0,
+                            ),
+                            child: SectionReveal(
+                              delay: Duration(milliseconds: e.key * 150),
+                              child: ProjectCard(
+                                project: e.value,
+                                viewLabel: lp.t('portfolio.view'),
+                              ),
+                            ),
+                          ),
+                        )).toList(),
                       ),
-                    ),
-                  )).toList(),
-                )
-              : Column(
-                  children: _projects.map((p) => Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: _ProjectCard(title: p.$1, subtitle: p.$2, colors: p.$3, lp: lp),
-                  )).toList(),
-                ),
+                    )
+                  : Column(
+                      children: projects.map((p) => Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: ProjectCard(
+                          project: p,
+                          viewLabel: lp.t('portfolio.view'),
+                        ),
+                      )).toList(),
+                    );
+            },
+          ),
         ],
       ),
     );
   }
-}
-
-class _ProjectCard extends StatefulWidget {
-  final String title, subtitle;
-  final List<Color> colors;
-  final AppProvider lp;
-  const _ProjectCard({required this.title, required this.subtitle, required this.colors, required this.lp});
-  @override
-  State<_ProjectCard> createState() => _ProjectCardState();
-}
-
-class _ProjectCardState extends State<_ProjectCard> {
-  bool _hovered = false;
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: () => context.go('/portfolio'),
-        child: AnimatedContainer(
-          duration: 300.ms,
-          height: 280,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft, end: Alignment.bottomRight,
-              colors: widget.colors,
-            ),
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: _hovered
-                ? [BoxShadow(color: widget.colors[0].withValues(alpha: 0.3), blurRadius: 30)]
-                : [],
-          ),
-          child: Stack(children: [
-            // Grid pattern overlay
-            Positioned.fill(child: CustomPaint(painter: _GridPainter())),
-            // Hover overlay
-            AnimatedContainer(
-              duration: 300.ms,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: _hovered ? 0.5 : 0.2),
-                borderRadius: BorderRadius.circular(24),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(widget.subtitle,
-                    style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.7),
-                        letterSpacing: 1)),
-                  const SizedBox(height: 8),
-                  Text(widget.title,
-                    style: GoogleFonts.syne(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
-                  AnimatedOpacity(
-                    opacity: _hovered ? 1.0 : 0.0,
-                    duration: 200.ms,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Row(children: [
-                        Text(widget.lp.t('portfolio.view'),
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600,
-                              color: Colors.white)),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white),
-                      ]),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-class _GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
-      ..strokeWidth = 0.5;
-    for (double x = 0; x < size.width; x += 30) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y < size.height; y += 30) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-  @override
-  bool shouldRepaint(_) => false;
 }
 
 // ─── WHY VIVUM ──────────────────────────────────────────────────────────────
@@ -570,34 +523,39 @@ class _WhyVivum extends StatelessWidget {
     final pillars = [
       (Icons.palette_outlined, 'about.creative', 'about.creative.desc', VivumColors.teal),
       (Icons.code_rounded, 'about.tech', 'about.tech.desc', VivumColors.amber),
-      (Icons.psychology_outlined, 'pkg.ai.title', 'pkg.ai.desc', VivumColors.teal),
+      (Icons.psychology_outlined, 'about.ai', 'about.ai.desc', VivumColors.teal),
     ];
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor.withValues(alpha: 0.5),
+        color: lp.isDark ? theme.scaffoldBackgroundColor.withValues(alpha: 0.5) : VivumColors.lightBG,
       ),
       child: Column(
         children: [
           SectionReveal(child: Column(children: [
-            const _SectionLabel('WHY VIVUM'),
+            _SectionLabel(lp.t('pillars.label')),
             const SizedBox(height: 12),
-            Text('Our Three Pillars',
+            Text(lp.t('pillars.title'),
               style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
           ])),
           const SizedBox(height: 64),
           isWide
-              ? Row(
-                  children: pillars.asMap().entries.map((e) => Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(right: e.key < pillars.length - 1 ? 24 : 0),
-                      child: SectionReveal(
-                        delay: Duration(milliseconds: e.key * 150),
-                        child: _PillarCard(icon: e.value.$1, titleKey: e.value.$2,
-                            descKey: e.value.$3, accent: e.value.$4, lp: lp),
+              ? IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: pillars.asMap().entries.map((e) => Expanded(
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.only(
+                          end: e.key < pillars.length - 1 ? 24 : 0,
+                        ),
+                        child: SectionReveal(
+                          delay: Duration(milliseconds: e.key * 150),
+                          child: _PillarCard(icon: e.value.$1, titleKey: e.value.$2,
+                              descKey: e.value.$3, accent: e.value.$4, lp: lp),
+                        ),
                       ),
-                    ),
-                  )).toList(),
+                    )).toList(),
+                  ),
                 )
               : Column(
                   children: pillars.map((p) => Padding(
@@ -621,12 +579,20 @@ class _PillarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        border: Border.all(color: theme.dividerColor),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          )
+        ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
@@ -661,47 +627,87 @@ class _CtaBanner extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      margin: EdgeInsets.fromLTRB(isWide ? 80 : 24, 0, isWide ? 80 : 24, 80),
-      padding: EdgeInsets.symmetric(horizontal: isWide ? 60 : 24, vertical: isWide ? 70 : 40),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: isDark 
-              ? [const Color(0xFF0E2A40), const Color(0xFF0A1F35), const Color(0xFF0D1535)]
-              : [const Color(0xFFF1F5F9), const Color(0xFFE2E8F0), const Color(0xFFF1F5F9)],
-        ),
-        border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-              color: VivumColors.teal.withValues(alpha: isDark ? 0.05 : 0.1), 
-              blurRadius: 60, 
-              spreadRadius: 10),
-        ],
-      ),
-      child: SectionReveal(
-        child: Column(children: [
-          Text(lp.isAr ? 'جاهز لتحويل عملك؟' : 'Ready to Transform Your Business?',
-            style: theme.textTheme.headlineLarge?.copyWith(
-              fontSize: isWide ? 42 : 28, 
-              color: theme.colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          Text(lp.isAr 
-              ? 'انضم إلى الشركات في الإمارات والسعودية وسوريا التي تثق بـ فيفوم.'
-              : 'Join businesses across UAE, Saudi Arabia, and Syria who trust VIVUM.',
-            style: theme.textTheme.bodyLarge,
-            textAlign: TextAlign.center),
-          const SizedBox(height: 36),
-          VivumButton(
-            label: lp.t('hero.cta2'),
-            onTap: () => context.go('/contact'),
-            variant: ButtonVariant.teal,
-            icon: const Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
+      width: double.infinity,
+      color: lp.isDark ? Colors.transparent : VivumColors.lightBGAlt,
+      padding: EdgeInsets.only(bottom: 80),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+        padding: EdgeInsets.symmetric(horizontal: isWide ? 60 : 24, vertical: isWide ? 70 : 40),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: isDark 
+                ? [const Color(0xFF0E2A40), const Color(0xFF0A1F35), const Color(0xFF0D1535)]
+                : [VivumColors.teal.withValues(alpha: 0.05), VivumColors.teal.withValues(alpha: 0.1)],
           ),
-        ]),
+          border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.05), 
+                blurRadius: 60, 
+                spreadRadius: 10),
+          ],
+        ),
+        child: SectionReveal(
+          child: Column(children: [
+            Text(lp.isAr ? 'جاهز لتحويل عملك؟' : 'Ready to Transform Your Business?',
+              style: theme.textTheme.headlineLarge?.copyWith(
+                fontSize: isWide ? 42 : 28, 
+                color: isDark ? Colors.white : VivumColors.tealDark,
+              ),
+              textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            Text(lp.isAr 
+                ? 'انضم إلى الشركات في الإمارات والسعودية وسوريا التي تثق بـ فيفوم.'
+                : 'Join businesses across UAE, Saudi Arabia, and Syria who trust VIVUM.',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: isDark ? VivumColors.darkMuted : VivumColors.lightMuted,
+              ),
+              textAlign: TextAlign.center),
+            const SizedBox(height: 36),
+            VivumButton(
+              label: lp.t('hero.cta2'),
+              onTap: () => context.go('/contact'),
+              variant: ButtonVariant.teal,
+              icon: Icon(lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 18, color: Colors.white),
+            ),
+          ]),
+        ),
       ),
+    );
+  }
+}
+
+class _PortfolioHeader extends StatelessWidget {
+  final AppProvider lp;
+  final ThemeData theme;
+  final bool centered;
+  const _PortfolioHeader({required this.lp, required this.theme, this.centered = false});
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        const _SectionLabel('SELECTED WORK'),
+        const SizedBox(height: 12),
+        Text(lp.t('portfolio.title'),
+            style: theme.textTheme.displaySmall, textAlign: centered ? TextAlign.center : TextAlign.start),
+      ],
+    );
+  }
+}
+
+class _ViewAllButton extends StatelessWidget {
+  final AppProvider lp;
+  const _ViewAllButton({required this.lp});
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: () => context.go('/portfolio'),
+      icon: Icon(lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, color: VivumColors.teal),
+      label: Text(lp.t('portfolio.view'),
+          style: GoogleFonts.inter(color: VivumColors.teal, fontWeight: FontWeight.w600)),
     );
   }
 }
@@ -713,15 +719,15 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: VivumColors.teal.withValues(alpha: 0.08),
+        color: VivumColors.teal.withValues(alpha: 0.1),
         border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(text, style: GoogleFonts.inter(
-        fontSize: 11, fontWeight: FontWeight.w600,
-        color: VivumColors.teal, letterSpacing: 2)),
+        fontSize: 12, fontWeight: FontWeight.w700,
+        color: VivumColors.teal, letterSpacing: 1.2)),
     );
   }
 }

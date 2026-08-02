@@ -18,7 +18,8 @@ class VivumColors {
   static const darkWhite = Color(0xFFF8F9FC);
 
   // Light Theme Palette
-  static const lightBG = Color(0xFFF8FAFF);
+  static const lightBG = Color(0xFFF8FAFC); // Very light grey-blue
+  static const lightBGAlt = Color(0xFFF1F5F9); // Slightly darker for alternating
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightCard = Color(0xFFFFFFFF);
   static const lightBorder = Color(0xFFE2E8F0);
@@ -34,7 +35,7 @@ class VivumColors {
       : const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8FAFF), Color(0xFFE2E8FF), Color(0xFFF8FAFF)],
+          colors: [Color(0xFFF1F5F9), Color(0xFFE2E8F0), Color(0xFFF1F5F9)],
         );
 
   static const LinearGradient tealGradient = LinearGradient(

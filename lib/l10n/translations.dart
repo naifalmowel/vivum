@@ -125,6 +125,8 @@ class AppProvider extends InheritedWidget {
     'about.ai': 'AI-Powered Innovation',
     'about.ai.desc': 'Intelligent automation and AI solutions that give your business a competitive edge.',
     'about.markets': 'Our Markets',
+    'pillars.title': 'Our Three Pillars',
+    'pillars.label': 'WHY VIVUM',
 
     // Contact
     'contact.title': 'Let\'s Build Something Great',
@@ -230,6 +232,8 @@ class AppProvider extends InheritedWidget {
     'about.ai': 'ابتكار مدعوم بالذكاء الاصطناعي',
     'about.ai.desc': 'أتمتة ذكية وحلول AI تمنح عملك ميزة تنافسية.',
     'about.markets': 'أسواقنا',
+    'pillars.title': 'ركائزنا الثلاث',
+    'pillars.label': 'لماذا فيفوم',
 
     // Contact
     'contact.title': 'لنبني شيئاً عظيماً معاً',
