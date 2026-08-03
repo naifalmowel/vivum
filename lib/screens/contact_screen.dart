@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/footer.dart';
@@ -452,7 +451,7 @@ class _Label extends StatelessWidget {
         border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text, style: GoogleFonts.inter(
+      child: Text(text, style: const TextStyle(
         fontSize: 11, fontWeight: FontWeight.w600, color: VivumColors.teal, letterSpacing: 2)),
     );
   }

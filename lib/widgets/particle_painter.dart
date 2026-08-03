@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 
@@ -83,71 +84,135 @@ class _GlowSphere extends StatelessWidget {
   }
 }
 
-/// A hardware-accelerated version of the Hero Orbit.
-/// Uses standard Flutter animation controllers and rotations instead of CustomPainter math.
-class HeroOrbit extends StatefulWidget {
+/// The permanent Hero branding element: Glassmorphic V
+class HeroOrbit extends StatelessWidget {
   const HeroOrbit({super.key});
 
   @override
-  State<HeroOrbit> createState() => _HeroOrbitState();
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.maxWidth;
+        // Reduced ratios for a more compact and balanced look
+        final barWidth = size * 0.07; 
+        final barHeight = size * 0.58; 
+
+        return Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Background soft glow - Slightly more visible for contrast
+              _GlowDot(
+                color: VivumColors.teal, 
+                size: size * 0.25, 
+                glowSize: size * 0.7, 
+                opacity: isDark ? 0.12 : 0.15
+              ),
+              
+              // Outer decorative ring
+              _OrbitRing(
+                size: 0.75, 
+                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.15), 
+                isDashed: true
+              ),
+
+              // The V shape components
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Left bar
+                  Transform.rotate(
+                    angle: -0.42, // Slightly tighter angle
+                    child: _GlassBar(
+                      width: barWidth, 
+                      height: barHeight, 
+                      color: VivumColors.teal, 
+                      delay: 0.ms,
+                      isDark: isDark,
+                    ),
+                  ),
+                  // Right bar
+                  Transform.rotate(
+                    angle: 0.42,
+                    child: _GlassBar(
+                      width: barWidth, 
+                      height: barHeight, 
+                      color: VivumColors.amber, 
+                      delay: 400.ms,
+                      isDark: isDark,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
-class _HeroOrbitState extends State<HeroOrbit> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class _GlassBar extends StatelessWidget {
+  final double width;
+  final double height;
+  final Color color;
+  final Duration delay;
+  final bool isDark;
+  const _GlassBar({required this.width, required this.height, required this.color, required this.delay, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppProvider.of(context).isDark;
-    final ringColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05);
-
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Static Rings
-            _OrbitRing(size: 0.85, color: ringColor, isDashed: true),
-            _OrbitRing(size: 0.6, color: ringColor, isDashed: true),
-            _OrbitRing(size: 0.35, color: VivumColors.teal.withValues(alpha: 0.1), isDashed: false),
-            
-            // Orbiting Dot 1 (Teal)
-            RotationTransition(
-              turns: _controller,
-              child: _OrbitingObject(
-                distance: 0.85,
-                child: _GlowDot(color: VivumColors.teal, size: 12),
-              ),
-            ),
-            
-            // Orbiting Dot 2 (Amber - opposite direction)
-            RotationTransition(
-              turns: ReverseAnimation(_controller),
-              child: _OrbitingObject(
-                distance: 0.6,
-                child: _GlowDot(color: VivumColors.amber, size: 8),
-              ),
-            ),
-            
-            // Center Core
-            _GlowDot(color: VivumColors.teal, size: 24, glowSize: 60, opacity: 0.4),
+    return Container(
+      width: width, 
+      height: height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter, end: Alignment.bottomCenter,
+          colors: [
+            // Significantly higher opacity for better visibility, especially in Light Mode
+            color.withValues(alpha: isDark ? 0.6 : 0.8),
+            color.withValues(alpha: isDark ? 0.1 : 0.25),
           ],
         ),
+        borderRadius: BorderRadius.circular(width / 2),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: isDark ? 0.2 : 0.35), 
+            blurRadius: width * 2, 
+            spreadRadius: 0
+          )
+        ],
+      ),
+    ).animate(onPlay: (c) => c.repeat(reverse: true))
+     .scaleY(begin: 0.95, end: 1.05, duration: 2.seconds, delay: delay, curve: Curves.easeInOut)
+     .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: isDark ? 0.2 : 0.35));
+  }
+}
+
+class _GlowDot extends StatelessWidget {
+  final Color color;
+  final double size;
+  final double glowSize;
+  final double opacity;
+  const _GlowDot({required this.color, required this.size, this.glowSize = 20, this.opacity = 1.0});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: opacity),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.5),
+            blurRadius: glowSize,
+            spreadRadius: 2,
+          ),
+        ],
       ),
     );
   }
@@ -169,7 +234,7 @@ class _OrbitRing extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: isDashed 
-            ? Border.all(color: Colors.transparent) // Dashed border is complex, keep it simple for perf
+            ? Border.all(color: Colors.transparent)
             : Border.all(color: color, width: 1),
         ),
         child: isDashed ? CustomPaint(painter: _DashedCirclePainter(color: color)) : null,
@@ -207,57 +272,6 @@ class _DashedCirclePainter extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
-class _OrbitingObject extends StatelessWidget {
-  final double distance;
-  final Widget child;
-  const _OrbitingObject({required this.distance, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: constraints.maxWidth * distance,
-            child: Center(child: child),
-          ),
-        ],
-      );
-    });
-  }
-}
-
-class _GlowDot extends StatelessWidget {
-  final Color color;
-  final double size;
-  final double glowSize;
-  final double opacity;
-  const _GlowDot({required this.color, required this.size, this.glowSize = 20, this.opacity = 1.0});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color.withValues(alpha: opacity),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.5),
-            blurRadius: glowSize,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Keeping names compatible with old code but with optimized logic
 class ParticleBackground extends StatelessWidget {
   const ParticleBackground({super.key});
   @override
@@ -266,6 +280,3 @@ class ParticleBackground extends StatelessWidget {
     return VivumBackground(isAr: lp.isAr, isDark: lp.isDark);
   }
 }
-
-// Added alias for compatibility
-typedef VivumBackgroundWidget = VivumBackground;

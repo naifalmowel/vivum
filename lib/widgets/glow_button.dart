@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 
 enum ButtonVariant { amber, teal, outline }
@@ -52,16 +51,18 @@ class _VivumButtonState extends State<VivumButton> {
             duration: 200.ms,
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
             decoration: BoxDecoration(
-              color: isOutline ? Colors.transparent : (_hovered ? color.withValues(alpha: 0.85) : color),
+              color: isOutline 
+                  ? (_hovered ? VivumColors.teal.withValues(alpha: 0.1) : Colors.transparent) 
+                  : (_hovered ? color.withValues(alpha: 0.85) : color),
               border: isOutline
                   ? Border.all(
-                      color: _hovered ? theme.colorScheme.onSurface : theme.dividerColor, 
+                      color: _hovered ? VivumColors.teal : theme.dividerColor, 
                       width: 1.5)
                   : Border.all(color: Colors.transparent),
               borderRadius: BorderRadius.circular(12),
-              boxShadow: !isOutline && _hovered
+              boxShadow: (isTeal || isAmber || (isOutline && _hovered)) && _hovered
                   ? [BoxShadow(
-                      color: shadowColor.withValues(alpha: 0.35),
+                      color: (isOutline ? VivumColors.teal : shadowColor).withValues(alpha: 0.35),
                       blurRadius: 20,
                       spreadRadius: 0,
                       offset: const Offset(0, 4),
@@ -73,12 +74,12 @@ class _VivumButtonState extends State<VivumButton> {
               children: [
                 Text(
                   widget.label,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: isOutline 
-                        ? theme.colorScheme.onSurface 
-                        : Colors.white, // Text on primary/secondary usually white in this design
+                        ? ( _hovered ? VivumColors.teal : theme.colorScheme.onSurface)
+                        : Colors.white, 
                   ),
                 ),
                 if (widget.icon != null) ...[

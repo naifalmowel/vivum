@@ -1,14 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import 'navbar.dart';
-import 'footer.dart';
+import 'navbar.dart';
 
-class ScaffoldShell extends StatelessWidget {
+class ScaffoldShell extends StatefulWidget {
   final Widget child;
   const ScaffoldShell({super.key, required this.child});
+
+  @override
+  State<ScaffoldShell> createState() => _ScaffoldShellState();
+}
+
+class _ScaffoldShellState extends State<ScaffoldShell> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showBackToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!mounted) return;
+    if (_scrollController.offset > 400 && !_showBackToTop) {
+      setState(() => _showBackToTop = true);
+    } else if (_scrollController.offset <= 400 && _showBackToTop) {
+      setState(() => _showBackToTop = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +51,41 @@ class ScaffoldShell extends StatelessWidget {
         children: [
           const VivumNavbar(),
           Expanded(
-            child: SingleChildScrollView(
-              child: child,
+            child: Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: widget.child,
+              ),
             ),
           ),
         ],
+      ),
+      floatingActionButton: AnimatedSlide(
+        offset: _showBackToTop ? Offset.zero : const Offset(0, 2),
+        duration: 400.ms,
+        curve: Curves.easeOutBack,
+        child: AnimatedOpacity(
+          opacity: _showBackToTop ? 1.0 : 0.0,
+          duration: 300.ms,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => _scrollController.animateTo(0, duration: 800.ms, curve: Curves.easeOutCubic),
+              child: Container(
+                width: 50, height: 50,
+                decoration: BoxDecoration(
+                  color: VivumColors.teal,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(color: VivumColors.teal.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 8))
+                  ],
+                ),
+                child: const Icon(Icons.keyboard_arrow_up_rounded, color: Colors.white, size: 30),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -62,9 +121,10 @@ class _MobileDrawer extends StatelessWidget {
                 children: [
                   RichText(
                     text: TextSpan(
-                      style: GoogleFonts.syne(
-                        fontSize: 24, fontWeight: FontWeight.w800,
+                      style: TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.w900,
                         color: theme.colorScheme.onSurface,
+                        fontFamily: 'Cairo',
                       ),
                       children: const [
                         TextSpan(text: 'vi'),
@@ -89,7 +149,7 @@ class _MobileDrawer extends StatelessWidget {
                   return ListTile(
                     title: Text(
                       lp.t(item.$1),
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                         color: isActive ? VivumColors.teal : theme.colorScheme.onSurface,
@@ -117,7 +177,7 @@ class _MobileDrawer extends StatelessWidget {
                       const SizedBox(width: 20),
                       TextButton(
                         onPressed: lp.onToggleLang,
-                        child: Text(lp.t('nav.lang'), style: GoogleFonts.inter(fontSize: 16)),
+                        child: Text(lp.t('nav.lang'), style: const TextStyle(fontSize: 16)),
                       ),
                     ],
                   ),

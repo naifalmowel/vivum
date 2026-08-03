@@ -7,13 +7,13 @@ import 'package:visibility_detector/visibility_detector.dart';
 class SectionReveal extends StatefulWidget {
   final Widget child;
   final Duration delay;
-  final Offset? slideFrom;
+  final bool fillHeight;
 
   const SectionReveal({
     super.key,
     required this.child,
     this.delay = Duration.zero,
-    this.slideFrom,
+    this.fillHeight = false,
   });
 
   @override
@@ -25,43 +25,36 @@ class _SectionRevealState extends State<SectionReveal> {
 
   @override
   Widget build(BuildContext context) {
-    // We use a simpler animation structure for performance.
+    Widget content = AnimatedOpacity(
+      duration: 500.ms, 
+      opacity: _visible ? 1.0 : 0.0,
+      curve: Curves.easeOut,
+      child: widget.child,
+    );
+
+    if (widget.fillHeight) {
+      content = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          // Invisible child to define intrinsic size
+          Opacity(opacity: 0, child: widget.child),
+          // Filling child
+          Positioned.fill(child: content),
+        ],
+      );
+    }
+
     return VisibilityDetector(
-      key: widget.key ?? UniqueKey(),
+      key: widget.key ?? ValueKey(widget.child.hashCode ^ widget.delay.inMilliseconds),
       onVisibilityChanged: (info) {
+        if (!mounted) return;
         if (info.visibleFraction > 0.1 && !_visible) {
-          setState(() => _visible = true);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _visible = true);
+          });
         }
       },
-      child: AnimatedOpacity(
-        duration: 500.ms, // Faster duration
-        opacity: _visible ? 1.0 : 0.0,
-        curve: Curves.easeOut,
-        child: widget.child,
-      ),
-    );
-  }
-}
-
-class StaggerReveal extends StatelessWidget {
-  final List<Widget> children;
-  final Duration staggerDelay;
-
-  const StaggerReveal({
-    super.key,
-    required this.children,
-    this.staggerDelay = const Duration(milliseconds: 50),
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: children.asMap().entries.map((e) {
-        return SectionReveal(
-          delay: staggerDelay * e.key,
-          child: e.value,
-        );
-      }).toList(),
+      child: content,
     );
   }
 }

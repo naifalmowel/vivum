@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 
@@ -88,9 +87,8 @@ class _VivumNavbarState extends State<VivumNavbar> {
                       ),
                       child: Text(
                         app.t('nav.lang'),
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
                           fontSize: 13, fontWeight: FontWeight.w500,
-                          color: theme.textTheme.bodyMedium?.color,
                         ),
                       ),
                     ),
@@ -111,7 +109,7 @@ class _VivumNavbarState extends State<VivumNavbar> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(app.t('nav.lang'),
-                        style: GoogleFonts.inter(fontSize: 13, color: theme.textTheme.bodyMedium?.color)),
+                        style: const TextStyle(fontSize: 13)),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -139,9 +137,10 @@ class _VivumLogoText extends StatelessWidget {
     final theme = Theme.of(context);
     return RichText(
       text: TextSpan(
-        style: GoogleFonts.acme(
-          fontSize: 24, fontWeight: FontWeight.w800,
+        style: TextStyle(
+          fontSize: 24, fontWeight: FontWeight.w900,
           color: theme.colorScheme.onSurface,
+          fontFamily: 'Cairo',
         ),
         children: const [
           TextSpan(text: 'vi'),
@@ -186,20 +185,25 @@ class _NavItemState extends State<_NavItem> {
             children: [
               Text(
                 widget.label,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
                   color: widget.isActive || _hovered ? activeColor : inactiveColor,
                 ),
               ),
-              const SizedBox(height: 3),
               AnimatedContainer(
                 duration: 200.ms,
                 height: 2,
-                width: widget.isActive || _hovered ? 20 : 0,
+                width: widget.isActive || _hovered ? 28 : 0,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [VivumColors.teal, VivumColors.amber]),
+                  gradient: const LinearGradient(
+                    colors: [VivumColors.teal, VivumColors.amber],
+                    stops: [0.3, 1.0],
+                  ),
                   borderRadius: BorderRadius.circular(2),
+                  boxShadow: (widget.isActive || _hovered) 
+                      ? [BoxShadow(color: VivumColors.teal.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 1))]
+                      : [],
                 ),
               ),
             ],
@@ -239,7 +243,7 @@ class _GlowButtonState extends State<_GlowButton> {
           ),
           child: Text(
             widget.label,
-            style: GoogleFonts.inter(
+            style: const TextStyle(
               fontSize: 14, fontWeight: FontWeight.w600,
               color: Colors.white,
             ),

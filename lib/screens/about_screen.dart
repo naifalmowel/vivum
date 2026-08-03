@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/section_reveal.dart';
@@ -50,21 +49,21 @@ class AboutScreen extends StatelessWidget {
               SectionReveal(child: Column(children: [
                 const _Label('OUR PILLARS'),
                 const SizedBox(height: 12),
-                Text('Built on Three Foundations',
+                Text(lp.t('about.foundation'),
                   style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
               ])),
               const SizedBox(height: 60),
               isWide
                   ? Row(children: [
-                      Expanded(child: SectionReveal(delay: 0.ms, child: _PillarCard(
+                      Expanded(child: SectionReveal(delay: 0.ms, fillHeight: true, child: _PillarCard(
                         icon: Icons.palette_outlined, titleKey: 'about.creative',
                         descKey: 'about.creative.desc', accent: VivumColors.teal, lp: lp, number: '01'))),
                       const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 150.ms, child: _PillarCard(
+                      Expanded(child: SectionReveal(delay: 150.ms, fillHeight: true, child: _PillarCard(
                         icon: Icons.code_rounded, titleKey: 'about.tech',
                         descKey: 'about.tech.desc', accent: VivumColors.amber, lp: lp, number: '02'))),
                       const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 300.ms, child: _PillarCard(
+                      Expanded(child: SectionReveal(delay: 300.ms, fillHeight: true, child: _PillarCard(
                         icon: Icons.psychology_outlined, titleKey: 'about.ai',
                         descKey: 'about.ai.desc', accent: VivumColors.teal, lp: lp, number: '03'))),
                     ])
@@ -100,27 +99,27 @@ class AboutScreen extends StatelessWidget {
               const SizedBox(height: 60),
               isWide
                   ? Row(children: [
-                      Expanded(child: SectionReveal(delay: 0.ms, child: _MarketCard(
-                        flag: '🇦🇪', name: 'United Arab Emirates',
-                        desc: 'Dubai, Abu Dhabi, Sharjah & across the Emirates', color: VivumColors.teal))),
+                      Expanded(child: SectionReveal(delay: 0.ms, fillHeight: true, child: _MarketCard(
+                        flag: '🇦🇪', name: lp.t('footer.uae'),
+                        desc: lp.t('about.markets.uae.desc'), color: VivumColors.teal))),
                       const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 150.ms, child: _MarketCard(
-                        flag: '🇸🇦', name: 'Saudi Arabia',
-                        desc: 'Riyadh, Jeddah, NEOM & Vision 2030 projects', color: VivumColors.amber))),
+                      Expanded(child: SectionReveal(delay: 150.ms, fillHeight: true, child: _MarketCard(
+                        flag: '🇸🇦', name: lp.t('footer.ksa'),
+                        desc: lp.t('about.markets.ksa.desc'), color: VivumColors.amber))),
                       const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 300.ms, child: _MarketCard(
-                        flag: '🇸🇾', name: 'Syria',
-                        desc: 'Damascus, Aleppo & the growing digital sector', color: VivumColors.teal))),
+                      Expanded(child: SectionReveal(delay: 300.ms, fillHeight: true, child: _MarketCard(
+                        flag: '🇸🇾', name: lp.t('footer.syria'),
+                        desc: lp.t('about.markets.syria.desc'), color: VivumColors.teal))),
                     ])
                   : Column(children: [
-                      _MarketCard(flag: '🇦🇪', name: 'United Arab Emirates',
-                        desc: 'Dubai, Abu Dhabi, Sharjah & across the Emirates', color: VivumColors.teal),
+                      _MarketCard(flag: '🇦🇪', name: lp.t('footer.uae'),
+                        desc: lp.t('about.markets.uae.desc'), color: VivumColors.teal),
                       const SizedBox(height: 20),
-                      _MarketCard(flag: '🇸🇦', name: 'Saudi Arabia',
-                        desc: 'Riyadh, Jeddah, NEOM & Vision 2030 projects', color: VivumColors.amber),
+                      _MarketCard(flag: '🇸🇦', name: lp.t('footer.ksa'),
+                        desc: lp.t('about.markets.ksa.desc'), color: VivumColors.amber),
                       const SizedBox(height: 20),
-                      _MarketCard(flag: '🇸🇾', name: 'Syria',
-                        desc: 'Damascus, Aleppo & the growing digital sector', color: VivumColors.teal),
+                      _MarketCard(flag: '🇸🇾', name: lp.t('footer.syria'),
+                        desc: lp.t('about.markets.syria.desc'), color: VivumColors.teal),
                     ]),
             ],
           ),
@@ -134,7 +133,7 @@ class AboutScreen extends StatelessWidget {
               SectionReveal(child: Column(children: [
                 const _Label('CORE VALUES'),
                 const SizedBox(height: 12),
-                Text('What Drives Us', style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
+                Text(lp.t('about.values'), style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
               ])),
               const SizedBox(height: 60),
               isWide
@@ -142,20 +141,20 @@ class AboutScreen extends StatelessWidget {
                       crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 24, mainAxisSpacing: 24, childAspectRatio: 2.5,
                       children: [
-                        _ValueCard(icon: Icons.lightbulb_outline, label: 'Innovation', desc: 'We push creative and technical boundaries on every project.', color: VivumColors.amber),
-                        _ValueCard(icon: Icons.verified_outlined, label: 'Quality', desc: 'Premium output is our baseline, not our goal.', color: VivumColors.teal),
-                        _ValueCard(icon: Icons.handshake_outlined, label: 'Partnership', desc: 'We build long-term relationships, not transactions.', color: VivumColors.amber),
-                        _ValueCard(icon: Icons.trending_up_rounded, label: 'Growth', desc: 'Our success is measured by your business results.', color: VivumColors.teal),
+                        _ValueCard(icon: Icons.lightbulb_outline, label: lp.t('about.value.innovation'), desc: lp.t('about.value.innovation.desc'), color: VivumColors.amber),
+                        _ValueCard(icon: Icons.verified_outlined, label: lp.t('about.value.quality'), desc: lp.t('about.value.quality.desc'), color: VivumColors.teal),
+                        _ValueCard(icon: Icons.handshake_outlined, label: lp.t('about.value.partnership'), desc: lp.t('about.value.partnership.desc'), color: VivumColors.amber),
+                        _ValueCard(icon: Icons.trending_up_rounded, label: lp.t('about.value.growth'), desc: lp.t('about.value.growth.desc'), color: VivumColors.teal),
                       ],
                     )
                   : Column(children: [
-                      _ValueCard(icon: Icons.lightbulb_outline, label: 'Innovation', desc: 'We push creative and technical boundaries on every project.', color: VivumColors.amber),
+                      _ValueCard(icon: Icons.lightbulb_outline, label: lp.t('about.value.innovation'), desc: lp.t('about.value.innovation.desc'), color: VivumColors.amber),
                       const SizedBox(height: 16),
-                      _ValueCard(icon: Icons.verified_outlined, label: 'Quality', desc: 'Premium output is our baseline, not our goal.', color: VivumColors.teal),
+                      _ValueCard(icon: Icons.verified_outlined, label: lp.t('about.value.quality'), desc: lp.t('about.value.quality.desc'), color: VivumColors.teal),
                       const SizedBox(height: 16),
-                      _ValueCard(icon: Icons.handshake_outlined, label: 'Partnership', desc: 'We build long-term relationships, not transactions.', color: VivumColors.amber),
+                      _ValueCard(icon: Icons.handshake_outlined, label: lp.t('about.value.partnership'), desc: lp.t('about.value.partnership.desc'), color: VivumColors.amber),
                       const SizedBox(height: 16),
-                      _ValueCard(icon: Icons.trending_up_rounded, label: 'Growth', desc: 'Our success is measured by your business results.', color: VivumColors.teal),
+                      _ValueCard(icon: Icons.trending_up_rounded, label: lp.t('about.value.growth'), desc: lp.t('about.value.growth.desc'), color: VivumColors.teal),
                     ]),
             ],
           ),
@@ -189,7 +188,7 @@ class _PillarCard extends StatelessWidget {
             decoration: BoxDecoration(color: accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14),
               border: Border.all(color: accent.withValues(alpha: 0.2))),
             child: Icon(icon, color: accent, size: 24)),
-          Text(number, style: GoogleFonts.syne(fontSize: 48, fontWeight: FontWeight.w800, color: theme.dividerColor)),
+          Text(number, style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: theme.dividerColor)),
         ]),
         const SizedBox(height: 24),
         Text(lp.t(titleKey), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
@@ -270,7 +269,7 @@ class _Label extends StatelessWidget {
         border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text, style: GoogleFonts.inter(
+      child: Text(text, style: const TextStyle(
         fontSize: 11, fontWeight: FontWeight.w600, color: VivumColors.teal, letterSpacing: 2)),
     );
   }

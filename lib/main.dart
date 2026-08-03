@@ -100,8 +100,7 @@ class _VivumAppState extends State<VivumApp> {
             routerConfig: _router,
             builder: (context, child) {
               return Directionality(
-                // Force LTR direction regardless of language for consistent UI layout
-                textDirection: TextDirection.ltr,
+                textDirection: appProvider.isAr ? TextDirection.rtl : TextDirection.ltr,
                 child: child!,
               );
             },

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class VivumColors {
   // Brand Colors (Constant)
@@ -60,9 +59,8 @@ class VivumColors {
 }
 
 class AppTheme {
-  // "Plus Jakarta Sans" provides a very modern, professional, tech-forward feel
-  // "Manrope" is another excellent alternative.
-  static final String _fontFamily = GoogleFonts.plusJakartaSans().fontFamily!;
+  // Global font family - changed in one place
+  static const String fontFamily = 'Cairo';
 
   static ThemeData get darkTheme => _buildTheme(Brightness.dark);
   static ThemeData get lightTheme => _buildTheme(Brightness.light);
@@ -97,7 +95,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
-      fontFamily: _fontFamily,
+      fontFamily: fontFamily,
       scaffoldBackgroundColor: isDark ? VivumColors.darkBG : VivumColors.lightBG,
       colorScheme: colorScheme,
       dividerColor: colorScheme.outline,
@@ -150,6 +148,24 @@ class AppTheme {
           borderRadius: BorderRadius.circular(24),
           side: BorderSide(color: colorScheme.outline, width: 1),
         ),
+      ),
+      scrollbarTheme: ScrollbarThemeData(
+        thickness: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.hovered) || states.contains(WidgetState.dragged)) {
+            return 8.0;
+          }
+          return 4.0;
+        }),
+        radius: const Radius.circular(10),
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.hovered) || states.contains(WidgetState.dragged)) {
+            return VivumColors.teal;
+          }
+          return VivumColors.teal.withValues(alpha: 0.15);
+        }),
+        trackColor: WidgetStateProperty.all(Colors.transparent),
+        minThumbLength: 60,
+        interactive: true,
       ),
     );
   }

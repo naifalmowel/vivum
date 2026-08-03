@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/section_reveal.dart';
@@ -263,7 +262,7 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(widget.project == null ? 'Add New Project' : 'Edit Project', style: GoogleFonts.syne(fontSize: 24, fontWeight: FontWeight.w800)),
+                Text(widget.project == null ? 'Add New Project' : 'Edit Project', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 24),
                 _buildField(_titleCtrl, 'Title'),
                 _buildField(_industryCtrl, 'Industry'),
@@ -391,7 +390,7 @@ class _TealLabel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
       decoration: BoxDecoration(color: VivumColors.teal.withValues(alpha: 0.08), border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)), borderRadius: BorderRadius.circular(20)),
-      child: Text(text, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: VivumColors.teal, letterSpacing: 2)),
+      child: Text(text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: VivumColors.teal, letterSpacing: 2)),
     );
   }
 }

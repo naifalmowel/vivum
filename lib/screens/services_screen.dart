@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/section_reveal.dart';
@@ -394,7 +393,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
                   Column(
                     children: [
                       Text(widget.cat.number,
-                        style: GoogleFonts.syne(
+                        style: TextStyle(
                           fontSize: 80, fontWeight: FontWeight.w800,
                           color: theme.dividerColor, height: 1,
                         )),
@@ -437,7 +436,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
                 children: [
                   Row(children: [
                     Text(widget.cat.number,
-                      style: GoogleFonts.syne(fontSize: 48, fontWeight: FontWeight.w800, color: theme.dividerColor)),
+                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: theme.dividerColor)),
                     const Spacer(),
                     Icon(widget.cat.icon, color: widget.cat.accent, size: 32),
                   ]),
@@ -494,7 +493,7 @@ class _Label extends StatelessWidget {
         border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text, style: GoogleFonts.inter(
+      child: Text(text, style: const TextStyle(
         fontSize: 11, fontWeight: FontWeight.w600,
         color: VivumColors.teal, letterSpacing: 2)),
     );

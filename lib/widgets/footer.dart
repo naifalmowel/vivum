@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 
@@ -42,7 +41,7 @@ class VivumFooter extends StatelessWidget {
                   ]
                 )),
                 Expanded(child: _LinkColumn(
-                  title: 'Company', 
+                  title: lp.t('footer.company'), 
                   links: [
                     (lp.t('nav.about'), '/about'),
                     (lp.t('nav.portfolio'), '/portfolio'),
@@ -70,7 +69,7 @@ class VivumFooter extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 _LinkColumn(
-                  title: 'Company', 
+                  title: lp.t('footer.company'), 
                   links: [
                     (lp.t('nav.about'), '/about'),
                     (lp.t('nav.portfolio'), '/portfolio'),
@@ -90,11 +89,11 @@ class VivumFooter extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '© 2025 VIVUM Digital Agency. All rights reserved.',
+                  '© 2025 VIVUM Digital Agency. ${lp.t('footer.rights')}',
                   style: theme.textTheme.bodySmall,
                 ),
                 Row(
-                  children: ['UAE', 'Saudi Arabia', 'Syria'].map((m) => Padding(
+                  children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) => Padding(
                     padding: const EdgeInsets.only(left: 24),
                     child: Text(m, style: theme.textTheme.bodySmall),
                   )).toList(),
@@ -111,12 +110,12 @@ class VivumFooter extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'All rights reserved.',
+                  lp.t('footer.rights'),
                   style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 16),
                 Row(
-                  children: ['UAE', 'KSA', 'SY'].map((m) => Padding(
+                  children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) => Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: Text(m, style: theme.textTheme.bodySmall),
                   )).toList(),
@@ -141,7 +140,11 @@ class _BrandColumn extends StatelessWidget {
       children: [
         RichText(
           text: TextSpan(
-            style: GoogleFonts.syne(fontSize: 28, fontWeight: FontWeight.w800, color: theme.colorScheme.onSurface),
+            style: TextStyle(
+              fontSize: 28, fontWeight: FontWeight.w900, 
+              color: theme.colorScheme.onSurface,
+              fontFamily: 'Cairo',
+            ),
             children: const [
               TextSpan(text: 'vi'),
               TextSpan(text: 'v', style: TextStyle(color: VivumColors.teal)),
@@ -245,7 +248,7 @@ class _ContactColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Contact', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        Text(lp.t('nav.contact'), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 24),
         Text('info@vivum.agency', style: theme.textTheme.bodyMedium),
         const SizedBox(height: 12),
@@ -254,7 +257,7 @@ class _ContactColumn extends StatelessWidget {
         Wrap(
           spacing: 16,
           runSpacing: 8,
-          children: ['🇦🇪 UAE', '🇸🇦 KSA', '🇸🇾 SY'].map((m) =>
+          children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) =>
             Text(m, style: theme.textTheme.bodySmall),
           ).toList(),
         ),

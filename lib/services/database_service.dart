@@ -34,18 +34,6 @@ class DatabaseService {
     }
   }
 
-  // Sync initial projects (deprecated in favor of manual management)
-  static Future<void> syncProjects(List<Map<String, dynamic>> projects) async {
-    final batch = _db.batch();
-    for (var project in projects) {
-      final id = project['title'].toString().toLowerCase().replaceAll(' ', '_');
-      project['id'] = id;
-      final docRef = _db.collection('projects').doc(id);
-      batch.set(docRef, project);
-    }
-    await batch.commit();
-  }
-
   // Stream of projects from Firestore
   static Stream<List<Map<String, dynamic>>> getProjectsStream() {
     return _db.collection('projects').snapshots().map((snapshot) {

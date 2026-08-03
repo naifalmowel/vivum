@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/section_reveal.dart';
@@ -154,7 +153,7 @@ class _TimelineCenter extends StatelessWidget {
             ),
             child: Center(
               child: Text(step.number,
-                style: GoogleFonts.syne(fontSize: 16, fontWeight: FontWeight.w800, color: step.accent)),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: step.accent)),
             ),
           ),
           if (!isLast)
@@ -257,7 +256,7 @@ class _NarrowTimeline extends StatelessWidget {
                     border: Border.all(color: step.accent.withValues(alpha: 0.4)),
                   ),
                   child: Center(child: Text(step.number,
-                    style: GoogleFonts.syne(fontSize: 14, fontWeight: FontWeight.w800, color: step.accent))),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: step.accent))),
                 ),
                 if (e.key < steps.length - 1)
                   Container(width: 1.5, height: 60,
@@ -348,7 +347,7 @@ class _Label extends StatelessWidget {
         border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text, style: GoogleFonts.inter(
+      child: Text(text, style: const TextStyle(
         fontSize: 11, fontWeight: FontWeight.w600, color: VivumColors.teal, letterSpacing: 2)),
     );
   }

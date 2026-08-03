@@ -26,9 +26,16 @@ class AppProvider extends InheritedWidget {
   bool get isAr => lang == 'ar';
   bool get isDark => themeMode == ThemeMode.dark;
 
-  String t(String key) => isAr
-      ? (_ar[key] ?? _en[key] ?? key)
-      : (_en[key] ?? key);
+  String t(String key, {Map<String, String>? args}) {
+    String res = (isAr ? _ar[key] : _en[key]) ?? _en[key] ?? key;
+    
+    if (args != null) {
+      args.forEach((k, v) {
+        res = res.replaceAll('{$k}', v);
+      });
+    }
+    return res;
+  }
 
   @override
   bool updateShouldNotify(AppProvider old) => 
@@ -100,6 +107,8 @@ class AppProvider extends InheritedWidget {
     'portfolio.sub': 'Case studies from across the region',
     'portfolio.view': 'View Case Study',
     'portfolio.all': 'All',
+    'portfolio.challenge': 'Challenge',
+    'portfolio.solution': 'Solution',
 
     // Process
     'process.title': 'How We Work',
@@ -118,6 +127,7 @@ class AppProvider extends InheritedWidget {
     // About
     'about.title': 'Who We Are',
     'about.story': 'VIVUM is a regional digital agency helping businesses across UAE, Saudi Arabia, and Syria transform their ideas into powerful digital experiences. We combine creative design, cutting-edge technology, and artificial intelligence to deliver solutions that drive real business growth.',
+    'about.foundation': 'Built on Three Foundations',
     'about.creative': 'Creative Expertise',
     'about.creative.desc': 'Award-worthy design that communicates your brand\'s story with precision and impact.',
     'about.tech': 'Technical Mastery',
@@ -125,8 +135,27 @@ class AppProvider extends InheritedWidget {
     'about.ai': 'AI-Powered Innovation',
     'about.ai.desc': 'Intelligent automation and AI solutions that give your business a competitive edge.',
     'about.markets': 'Our Markets',
+    'about.markets.uae.desc': 'Dubai, Abu Dhabi, Sharjah & across the Emirates',
+    'about.markets.ksa.desc': 'Riyadh, Jeddah, NEOM & Vision 2030 projects',
+    'about.markets.syria.desc': 'Damascus, Aleppo & the growing digital sector',
+    'about.values': 'What Drives Us',
+    'about.value.innovation': 'Innovation',
+    'about.value.innovation.desc': 'We push creative and technical boundaries on every project.',
+    'about.value.quality': 'Quality',
+    'about.value.quality.desc': 'Premium output is our baseline, not our goal.',
+    'about.value.partnership': 'Partnership',
+    'about.value.partnership.desc': 'We build long-term relationships, not transactions.',
+    'about.value.growth': 'Growth',
+    'about.value.growth.desc': 'Our success is measured by your business results.',
     'pillars.title': 'Our Three Pillars',
     'pillars.label': 'WHY VIVUM',
+    'hero.scroll': 'Scroll to explore',
+    'services.label': 'WHAT WE DO',
+    'portfolio.label': 'SELECTED WORK',
+    'portfolio.empty': 'No projects found.',
+    'portfolio.view_all': 'View Our Work',
+    'cta.title': 'Ready to Transform Your Business?',
+    'cta.sub': 'Join businesses across UAE, Saudi Arabia, and Syria who trust VIVUM.',
 
     // Contact
     'contact.title': 'Let\'s Build Something Great',
@@ -139,6 +168,19 @@ class AppProvider extends InheritedWidget {
     'contact.send': 'Send Message',
     'contact.whatsapp': 'Chat on WhatsApp',
     'contact.coverage': 'We serve clients in',
+
+    // Footer
+    'footer.company': 'Company',
+    'footer.follow': 'Follow Us',
+    'footer.rights': 'All rights reserved.',
+    'footer.uae': 'UAE',
+    'footer.ksa': 'Saudi Arabia',
+    'footer.syria': 'Syria',
+
+    'common.cancel': 'Cancel',
+    'common.delete': 'Delete',
+    'portfolio.delete.title': 'Delete Project?',
+    'portfolio.delete.confirm': 'Are you sure you want to delete "{title}"?',
   };
 
   static const _ar = {
@@ -174,7 +216,7 @@ class AppProvider extends InheritedWidget {
     'services.brand.desc': 'تصميم الشعارات، الهوية البصرية الكاملة، الدليل المرئي، وتصميم وسائل التواصل الاجتماعي.',
     'services.digital.title': 'التجارب الرقمية',
     'services.digital.desc': 'تصميم وتطوير المواقع، تطبيقات الجوال، وحلول التجارة الإلكترونية.',
-    'services.ai.title': 'الذكاء الاصطناعي وأتمتة الأعمال',
+    'services.ai.title': 'أتمتة الأعمال والحلول الذكية',
     'services.ai.desc': 'روبوتات الدردشة، أتمتة واتساب، الحلول الذكية، والتحول الرقمي.',
     'services.it.title': 'حلول تقنية المعلومات',
     'services.it.desc': 'البريد المؤسسي، الخدمات السحابية، الدعم التقني، واستشارات البنية التحتية.',
@@ -184,7 +226,7 @@ class AppProvider extends InheritedWidget {
     'pricing.starting': 'يبدأ من',
     'pricing.website': 'المواقع الإلكترونية',
     'pricing.branding': 'الهوية البصرية',
-    'pricing.ai': 'الذكاء الاصطناعي',
+    'pricing.ai': 'حلول ذكية',
     'pricing.custom': 'عرض سعر مخصص',
     'pricing.aed': 'درهم',
 
@@ -197,16 +239,18 @@ class AppProvider extends InheritedWidget {
     'pkg.premium.title': 'حلول مخصصة للشركات',
     'pkg.premium.price': '15,000+',
     'pkg.premium.desc': 'حلول مخصصة عالية المستوى مع تقنيات متقدمة وأتمتة ودعم كامل.',
-    'pkg.ai.title': 'باقة AI للأعمال',
+    'pkg.ai.title': 'باقة الحلول الذكية للأعمال',
     'pkg.ai.price': '4,000 - 8,000',
     'pkg.ai.monthly': ' + 500 - 1,500/ش',
-    'pkg.ai.desc': 'أتمتة فريدة مدعومة بالذكاء الاصطناعي لتجعل عملك متميزاً عن آلاف المنافسين.',
+    'pkg.ai.desc': 'أتمتة فريدة مدعومة بالتقنيات الذكية لتجعل عملك متميزاً عن آلاف المنافسين.',
 
     // Portfolio
     'portfolio.title': 'أعمالنا',
     'portfolio.sub': 'دراسات حالة من أنحاء المنطقة',
     'portfolio.view': 'عرض دراسة الحالة',
     'portfolio.all': 'الكل',
+    'portfolio.challenge': 'التحدي',
+    'portfolio.solution': 'الحل',
 
     // Process
     'process.title': 'كيف نعمل',
@@ -225,15 +269,35 @@ class AppProvider extends InheritedWidget {
     // About
     'about.title': 'من نحن',
     'about.story': 'فيفوم وكالة رقمية إقليمية تساعد الأعمال في الإمارات والسعودية وسوريا على تحويل أفكارها إلى تجارب رقمية قوية. نجمع التصميم الإبداعي والتكنولوجيا المتقدمة والذكاء الاصطناعي لتقديم حلول تحقق نمواً حقيقياً.',
+    'about.foundation': 'مبنية على ثلاث ركائز أساسية',
     'about.creative': 'الخبرة الإبداعية',
     'about.creative.desc': 'تصميم استثنائي يروي قصة علامتك التجارية بدقة وتأثير.',
     'about.tech': 'التمكن التقني',
     'about.tech.desc': 'قدرات تطوير شاملة من تطبيقات الجوال إلى البنية التحتية السحابية.',
-    'about.ai': 'ابتكار مدعوم بالذكاء الاصطناعي',
-    'about.ai.desc': 'أتمتة ذكية وحلول AI تمنح عملك ميزة تنافسية.',
+    'about.ai': 'ابتكار مدعوم بأحدث التقنيات',
+    'about.ai.desc': 'أتمتة ذكية وحلول تمنح عملك ميزة تنافسية.',
     'about.markets': 'أسواقنا',
+    'about.markets.uae.desc': 'دبي، أبوظبي، الشارقة وكافة أنحاء الإمارات',
+    'about.markets.ksa.desc': 'الرياض، جدة، نيوم ومشاريع رؤية 2030',
+    'about.markets.syria.desc': 'دمشق، حلب وقطاع التكنولوجيا المتنامي',
+    'about.values': 'ما الذي يدفعنا للتميز',
+    'about.value.innovation': 'الابتكار',
+    'about.value.innovation.desc': 'نتخطى الحدود الإبداعية والتقنية في كل مشروع.',
+    'about.value.quality': 'الجودة',
+    'about.value.quality.desc': 'الإنتاج المتميز هو معيارنا الأساسي، وليس مجرد هدف.',
+    'about.value.partnership': 'الشراكة',
+    'about.value.partnership.desc': 'نبني علاقات طويلة الأمد مع شركائنا، لا مجرد صفقات.',
+    'about.value.growth': 'النمو',
+    'about.value.growth.desc': 'نجاحنا يقاس بالنتائج الحقيقية التي يحققها عملك.',
     'pillars.title': 'ركائزنا الثلاث',
     'pillars.label': 'لماذا فيفوم',
+    'hero.scroll': 'مرر للاستكشاف',
+    'services.label': 'ما نقدمه',
+    'portfolio.label': 'أعمال مختارة',
+    'portfolio.empty': 'لا توجد مشاريع حالياً.',
+    'portfolio.view_all': 'شاهد أعمالنا',
+    'cta.title': 'جاهز لتحويل عملك؟',
+    'cta.sub': 'انضم إلى الشركات في الإمارات والسعودية وسوريا التي تثق بـ فيفوم.',
 
     // Contact
     'contact.title': 'لنبني شيئاً عظيماً معاً',
@@ -246,7 +310,18 @@ class AppProvider extends InheritedWidget {
     'contact.send': 'إرسال الرسالة',
     'contact.whatsapp': 'تواصل عبر واتساب',
     'contact.coverage': 'نخدم عملاء في',
+
+    // Footer
+    'footer.company': 'الشركة',
+    'footer.follow': 'تابعنا',
+    'footer.rights': 'جميع الحقوق محفوظة.',
+    'footer.uae': 'الإمارات',
+    'footer.ksa': 'السعودية',
+    'footer.syria': 'سوريا',
+
+    'common.cancel': 'إلغاء',
+    'common.delete': 'حذف',
+    'portfolio.delete.title': 'حذف المشروع؟',
+    'portfolio.delete.confirm': 'هل أنت متأكد من حذف "{title}"؟',
   };
 }
-
-typedef LanguageProvider = AppProvider;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/particle_painter.dart';
@@ -46,12 +45,25 @@ class _HeroSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(minHeight: size.height * 0.92),
+      constraints: BoxConstraints(minHeight: size.height * 0.8), // Slightly reduced minHeight
       decoration: BoxDecoration(gradient: VivumColors.heroGradient(lp.isDark)),
       child: Stack(
+        alignment: Alignment.center,
         children: [
-          // Animated particle background
-          const Positioned.fill(child: RepaintBoundary(child: ParticleBackground())),
+          // Animated mesh background
+          Positioned.fill(child: const RepaintBoundary(child: ParticleBackground())),
+          
+          // Centered Background Logo for mobile only (Purely decorative)
+          if (!isWide)
+            Opacity(
+              opacity: lp.isDark ? 0.35 : 0.45,
+              child: SizedBox(
+                width: size.width * 0.85,
+                height: size.width * 0.85,
+                child: const RepaintBoundary(child: HeroOrbit()),
+              ),
+            ),
+
           // Radial glow
           Positioned(
             top: size.height * 0.05,
@@ -63,37 +75,30 @@ class _HeroSection extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    VivumColors.teal.withValues(alpha: 0.12),
-                    theme.colorScheme.primary.withValues(alpha: 0.06),
+                    VivumColors.teal.withValues(alpha: 0.1),
+                    theme.colorScheme.primary.withValues(alpha: 0.05),
                     Colors.transparent,
                   ],
                 ),
               ),
             ),
           ),
-          // Content
+
+          // Responsive Content
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: isWide ? 80 : 24,
-              vertical: isWide ? 80 : 60,
+              vertical: isWide ? 80 : 40, // Reduced vertical padding on mobile
             ),
             child: isWide
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(flex: 5, child: _HeroText(lp: lp)),
-                      const Expanded(flex: 4, child: RepaintBoundary(child: HeroOrbit())),
+                      const Expanded(flex: 5, child: RepaintBoundary(child: HeroOrbit())),
                     ],
                   )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _HeroText(lp: lp),
-                      const SizedBox(height: 40),
-                      const SizedBox(height: 320, child: RepaintBoundary(child: HeroOrbit())),
-                    ],
-                  ),
+                : _HeroText(lp: lp), // Content is just text; Logo is in the Stack background
           ),
         ],
       ),
@@ -136,7 +141,7 @@ class _HeroText extends StatelessWidget {
                     shape: BoxShape.circle, color: VivumColors.teal)),
             const SizedBox(width: 8),
             Text(lp.t('hero.badge'),
-                style: GoogleFonts.inter(
+                style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: VivumColors.teal)),
@@ -177,33 +182,52 @@ class _HeroText extends StatelessWidget {
               icon: Icon(lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 18, color: Colors.white),
             ),
             VivumButton(
-              label: lp.t('hero.cta1'),
+              label: lp.t('portfolio.view_all'),
               onTap: () => context.go('/portfolio'),
               variant: ButtonVariant.outline,
             ),
           ],
         ),
         const SizedBox(height: 56),
-        // Scroll indicator
+        // Context-aware Scroll Indicator
         Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(lp.isAr ? 'مرر للاستكشاف' : 'Scroll to explore',
-              style: GoogleFonts.inter(
-                  fontSize: 11, 
-                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5), 
-                  letterSpacing: 1.5)),
-            const SizedBox(height: 8),
             Container(
-              width: 1, height: 40,
+              width: 24, height: 38,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                  colors: [VivumColors.teal, VivumColors.teal.withValues(alpha: 0)],
-                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: VivumColors.teal.withValues(alpha: 0.3), width: 1.5),
+              ),
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 6),
+                    width: 3, height: 6,
+                    decoration: BoxDecoration(
+                      color: VivumColors.teal,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ).animate(onPlay: (c) => c.repeat())
+                   .moveY(begin: 0, end: 10, duration: 1500.ms, curve: Curves.easeInOut)
+                   .fadeOut(duration: 1500.ms),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              lp.t('hero.scroll'),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                letterSpacing: 1.0,
               ),
             ),
           ],
-        ),
+        ).animate().fadeIn(delay: 1500.ms),
       ],
     ).animate().fadeIn(duration: 800.ms);
   }
@@ -216,8 +240,11 @@ class _ServicesPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 768;
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width > 1100;
+    final isTablet = width > 650;
     final theme = Theme.of(context);
+    
     final services = [
       (Icons.palette_outlined, 'services.brand.title', 'services.brand.desc', VivumColors.teal),
       (Icons.devices_outlined, 'services.digital.title', 'services.digital.desc', VivumColors.amber),
@@ -226,7 +253,7 @@ class _ServicesPreview extends StatelessWidget {
     ];
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 80 : 24, vertical: 100),
       decoration: BoxDecoration(
         color: lp.isDark ? Colors.transparent : theme.colorScheme.surface,
       ),
@@ -234,7 +261,7 @@ class _ServicesPreview extends StatelessWidget {
         children: [
           SectionReveal(
             child: Column(children: [
-              const _SectionLabel('WHAT WE DO'),
+              _SectionLabel(lp.t('services.label')),
               const SizedBox(height: 12),
               Text(lp.t('services.title'),
                 style: Theme.of(context).textTheme.displaySmall, textAlign: TextAlign.center),
@@ -244,39 +271,80 @@ class _ServicesPreview extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 64),
-          isWide
-              ? IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: services.asMap().entries.map((e) => Expanded(
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.only(
-                          end: e.key < services.length - 1 ? 20 : 0,
-                        ),
-                        child: SectionReveal(
-                          delay: Duration(milliseconds: e.key * 120),
-                          child: GestureDetector(
-                            onTap: () => context.go('/services'),
-                            child: _ServiceCard(
-                              icon: e.value.$1, titleKey: e.value.$2,
-                              descKey: e.value.$3, accent: e.value.$4, lp: lp,
-                            ),
-                          ),
+          if (isDesktop)
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: services.asMap().entries.map((e) => Expanded(
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.only(
+                      end: e.key < services.length - 1 ? 20 : 0,
+                    ),
+                    child: SectionReveal(
+                      delay: Duration(milliseconds: e.key * 120),
+                      fillHeight: true,
+                      child: GestureDetector(
+                        onTap: () => context.go('/services'),
+                        child: _ServiceCard(
+                          icon: e.value.$1, titleKey: e.value.$2,
+                          descKey: e.value.$3, accent: e.value.$4, lp: lp,
                         ),
                       ),
-                    )).toList(),
-                  ),
-                )
-              : Column(
-                  children: services.map((s) => Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: GestureDetector(
-                      onTap: () => context.go('/services'),
-                      child: _ServiceCard(icon: s.$1, titleKey: s.$2, descKey: s.$3, accent: s.$4, lp: lp),
                     ),
-                  )).toList(),
+                  ),
+                )).toList(),
+              ),
+            )
+          else if (isTablet)
+            Column(
+              children: [
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildServiceItem(services[0], 0, lp),
+                      const SizedBox(width: 24),
+                      _buildServiceItem(services[1], 1, lp),
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 24),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildServiceItem(services[2], 2, lp),
+                      const SizedBox(width: 24),
+                      _buildServiceItem(services[3], 3, lp),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          else
+            Column(
+              children: services.map((s) => Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: GestureDetector(
+                  onTap: () => context.go('/services'),
+                  child: _ServiceCard(icon: s.$1, titleKey: s.$2, descKey: s.$3, accent: s.$4, lp: lp),
+                ),
+              )).toList(),
+            ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildServiceItem((IconData, String, String, Color) s, int index, AppProvider lp) {
+    return Expanded(
+      child: SectionReveal(
+        delay: Duration(milliseconds: index * 120),
+        fillHeight: true,
+        child: _ServiceCard(
+          icon: s.$1, titleKey: s.$2,
+          descKey: s.$3, accent: s.$4, lp: lp,
+        ),
       ),
     );
   }
@@ -302,53 +370,62 @@ class _ServiceCardState extends State<_ServiceCard> {
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: 250.ms,
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          color: _hovered 
-              ? theme.colorScheme.surface.withValues(alpha: 0.8) 
-              : theme.colorScheme.surface,
-          border: Border.all(
-            color: _hovered ? widget.accent.withValues(alpha: 0.4) : theme.dividerColor.withValues(alpha: 0.5),
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
+      child: InkWell(
+        onTap: () => context.go('/services'),
+        borderRadius: BorderRadius.circular(20),
+        child: AnimatedScale(
+          scale: _hovered ? 1.02 : 1.0,
+          duration: 200.ms,
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: 250.ms,
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
               color: _hovered 
-                  ? widget.accent.withValues(alpha: isDark ? 0.15 : 0.1)
-                  : theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02), 
-              blurRadius: _hovered ? 32 : 20, 
-              spreadRadius: 0,
-              offset: Offset(0, _hovered ? 12 : 6))
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AnimatedContainer(
-              duration: 250.ms,
-              width: 52, height: 52,
-              decoration: BoxDecoration(
-                color: widget.accent.withValues(alpha: _hovered ? 0.2 : 0.1),
-                borderRadius: BorderRadius.circular(12),
+                  ? theme.colorScheme.surface.withValues(alpha: 0.8) 
+                  : theme.colorScheme.surface,
+              border: Border.all(
+                color: _hovered ? widget.accent.withValues(alpha: 0.4) : theme.dividerColor.withValues(alpha: 0.5),
               ),
-              child: Icon(widget.icon, color: widget.accent, size: 24),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: _hovered 
+                      ? widget.accent.withValues(alpha: isDark ? 0.2 : 0.15)
+                      : theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02), 
+                  blurRadius: _hovered ? 40 : 20, 
+                  spreadRadius: 0,
+                  offset: Offset(0, _hovered ? 15 : 6))
+              ],
             ),
-            const SizedBox(height: 20),
-            Text(widget.lp.t(widget.titleKey),
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 10),
-            Text(widget.lp.t(widget.descKey),
-              style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 20),
-            Row(children: [
-              Text(widget.lp.t('services.learn'),
-                style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: widget.accent)),
-              const SizedBox(width: 6),
-              Icon(widget.lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 14, color: widget.accent),
-            ]),
-          ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AnimatedContainer(
+                  duration: 250.ms,
+                  width: 52, height: 52,
+                  decoration: BoxDecoration(
+                    color: widget.accent.withValues(alpha: _hovered ? 0.2 : 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(widget.icon, color: widget.accent, size: 24),
+                ),
+                const SizedBox(height: 20),
+                Text(widget.lp.t(widget.titleKey),
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 10),
+                Text(widget.lp.t(widget.descKey),
+                  style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 20),
+                Row(children: [
+                  Text(widget.lp.t('services.learn'),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: widget.accent)),
+                  const SizedBox(width: 6),
+                  Icon(widget.lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 14, color: widget.accent),
+                ]),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -418,7 +495,7 @@ class _StatItem extends StatelessWidget {
         shaderCallback: (bounds) => const LinearGradient(
           colors: [VivumColors.amber, VivumColors.teal],
         ).createShader(bounds),
-        child: Text(value, style: GoogleFonts.syne(
+        child: Text(value, style: const TextStyle(
           fontSize: 42, fontWeight: FontWeight.w800, color: Colors.white)),
       ),
       const SizedBox(height: 8),
@@ -465,13 +542,15 @@ class _PortfolioTeaser extends StatelessWidget {
             stream: DatabaseService.getProjectsStream(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return isWide 
+                  ? Row(children: List.generate(3, (i) => const Expanded(child: Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: ShimmerProjectCard()))))
+                  : const Column(children: [ShimmerProjectCard(), SizedBox(height: 20), ShimmerProjectCard()]);
               }
               final data = snapshot.data ?? [];
               final projects = data.take(3).map((m) => Project.fromMap(m)).toList();
 
               if (projects.isEmpty) {
-                return const Center(child: Text('No projects found.'));
+                return Center(child: Text(lp.t('portfolio.empty')));
               }
 
               return isWide
@@ -550,17 +629,26 @@ class _WhyVivum extends StatelessWidget {
                         ),
                         child: SectionReveal(
                           delay: Duration(milliseconds: e.key * 150),
-                          child: _PillarCard(icon: e.value.$1, titleKey: e.value.$2,
-                              descKey: e.value.$3, accent: e.value.$4, lp: lp),
+                          fillHeight: true,
+                          child: _PillarCardContent(
+                            icon: e.value.$1, titleKey: e.value.$2,
+                            descKey: e.value.$3, accent: e.value.$4, lp: lp,
+                          ),
                         ),
                       ),
                     )).toList(),
                   ),
                 )
               : Column(
-                  children: pillars.map((p) => Padding(
+                  children: pillars.asMap().entries.map((e) => Padding(
                     padding: const EdgeInsets.only(bottom: 20),
-                    child: _PillarCard(icon: p.$1, titleKey: p.$2, descKey: p.$3, accent: p.$4, lp: lp),
+                    child: SectionReveal(
+                      delay: Duration(milliseconds: e.key * 150),
+                      child: _PillarCardContent(
+                        icon: e.value.$1, titleKey: e.value.$2,
+                        descKey: e.value.$3, accent: e.value.$4, lp: lp,
+                      ),
+                    ),
                   )).toList(),
                 ),
         ],
@@ -569,48 +657,66 @@ class _WhyVivum extends StatelessWidget {
   }
 }
 
-class _PillarCard extends StatelessWidget {
+class _PillarCardContent extends StatefulWidget {
   final IconData icon;
   final String titleKey, descKey;
   final Color accent;
   final AppProvider lp;
-  const _PillarCard({required this.icon, required this.titleKey, required this.descKey, required this.accent, required this.lp});
+  const _PillarCardContent({required this.icon, required this.titleKey, required this.descKey, required this.accent, required this.lp});
+
+  @override
+  State<_PillarCardContent> createState() => _PillarCardContentState();
+}
+
+class _PillarCardContentState extends State<_PillarCardContent> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          )
-        ],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 56, height: 56,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.02 : 1.0,
+        duration: 200.ms,
+        curve: Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: 250.ms,
+          constraints: const BoxConstraints(minHeight: 260), // Harmonize height on mobile
+          padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accent.withValues(alpha: 0.2)),
+            color: theme.colorScheme.surface,
+            border: Border.all(color: _hovered ? widget.accent.withValues(alpha: 0.5) : theme.dividerColor.withValues(alpha: 0.5)),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: _hovered ? widget.accent.withValues(alpha: 0.15) : theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02),
+                blurRadius: _hovered ? 30 : 20,
+                offset: Offset(0, _hovered ? 12 : 8),
+              )
+            ],
           ),
-          child: Icon(icon, color: accent, size: 26),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 56, height: 56,
+              decoration: BoxDecoration(
+                color: widget.accent.withValues(alpha: _hovered ? 0.2 : 0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: widget.accent.withValues(alpha: 0.2)),
+              ),
+              child: Icon(widget.icon, color: widget.accent, size: 26),
+            ),
+            const SizedBox(height: 24),
+            Text(widget.lp.t(widget.titleKey),
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            Text(widget.lp.t(widget.descKey),
+              style: theme.textTheme.bodyMedium),
+          ]),
         ),
-        const SizedBox(height: 24),
-        Text(lp.t(titleKey),
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-        const SizedBox(height: 12),
-        Text(lp.t(descKey),
-          style: theme.textTheme.bodyMedium),
-      ]),
+      ),
     );
   }
 }
@@ -651,16 +757,14 @@ class _CtaBanner extends StatelessWidget {
         ),
         child: SectionReveal(
           child: Column(children: [
-            Text(lp.isAr ? 'جاهز لتحويل عملك؟' : 'Ready to Transform Your Business?',
+            Text(lp.t('cta.title'),
               style: theme.textTheme.headlineLarge?.copyWith(
                 fontSize: isWide ? 42 : 28, 
                 color: isDark ? Colors.white : VivumColors.tealDark,
               ),
               textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            Text(lp.isAr 
-                ? 'انضم إلى الشركات في الإمارات والسعودية وسوريا التي تثق بـ فيفوم.'
-                : 'Join businesses across UAE, Saudi Arabia, and Syria who trust VIVUM.',
+            Text(lp.t('cta.sub'),
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: isDark ? VivumColors.darkMuted : VivumColors.lightMuted,
               ),
@@ -689,7 +793,7 @@ class _PortfolioHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
-        const _SectionLabel('SELECTED WORK'),
+        _SectionLabel(lp.t('portfolio.label')),
         const SizedBox(height: 12),
         Text(lp.t('portfolio.title'),
             style: theme.textTheme.displaySmall, textAlign: centered ? TextAlign.center : TextAlign.start),
@@ -707,7 +811,7 @@ class _ViewAllButton extends StatelessWidget {
       onPressed: () => context.go('/portfolio'),
       icon: Icon(lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, color: VivumColors.teal),
       label: Text(lp.t('portfolio.view'),
-          style: GoogleFonts.inter(color: VivumColors.teal, fontWeight: FontWeight.w600)),
+          style: const TextStyle(color: VivumColors.teal, fontWeight: FontWeight.w600)),
     );
   }
 }
@@ -725,7 +829,7 @@ class _SectionLabel extends StatelessWidget {
         border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(text, style: GoogleFonts.inter(
+      child: Text(text, style: const TextStyle(
         fontSize: 12, fontWeight: FontWeight.w700,
         color: VivumColors.teal, letterSpacing: 1.2)),
     );
