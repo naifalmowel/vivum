@@ -48,10 +48,10 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.white.withValues(alpha: 0.1) // Use very faint color
       ..strokeWidth = 0.5;
     
-    const step = 40.0;
+    const step = 80.0; // Double the step to draw fewer lines
     for (double x = 0; x < size.width; x += step) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
@@ -85,6 +85,8 @@ class _GlowSphere extends StatelessWidget {
 }
 
 /// The permanent Hero branding element: Glassmorphic V
+/// [PRO TIP]: If you have a professional Lottie animation, you can replace
+/// the Stack below with Lottie.network('your_url') or Lottie.asset('path').
 class HeroOrbit extends StatelessWidget {
   const HeroOrbit({super.key});
 
@@ -95,36 +97,49 @@ class HeroOrbit extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = constraints.maxWidth;
-        // Reduced ratios for a more compact and balanced look
-        final barWidth = size * 0.07; 
-        final barHeight = size * 0.58; 
+        // Adjusted ratios for a more sleek and professional look
+        final barWidth = size * 0.08; 
+        final barHeight = size * 0.6; 
 
         return Center(
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Background soft glow - Slightly more visible for contrast
+              // Background soft glow - Enhanced for tech-agency look
               _GlowDot(
                 color: VivumColors.teal, 
-                size: size * 0.25, 
-                glowSize: size * 0.7, 
-                opacity: isDark ? 0.12 : 0.15
-              ),
+                size: size * 0.3, 
+                glowSize: size * 0.8, 
+                opacity: isDark ? 0.15 : 0.2
+              ).animate(onPlay: (c) => c.repeat(reverse: true))
+               .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2), duration: 4.seconds, curve: Curves.easeInOut),
               
-              // Outer decorative ring
-              _OrbitRing(
-                size: 0.75, 
-                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.15), 
-                isDashed: true
+              // Animated Orbit Rings
+              RepaintBoundary(
+                child: _OrbitRing(
+                  size: 0.85, 
+                  color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.2), 
+                  isDashed: true
+                ).animate(onPlay: (c) => c.repeat())
+                 .rotate(duration: 20.seconds),
               ),
 
-              // The V shape components
+              RepaintBoundary(
+                child: _OrbitRing(
+                  size: 0.65, 
+                  color: VivumColors.amber.withValues(alpha: isDark ? 0.08 : 0.15), 
+                  isDashed: true
+                ).animate(onPlay: (c) => c.repeat())
+                 .rotate(duration: 15.seconds, begin: 1, end: 0),
+              ),
+
+              // The Glassy V shape
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Left bar
+                  // Left bar (Teal)
                   Transform.rotate(
-                    angle: -0.42, // Slightly tighter angle
+                    angle: -0.4, 
                     child: _GlassBar(
                       width: barWidth, 
                       height: barHeight, 
@@ -133,16 +148,33 @@ class HeroOrbit extends StatelessWidget {
                       isDark: isDark,
                     ),
                   ),
-                  // Right bar
+                  // Right bar (Amber)
                   Transform.rotate(
-                    angle: 0.42,
+                    angle: 0.4,
                     child: _GlassBar(
                       width: barWidth, 
                       height: barHeight, 
                       color: VivumColors.amber, 
-                      delay: 400.ms,
+                      delay: 500.ms,
                       isDark: isDark,
                     ),
+                  ),
+                  
+                  // Central Core Glow
+                  RepaintBoundary(
+                    child: Container(
+                      width: barWidth * 1.5,
+                      height: barWidth * 1.5,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: isDark ? 0.8 : 1.0),
+                        boxShadow: [
+                          BoxShadow(color: VivumColors.teal, blurRadius: 20, spreadRadius: 2),
+                          BoxShadow(color: VivumColors.amber, blurRadius: 40, spreadRadius: 0),
+                        ],
+                      ),
+                    ).animate(onPlay: (c) => c.repeat(reverse: true))
+                     .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.1, 1.1), duration: 1.seconds),
                   ),
                 ],
               ),
@@ -168,26 +200,19 @@ class _GlassBar extends StatelessWidget {
       width: width, 
       height: height,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter, end: Alignment.bottomCenter,
-          colors: [
-            // Significantly higher opacity for better visibility, especially in Light Mode
-            color.withValues(alpha: isDark ? 0.6 : 0.8),
-            color.withValues(alpha: isDark ? 0.1 : 0.25),
-          ],
-        ),
+        color: color.withValues(alpha: isDark ? 0.3 : 0.5), // Use solid color instead of gradient
         borderRadius: BorderRadius.circular(width / 2),
         boxShadow: [
           BoxShadow(
-            color: color.withValues(alpha: isDark ? 0.2 : 0.35), 
-            blurRadius: width * 2, 
+            color: color.withValues(alpha: isDark ? 0.1 : 0.2), 
+            blurRadius: width, 
             spreadRadius: 0
           )
         ],
       ),
     ).animate(onPlay: (c) => c.repeat(reverse: true))
-     .scaleY(begin: 0.95, end: 1.05, duration: 2.seconds, delay: delay, curve: Curves.easeInOut)
-     .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: isDark ? 0.2 : 0.35));
+     .scaleY(begin: 0.98, end: 1.02, duration: 2.seconds, delay: delay, curve: Curves.easeInOut);
+     // Removed shimmer as it triggers constant repaints
   }
 }
 

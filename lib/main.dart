@@ -13,28 +13,35 @@ import 'screens/services_screen.dart';
 import 'screens/portfolio_screen.dart';
 import 'screens/process_screen.dart';
 import 'screens/contact_screen.dart';
+import 'screens/project_details_screen.dart';
 import 'widgets/scaffold_shell.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Memory Management for Web/High-res images
+  // Aggressive Limit image cache to 30MB
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 30 * 1024 * 1024;
+  // Limit to 10 images in memory at once
+  PaintingBinding.instance.imageCache.maximumSize = 10;
+
   // Initialize Firebase
   // If you are using web, you might need to pass options:
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Firebase.initializeApp(
-    options: FirebaseOptions(
-        apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
-        authDomain: "vivum-d2907.firebaseapp.com",
-        projectId: "vivum-d2907",
-        storageBucket: "vivum-d2907.firebasestorage.app",
-        messagingSenderId: "899371078453",
-        appId: "1:899371078453:web:f96fb357e3603473f1727c",
-        measurementId: "G-E7C1ZV11L7")
+      options: FirebaseOptions(
+          apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
+          authDomain: "vivum-d2907.firebaseapp.com",
+          projectId: "vivum-d2907",
+          storageBucket: "vivum-d2907.firebasestorage.app",
+          messagingSenderId: "899371078453",
+          appId: "1:899371078453:web:f96fb357e3603473f1727c",
+          measurementId: "G-E7C1ZV11L7")
   );
 
   await Supabase.initialize(
     url: 'https://gosqrnkrebpdqvhazugw.supabase.co',
-    publishableKey: 'sb_publishable_N0iUuNR5DD-yKtgCqcXglg_K2ySU9pj', 
+    publishableKey: 'sb_publishable_N0iUuNR5DD-yKtgCqcXglg_K2ySU9pj',
     debug: false,
   );
 
@@ -52,6 +59,9 @@ final _router = GoRouter(
         GoRoute(path: '/about', builder: (c, s) => const AboutScreen()),
         GoRoute(path: '/services', builder: (c, s) => const ServicesScreen()),
         GoRoute(path: '/portfolio', builder: (c, s) => const PortfolioScreen()),
+        // Handle cases where ID might be missing or someone navigates to /project
+        GoRoute(path: '/project', redirect: (context, state) => '/portfolio'),
+        GoRoute(path: '/project/:id', builder: (c, s) => ProjectDetailsScreen(projectId: s.pathParameters['id']!)),
         GoRoute(path: '/process', builder: (c, s) => const ProcessScreen()),
         GoRoute(path: '/contact', builder: (c, s) => const ContactScreen()),
       ],
@@ -72,8 +82,12 @@ class _VivumAppState extends State<VivumApp> {
   bool _isAdminMode = false;
 
   void _toggleLang() => setState(() => _lang = _lang == 'en' ? 'ar' : 'en');
-  void _toggleTheme() => setState(() => 
-    _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+
+  void _toggleTheme() =>
+      setState(() =>
+      _themeMode =
+      _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+
   void _toggleAdmin() => setState(() => _isAdminMode = !_isAdminMode);
 
   @override
@@ -92,7 +106,11 @@ class _VivumAppState extends State<VivumApp> {
             title: 'VIVUM Digital Agency',
             debugShowCheckedModeBanner: false,
             scrollBehavior: const MaterialScrollBehavior().copyWith(
-              dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.trackpad},
+              dragDevices: {
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.touch,
+                PointerDeviceKind.trackpad
+              },
             ),
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
@@ -100,7 +118,8 @@ class _VivumAppState extends State<VivumApp> {
             routerConfig: _router,
             builder: (context, child) {
               return Directionality(
-                textDirection: appProvider.isAr ? TextDirection.rtl : TextDirection.ltr,
+                // Force LTR for all languages as per user request to keep UI consistent
+                textDirection: TextDirection.ltr,
                 child: child!,
               );
             },

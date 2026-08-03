@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -131,10 +133,20 @@ class _ProjectCardState extends State<ProjectCard> {
     final p = widget.project;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) {
+        if (mounted) setState(() => _hovered = true);
+      },
+      onExit: (_) {
+        if (mounted) setState(() => _hovered = false);
+      },
       child: GestureDetector(
-        onTap: () => context.go('/portfolio'),
+        onTap: () {
+          final cleanId = p.id.trim();
+          if (cleanId.isNotEmpty) {
+            // Wrap navigation to avoid MouseTracker assertion issues during build/update
+            Future.microtask(() => context.go('/project/$cleanId'));
+          }
+        },
         child: AnimatedScale(
           scale: _hovered ? 1.02 : 1.0,
           duration: 200.ms,
@@ -155,217 +167,236 @@ class _ProjectCardState extends State<ProjectCard> {
                           blurRadius: 40,
                           offset: const Offset(0, 15))
                     ]
-                  : [],
+                  : [
+                      BoxShadow(
+                          color: theme.shadowColor.withValues(alpha: 0.08),
+                          blurRadius: 20,
+                          offset: const Offset(0, 5))
+                    ],
             ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 220,
-                  child: Stack(
-                    children: [
-                      if (p.imageUrls.isEmpty)
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 220,
+                    child: Stack(
+                      children: [
+                        if (p.imageUrls.isEmpty)
                         Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: p.colors)))
-                      else
-                        PageView.builder(
-                          controller: _pageController,
-                          itemCount: p.imageUrls.length,
-                          onPageChanged: (idx) =>
-                              setState(() => _currentImageIndex = idx),
-                          itemBuilder: (context, idx) => Image.network(
-                              p.imageUrls[idx],
-                              fit: BoxFit.cover),
-                        ),
-                      if (p.imageUrls.length > 1 && _hovered) ...[
-                        Positioned(
-                          left: 8,
-                          top: 0,
-                          bottom: 0,
-                          child: Center(
-                            child: IconButton.filled(
-                              onPressed: () => _pageController.previousPage(
-                                  duration: 300.ms, curve: Curves.easeInOut),
-                              icon: const Icon(Icons.chevron_left_rounded),
-                              style: IconButton.styleFrom(
-                                  backgroundColor: Colors.black26),
-                            ),
+                                gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: p.colors.length >= 2
+                                        ? p.colors
+                                        : [
+                                            VivumColors.teal,
+                                            VivumColors.amber
+                                          ])))
+                        else
+                          PageView.builder(
+                            controller: _pageController,
+                            itemCount: p.imageUrls.length,
+                            onPageChanged: (idx) =>
+                                setState(() => _currentImageIndex = idx),
+                            itemBuilder: (context, idx) => Image.network(
+                                p.imageUrls[idx],
+                                fit: BoxFit.cover,
+                                // Memory optimization: cards don't need full resolution
+                                cacheWidth: 600,
+                              ),
                           ),
-                        ),
-                        Positioned(
-                          right: 8,
-                          top: 0,
-                          bottom: 0,
-                          child: Center(
-                            child: IconButton.filled(
-                              onPressed: () => _pageController.nextPage(
-                                  duration: 300.ms, curve: Curves.easeInOut),
-                              icon: const Icon(Icons.chevron_right_rounded),
-                              style: IconButton.styleFrom(
-                                  backgroundColor: Colors.black26),
-                            ),
-                          ),
-                        ),
-                      ],
-                      Positioned.fill(
-                        child: IgnorePointer(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black.withValues(alpha: 0.7)
-                                ],
+                        if (p.imageUrls.length > 1 && _hovered) ...[
+                          Positioned(
+                            left: 8,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: IconButton.filled(
+                                onPressed: () => _pageController.previousPage(
+                                    duration: 300.ms, curve: Curves.easeInOut),
+                                icon: const Icon(Icons.chevron_left_rounded),
+                                style: IconButton.styleFrom(
+                                    backgroundColor: Colors.black26),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      if (p.imageUrls.length > 1)
-                        Positioned(
-                          bottom: 12,
-                          right: 12,
-                          child: Row(
-                            children: List.generate(
-                              p.imageUrls.length,
-                              (index) => Container(
-                                width: 6,
-                                height: 6,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 2),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: _currentImageIndex == index
-                                      ? p.accentColor
-                                      : Colors.white.withValues(alpha: 0.5),
+                          Positioned(
+                            right: 8,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: IconButton.filled(
+                                onPressed: () => _pageController.nextPage(
+                                    duration: 300.ms, curve: Curves.easeInOut),
+                                icon: const Icon(Icons.chevron_right_rounded),
+                                style: IconButton.styleFrom(
+                                    backgroundColor: Colors.black26),
+                              ),
+                            ),
+                          ),
+                        ],
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withValues(alpha: 0.7)
+                                  ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      Positioned.fill(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: p.accentColor.withValues(alpha: 0.2),
-                                  border: Border.all(
-                                      color:
-                                          p.accentColor.withValues(alpha: 0.4)),
-                                  borderRadius: BorderRadius.circular(6),
+                        if (p.imageUrls.length > 1)
+                          Positioned(
+                            bottom: 12,
+                            right: 12,
+                            child: Row(
+                              children: List.generate(
+                                p.imageUrls.length,
+                                (index) => Container(
+                                  width: 6,
+                                  height: 6,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 2),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _currentImageIndex == index
+                                        ? p.accentColor
+                                        : Colors.white.withValues(alpha: 0.5),
+                                  ),
                                 ),
-                                child: Text('${p.industry} • ${p.location}',
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        color: p.accentColor,
-                                        fontWeight: FontWeight.w600)),
                               ),
-                              const SizedBox(height: 8),
-                              Text(p.title,
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white)),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      if (widget.isAdminMode)
-                        Positioned(
-                          top: 12,
-                          right: 12,
-                          child: Row(
-                            children: [
-                              IconButton.filled(
-                                onPressed: widget.onEdit,
-                                icon: const Icon(Icons.edit_rounded, size: 18),
-                                style: IconButton.styleFrom(
-                                    backgroundColor: VivumColors.amber),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton.filled(
-                                onPressed: _delete,
-                                icon: const Icon(Icons.delete_outline_rounded,
-                                    size: 18),
-                                style: IconButton.styleFrom(
-                                    backgroundColor: Colors.redAccent),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _InfoRow(
-                          label: lp.t('portfolio.challenge'),
-                          value: p.challenge,
-                          color: theme.textTheme.bodyMedium?.color),
-                      const SizedBox(height: 10),
-                      _InfoRow(
-                          label: lp.t('portfolio.solution'),
-                          value: p.solution,
-                          color: theme.colorScheme.onSurface),
-                      const SizedBox(height: 16),
-                      Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: p.tech
-                              .map((t) => Container(
+                        Positioned.fill(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                      color: theme.dividerColor,
-                                      borderRadius: BorderRadius.circular(6)),
-                                  child: Text(t,
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(fontSize: 11))))
-                              .toList()),
-                      const SizedBox(height: 16),
-                      Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                              color: p.accentColor.withValues(alpha: 0.08),
-                              border: Border.all(
-                                  color: p.accentColor.withValues(alpha: 0.2)),
-                              borderRadius: BorderRadius.circular(8)),
-                          child: Row(children: [
-                            Icon(Icons.trending_up_rounded,
-                                size: 14, color: p.accentColor),
-                            const SizedBox(width: 8),
-                            Flexible(
-                                child: Text(p.result,
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        color: p.accentColor,
-                                        fontWeight: FontWeight.w600)))
-                          ]))
-                    ],
+                                    color: p.accentColor.withValues(alpha: 0.2),
+                                    border: Border.all(
+                                        color: p.accentColor
+                                            .withValues(alpha: 0.4)),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text('${p.industry} • ${p.location}',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: p.accentColor,
+                                          fontWeight: FontWeight.w600)),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(p.title,
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (widget.isAdminMode)
+                          Positioned(
+                            top: 12,
+                            right: 12,
+                            child: Row(
+                              children: [
+                                IconButton.filled(
+                                  onPressed: widget.onEdit,
+                                  icon:
+                                      const Icon(Icons.edit_rounded, size: 18),
+                                  style: IconButton.styleFrom(
+                                      backgroundColor: VivumColors.amber),
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton.filled(
+                                  onPressed: _delete,
+                                  icon: const Icon(Icons.delete_outline_rounded,
+                                      size: 18),
+                                  style: IconButton.styleFrom(
+                                      backgroundColor: Colors.redAccent),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _InfoRow(
+                            label: lp.t('portfolio.challenge'),
+                            value: p.challenge,
+                            color: theme.textTheme.bodyMedium?.color),
+                        const SizedBox(height: 10),
+                        _InfoRow(
+                            label: lp.t('portfolio.solution'),
+                            value: p.solution,
+                            color: theme.colorScheme.onSurface),
+                        const SizedBox(height: 16),
+                        Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: p.tech
+                                .map((t) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                        color: theme.dividerColor,
+                                        borderRadius: BorderRadius.circular(6)),
+                                    child: Text(t,
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(fontSize: 11))))
+                                .toList()),
+                        const SizedBox(height: 16),
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                                color: p.accentColor.withValues(alpha: 0.08),
+                                border: Border.all(
+                                    color:
+                                        p.accentColor.withValues(alpha: 0.2)),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Row(children: [
+                              Icon(Icons.trending_up_rounded,
+                                  size: 14, color: p.accentColor),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                  child: Text(p.result,
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: p.accentColor,
+                                          fontWeight: FontWeight.w600)))
+                            ]))
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 }
 

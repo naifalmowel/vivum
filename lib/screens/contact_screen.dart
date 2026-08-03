@@ -42,67 +42,94 @@ class _ContactScreenState extends State<ContactScreen> {
     final isWide = MediaQuery.of(context).size.width > 900;
     final theme = Theme.of(context);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Hero
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
-          decoration: BoxDecoration(
-            gradient: VivumColors.heroGradient(lp.isDark),
-          ),
+    return CustomScrollView(
+      primary: true,
+      slivers: [
+        SliverToBoxAdapter(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const _Label('GET IN TOUCH'),
-              const SizedBox(height: 20),
-              Text(lp.t('contact.title'),
-                style: theme.textTheme.displayMedium),
-              const SizedBox(height: 16),
-              Text(lp.t('contact.sub'),
-                style: theme.textTheme.bodyLarge),
-            ],
-          ),
-        ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
-
-        // Form + Info
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
-          child: isWide
-              ? Row(
+              // Hero
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
+                decoration: BoxDecoration(
+                  gradient: VivumColors.heroGradient(lp.isDark),
+                ),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 3, child: SectionReveal(child: _ContactForm(
-                      formKey: _formKey, nameCtrl: _nameCtrl,
-                      emailCtrl: _emailCtrl, companyCtrl: _companyCtrl,
-                      messageCtrl: _messageCtrl, service: _service,
-                      onServiceChanged: (v) => setState(() => _service = v),
-                      onSubmit: _submit, loading: _loading, submitted: _submitted, lp: lp,
-                    ))),
-                    const SizedBox(width: 48),
-                    Expanded(flex: 2, child: SectionReveal(
-                      delay: 200.ms,
-                      child: _ContactInfo(lp: lp),
-                    )),
-                  ],
-                )
-              : Column(
-                  children: [
-                    _ContactForm(
-                      formKey: _formKey, nameCtrl: _nameCtrl,
-                      emailCtrl: _emailCtrl, companyCtrl: _companyCtrl,
-                      messageCtrl: _messageCtrl, service: _service,
-                      onServiceChanged: (v) => setState(() => _service = v),
-                      onSubmit: _submit, loading: _loading, submitted: _submitted, lp: lp,
-                    ),
-                    const SizedBox(height: 40),
-                    _ContactInfo(lp: lp),
+                    const _Label('GET IN TOUCH'),
+                    const SizedBox(height: 20),
+                    Text(lp.t('contact.title'),
+                        style: theme.textTheme.displayMedium),
+                    const SizedBox(height: 16),
+                    Text(lp.t('contact.sub'), style: theme.textTheme.bodyLarge),
                   ],
                 ),
+              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
+
+              // Form + Info
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: 80),
+                child: isWide
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                              flex: 3,
+                              child: SectionReveal(
+                                  child: _ContactForm(
+                                formKey: _formKey,
+                                nameCtrl: _nameCtrl,
+                                emailCtrl: _emailCtrl,
+                                companyCtrl: _companyCtrl,
+                                messageCtrl: _messageCtrl,
+                                service: _service,
+                                onServiceChanged: (v) =>
+                                    setState(() => _service = v),
+                                onSubmit: _submit,
+                                loading: _loading,
+                                submitted: _submitted,
+                                lp: lp,
+                              ))),
+                          const SizedBox(width: 48),
+                          Expanded(
+                              flex: 2,
+                              child: SectionReveal(
+                                delay: 200.ms,
+                                child: _ContactInfo(lp: lp),
+                              )),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          _ContactForm(
+                            formKey: _formKey,
+                            nameCtrl: _nameCtrl,
+                            emailCtrl: _emailCtrl,
+                            companyCtrl: _companyCtrl,
+                            messageCtrl: _messageCtrl,
+                            service: _service,
+                            onServiceChanged: (v) =>
+                                setState(() => _service = v),
+                            onSubmit: _submit,
+                            loading: _loading,
+                            submitted: _submitted,
+                            lp: lp,
+                          ),
+                          const SizedBox(height: 40),
+                          _ContactInfo(lp: lp),
+                        ],
+                      ),
+              ),
+              const SizedBox(height: 40),
+              const VivumFooter(),
+            ],
+          ),
         ),
-        const SizedBox(height: 40),
-        const VivumFooter(),
       ],
     );
   }

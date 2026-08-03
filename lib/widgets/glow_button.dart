@@ -56,7 +56,11 @@ class _VivumButtonState extends State<VivumButton> {
                   : (_hovered ? color.withValues(alpha: 0.85) : color),
               border: isOutline
                   ? Border.all(
-                      color: _hovered ? VivumColors.teal : theme.dividerColor, 
+                      color: _hovered 
+                          ? VivumColors.teal 
+                          : (theme.brightness == Brightness.dark 
+                              ? theme.dividerColor 
+                              : VivumColors.teal.withValues(alpha: 0.5)), 
                       width: 1.5)
                   : Border.all(color: Colors.transparent),
               borderRadius: BorderRadius.circular(12),

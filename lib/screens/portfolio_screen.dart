@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
-import '../widgets/section_reveal.dart';
 import '../services/storage_service.dart';
 import '../services/database_service.dart';
 import '../widgets/footer.dart';
@@ -49,110 +48,122 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final filters = ['All', 'Branding', 'Web', 'App', 'AI'];
 
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: DatabaseService.getProjectsStream(),
-      builder: (context, snapshot) {
-        final data = snapshot.data;
-        final firebaseProjects = (data != null && data.isNotEmpty)
-            ? data.map((m) => Project.fromMap(m)).toList()
-            : _fallbackProjects;
+        stream: DatabaseService.getProjectsStream(),
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final firebaseProjects = (data != null && data.isNotEmpty)
+              ? data.map((m) => Project.fromMap(m)).toList()
+              : _fallbackProjects;
 
-        final filtered = _filter == 'All'
-            ? firebaseProjects
-            : firebaseProjects.where((p) => p.category == _filter).toList();
+          final filtered = _filter == 'All'
+              ? firebaseProjects
+              : firebaseProjects.where((p) => p.category == _filter).toList();
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
-              decoration: BoxDecoration(gradient: VivumColors.heroGradient(lp.isDark)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return CustomScrollView(
+            primary: true, // Use the shared PrimaryScrollController
+            slivers: [
+              // Header
+              SliverToBoxAdapter(
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: isWide ? 80 : 24, vertical: 80),
+                  decoration: BoxDecoration(
+                      gradient: VivumColors.heroGradient(lp.isDark)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _TealLabel('SELECTED WORK'),
-                      if (lp.isAdminMode)
-                        ElevatedButton.icon(
-                          onPressed: () => _showProjectForm(),
-                          icon: const Icon(Icons.add_rounded),
-                          label: const Text('Add New Project'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: VivumColors.teal,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const _TealLabel('SELECTED WORK'),
+                          if (lp.isAdminMode)
+                            ElevatedButton.icon(
+                              onPressed: () => _showProjectForm(),
+                              icon: const Icon(Icons.add_rounded),
+                              label: const Text('Add New Project'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: VivumColors.teal,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Text(lp.t('portfolio.title'),
+                          style: theme.textTheme.displayMedium),
+                      const SizedBox(height: 16),
+                      Text(lp.t('portfolio.sub'),
+                          style: theme.textTheme.bodyLarge),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Text(lp.t('portfolio.title'), style: theme.textTheme.displayMedium),
-                  const SizedBox(height: 16),
-                  Text(lp.t('portfolio.sub'), style: theme.textTheme.bodyLarge),
-                ],
+                ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
               ),
-            ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
 
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 32),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: filters.map((f) => Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: _FilterChip(
-                      label: f, isActive: _filter == f,
-                      onTap: () => setState(() => _filter = f),
+              // Filters
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: isWide ? 80 : 24, vertical: 32),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: filters
+                          .map((f) => Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: _FilterChip(
+                                  label: f,
+                                  isActive: _filter == f,
+                                  onTap: () => setState(() => _filter = f),
+                                ),
+                              ))
+                          .toList(),
                     ),
-                  )).toList(),
+                  ),
                 ),
               ),
-            ),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
-              child: isWide
-                  ? _buildWideGrid(filtered, lp.isAdminMode)
-                  : _buildNarrowList(filtered, lp.isAdminMode),
-            ),
-            const SizedBox(height: 80),
-            const VivumFooter(),
-          ],
-        );
-      }
-    );
-  }
+              // Project Grid/List
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                sliver: isWide
+                    ? SliverGrid(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 24,
+                          crossAxisSpacing: 24,
+                          childAspectRatio: 0.8, // Adjust as needed
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => ProjectCard(
+                            project: filtered[index],
+                            isAdminMode: lp.isAdminMode,
+                            onEdit: () => _showProjectForm(filtered[index]),
+                          ),
+                          childCount: filtered.length,
+                        ),
+                      )
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: ProjectCard(
+                              project: filtered[index],
+                              isAdminMode: lp.isAdminMode,
+                              onEdit: () => _showProjectForm(filtered[index]),
+                            ),
+                          ),
+                          childCount: filtered.length,
+                        ),
+                      ),
+              ),
 
-  Widget _buildWideGrid(List<Project> filtered, bool isAdminMode) {
-    return Column(
-      children: [
-        for (int i = 0; i < filtered.length; i += 2)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: SectionReveal(child: ProjectCard(project: filtered[i], isAdminMode: isAdminMode, onEdit: () => _showProjectForm(filtered[i])))),
-                const SizedBox(width: 24),
-                if (i + 1 < filtered.length)
-                  Expanded(child: SectionReveal(delay: 150.ms, child: ProjectCard(project: filtered[i + 1], isAdminMode: isAdminMode, onEdit: () => _showProjectForm(filtered[i + 1]))))
-                else
-                  const Expanded(child: SizedBox()),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildNarrowList(List<Project> filtered, bool isAdminMode) {
-    return Column(
-      children: filtered.map((p) => Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: SectionReveal(child: ProjectCard(project: p, isAdminMode: isAdminMode, onEdit: () => _showProjectForm(p))),
-      )).toList(),
-    );
+              const SliverToBoxAdapter(child: SizedBox(height: 80)),
+              const SliverToBoxAdapter(child: VivumFooter()),
+            ],
+          );
+        });
   }
 }
 

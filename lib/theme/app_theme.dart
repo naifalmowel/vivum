@@ -17,12 +17,12 @@ class VivumColors {
   static const darkWhite = Color(0xFFF8F9FC);
 
   // Light Theme Palette
-  static const lightBG = Color(0xFFF8FAFC); // Very light grey-blue
-  static const lightBGAlt = Color(0xFFF1F5F9); // Slightly darker for alternating
+  static const lightBG = Color(0xFFF1F5F9); // Soft slate-grey instead of pure white
+  static const lightBGAlt = Color(0xFFE2E8F0); // Slightly deeper slate
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightCard = Color(0xFFFFFFFF);
-  static const lightBorder = Color(0xFFE2E8F0);
-  static const lightMuted = Color(0xFF64748B);
+  static const lightBorder = Color(0xFFCBD5E1); // Darker border for better definition
+  static const lightMuted = Color(0xFF475569); // Darker muted text for readability
   static const lightText = Color(0xFF0F172A);
 
   static LinearGradient heroGradient(bool isDark) => isDark
@@ -34,7 +34,7 @@ class VivumColors {
       : const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF1F5F9), Color(0xFFE2E8F0), Color(0xFFF1F5F9)],
+          colors: [Color(0xFFF8FAFF), Color(0xFFE2E8F0), Color(0xFFF1F5F9)],
         );
 
   static const LinearGradient tealGradient = LinearGradient(
@@ -86,7 +86,7 @@ class AppTheme {
             onSecondary: Colors.white,
             onSurface: VivumColors.lightText,
             outline: VivumColors.lightBorder,
-            shadow: Color(0x1A0F172A),
+            shadow: Color(0x330F172A), // Increased shadow opacity (20%)
           );
 
     final textColor = isDark ? VivumColors.darkWhite : VivumColors.lightText;
@@ -99,6 +99,7 @@ class AppTheme {
       scaffoldBackgroundColor: isDark ? VivumColors.darkBG : VivumColors.lightBG,
       colorScheme: colorScheme,
       dividerColor: colorScheme.outline,
+      shadowColor: colorScheme.shadow,
       textTheme: TextTheme(
         displayLarge: TextStyle(
           fontSize: 72, fontWeight: FontWeight.w800,

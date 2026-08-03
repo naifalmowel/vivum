@@ -17,16 +17,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lp = AppProvider.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _HeroSection(lp: lp),
-        _ServicesPreview(lp: lp),
-        _StatsSection(lp: lp),
-        _PortfolioTeaser(lp: lp),
-        _WhyVivum(lp: lp),
-        _CtaBanner(lp: lp),
-        const VivumFooter(),
+    return CustomScrollView(
+      primary: true, // Use the shared PrimaryScrollController
+      slivers: [
+        SliverToBoxAdapter(child: _HeroSection(lp: lp)),
+        SliverToBoxAdapter(child: _ServicesPreview(lp: lp)),
+        SliverToBoxAdapter(child: _StatsSection(lp: lp)),
+        SliverToBoxAdapter(child: _PortfolioTeaser(lp: lp)),
+        SliverToBoxAdapter(child: _WhyVivum(lp: lp)),
+        SliverToBoxAdapter(child: _CtaBanner(lp: lp)),
+        const SliverToBoxAdapter(child: VivumFooter()),
       ],
     );
   }
@@ -253,7 +253,7 @@ class _ServicesPreview extends StatelessWidget {
     ];
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isTablet ? 80 : 24, vertical: 100),
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 80 : 24, vertical: 80),
       decoration: BoxDecoration(
         color: lp.isDark ? Colors.transparent : theme.colorScheme.surface,
       ),
@@ -391,11 +391,11 @@ class _ServiceCardState extends State<_ServiceCard> {
               boxShadow: [
                 BoxShadow(
                   color: _hovered 
-                      ? widget.accent.withValues(alpha: isDark ? 0.2 : 0.15)
-                      : theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02), 
+                      ? widget.accent.withValues(alpha: isDark ? 0.25 : 0.2)
+                      : theme.shadowColor.withValues(alpha: isDark ? 0.1 : 0.08), 
                   blurRadius: _hovered ? 40 : 20, 
                   spreadRadius: 0,
-                  offset: Offset(0, _hovered ? 15 : 6))
+                  offset: Offset(0, _hovered ? 15 : 8))
               ],
             ),
             child: Column(
@@ -447,7 +447,7 @@ class _StatsSection extends StatelessWidget {
     ];
     final isDark = theme.brightness == Brightness.dark;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+      margin: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 40),
       padding: EdgeInsets.symmetric(vertical: isWide ? 60 : 40, horizontal: isWide ? 40 : 20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -455,7 +455,7 @@ class _StatsSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withValues(alpha: isDark ? 0.1 : 0.08),
+            color: theme.shadowColor.withValues(alpha: isDark ? 0.15 : 0.12),
             blurRadius: 40,
             offset: const Offset(0, 12),
           )
@@ -514,7 +514,7 @@ class _PortfolioTeaser extends StatelessWidget {
     final isWide = MediaQuery.of(context).size.width > 900;
     final theme = Theme.of(context);
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
+      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
       decoration: BoxDecoration(
         color: lp.isDark ? Colors.transparent : VivumColors.lightBGAlt,
       ),
@@ -605,7 +605,7 @@ class _WhyVivum extends StatelessWidget {
       (Icons.psychology_outlined, 'about.ai', 'about.ai.desc', VivumColors.teal),
     ];
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 100),
+      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
       decoration: BoxDecoration(
         color: lp.isDark ? theme.scaffoldBackgroundColor.withValues(alpha: 0.5) : VivumColors.lightBG,
       ),
@@ -692,7 +692,7 @@ class _PillarCardContentState extends State<_PillarCardContent> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: _hovered ? widget.accent.withValues(alpha: 0.15) : theme.shadowColor.withValues(alpha: isDark ? 0.05 : 0.02),
+                color: _hovered ? widget.accent.withValues(alpha: 0.2) : theme.shadowColor.withValues(alpha: isDark ? 0.1 : 0.08),
                 blurRadius: _hovered ? 30 : 20,
                 offset: Offset(0, _hovered ? 12 : 8),
               )
@@ -744,13 +744,13 @@ class _CtaBanner extends StatelessWidget {
             begin: Alignment.topLeft, end: Alignment.bottomRight,
             colors: isDark 
                 ? [const Color(0xFF0E2A40), const Color(0xFF0A1F35), const Color(0xFF0D1535)]
-                : [VivumColors.teal.withValues(alpha: 0.05), VivumColors.teal.withValues(alpha: 0.1)],
+                : [const Color(0xFFE0F2F1), const Color(0xFFB2DFDB)], // Nicer teal gradient for Light Mode
           ),
-          border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2)),
+          border: Border.all(color: VivumColors.teal.withValues(alpha: isDark ? 0.2 : 0.5)),
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.05), 
+                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.2), 
                 blurRadius: 60, 
                 spreadRadius: 10),
           ],
@@ -760,7 +760,8 @@ class _CtaBanner extends StatelessWidget {
             Text(lp.t('cta.title'),
               style: theme.textTheme.headlineLarge?.copyWith(
                 fontSize: isWide ? 42 : 28, 
-                color: isDark ? Colors.white : VivumColors.tealDark,
+                color: isDark ? Colors.white : const Color(0xFF004D40), // Darker teal for text
+                fontWeight: FontWeight.w900,
               ),
               textAlign: TextAlign.center),
             const SizedBox(height: 16),

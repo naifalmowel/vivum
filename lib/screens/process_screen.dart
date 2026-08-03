@@ -23,70 +23,87 @@ class ProcessScreen extends StatelessWidget {
       _Step('05', Icons.rocket_launch_outlined, 'process.step5.title', 'process.step5.desc', VivumColors.teal),
     ];
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Hero
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
-          decoration: BoxDecoration(
-            gradient: VivumColors.heroGradient(lp.isDark),
-          ),
+    return CustomScrollView(
+      primary: true,
+      slivers: [
+        SliverToBoxAdapter(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const _Label('OUR PROCESS'),
-              const SizedBox(height: 20),
-              Text(lp.t('process.title'), style: theme.textTheme.displayMedium),
-              const SizedBox(height: 16),
-              Text(lp.t('process.sub'), style: theme.textTheme.bodyLarge),
-            ],
-          ),
-        ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
+              // Hero
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
+                decoration: BoxDecoration(
+                  gradient: VivumColors.heroGradient(lp.isDark),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _Label('OUR PROCESS'),
+                    const SizedBox(height: 20),
+                    Text(lp.t('process.title'),
+                        style: theme.textTheme.displayMedium),
+                    const SizedBox(height: 16),
+                    Text(lp.t('process.sub'), style: theme.textTheme.bodyLarge),
+                  ],
+                ),
+              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
 
-        // Timeline
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
-          child: isWide
-              ? _WideTimeline(steps: steps, lp: lp)
-              : _NarrowTimeline(steps: steps, lp: lp),
-        ),
+              // Timeline
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: 80),
+                child: isWide
+                    ? _WideTimeline(steps: steps, lp: lp)
+                    : _NarrowTimeline(steps: steps, lp: lp),
+              ),
 
-        // Testimonials placeholder
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
-          child: Column(
-            children: [
-              SectionReveal(child: Column(children: [
-                const _Label('WHAT CLIENTS SAY'),
-                const SizedBox(height: 12),
-                Text('Client Testimonials', style: theme.textTheme.headlineLarge),
-              ])),
-              const SizedBox(height: 48),
-              isWide
-                  ? Row(
-                      children: List.generate(3, (i) => Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(right: i < 2 ? 20 : 0),
-                          child: SectionReveal(
-                            delay: Duration(milliseconds: i * 150),
-                            child: const _TestimonialPlaceholder(),
+              // Testimonials placeholder
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                child: Column(
+                  children: [
+                    SectionReveal(
+                        child: Column(children: [
+                      const _Label('WHAT CLIENTS SAY'),
+                      const SizedBox(height: 12),
+                      Text('Client Testimonials',
+                          style: theme.textTheme.headlineLarge),
+                    ])),
+                    const SizedBox(height: 48),
+                    isWide
+                        ? Row(
+                            children: List.generate(
+                                3,
+                                (i) => Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                            right: i < 2 ? 20 : 0),
+                                        child: SectionReveal(
+                                          delay: Duration(milliseconds: i * 150),
+                                          child: const _TestimonialPlaceholder(),
+                                        ),
+                                      ),
+                                    )),
+                          )
+                        : Column(
+                            children: List.generate(
+                                3,
+                                (i) => Padding(
+                                      padding: const EdgeInsets.only(bottom: 20),
+                                      child: const _TestimonialPlaceholder(),
+                                    )),
                           ),
-                        ),
-                      )),
-                    )
-                  : Column(
-                      children: List.generate(3, (i) => Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: const _TestimonialPlaceholder(),
-                      )),
-                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 80),
+              const VivumFooter(),
             ],
           ),
         ),
-        const SizedBox(height: 80),
-        const VivumFooter(),
       ],
     );
   }

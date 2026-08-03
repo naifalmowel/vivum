@@ -222,8 +222,22 @@ class _GlowButton extends StatefulWidget {
   State<_GlowButton> createState() => _GlowButtonState();
 }
 
-class _GlowButtonState extends State<_GlowButton> {
+class _GlowButtonState extends State<_GlowButton> with SingleTickerProviderStateMixin {
   bool _hovered = false;
+  late AnimationController _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _anim = AnimationController(vsync: this, duration: 2000.ms)..repeat();
+  }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -231,22 +245,47 @@ class _GlowButtonState extends State<_GlowButton> {
       onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: AnimatedContainer(
+        child: AnimatedScale(
+          scale: _hovered ? 1.05 : 1.0,
           duration: 200.ms,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-            gradient: VivumColors.amberGradient,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: _hovered
-                ? [BoxShadow(color: VivumColors.amber.withValues(alpha: 0.4), blurRadius: 16, spreadRadius: 2)]
-                : [],
-          ),
-          child: Text(
-            widget.label,
-            style: const TextStyle(
-              fontSize: 14, fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+          child: Stack(
+            children: [
+              AnimatedContainer(
+                duration: 300.ms,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [VivumColors.teal, VivumColors.tealDark],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: VivumColors.teal.withValues(alpha: _hovered ? 0.4 : 0.2),
+                      blurRadius: _hovered ? 20 : 10,
+                      spreadRadius: _hovered ? 2 : 0,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.label,
+                      style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w700,
+                        color: Colors.white, letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.rocket_launch_rounded, size: 16, color: Colors.white),
+                  ],
+                ),
+              ),
+              // Shimmer effect removed for performance if needed, or kept very simple
+            ],
           ),
         ),
       ),

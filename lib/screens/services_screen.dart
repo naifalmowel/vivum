@@ -51,51 +51,61 @@ class ServicesScreen extends StatelessWidget {
       ),
     ];
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Page Hero
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
-          decoration: BoxDecoration(
-            gradient: VivumColors.heroGradient(lp.isDark),
-          ),
+    return CustomScrollView(
+      primary: true,
+      slivers: [
+        SliverToBoxAdapter(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const _Label('OUR SERVICES'),
-              const SizedBox(height: 20),
-              Text(lp.t('services.title'),
-                style: theme.textTheme.displayMedium),
-              const SizedBox(height: 16),
-              Text(lp.t('services.sub'),
-                style: theme.textTheme.bodyLarge),
-            ],
-          ),
-        ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
-
-        // Service Categories
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
-          child: Column(
-            children: [
-              ...categories.asMap().entries.map((e) => Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: SectionReveal(
-                  key: ValueKey(e.key),
-                  delay: Duration(milliseconds: e.key * 100),
-                  child: _ServiceCategoryCard(cat: e.value, lp: lp, isEven: e.key % 2 == 0),
+              // Page Hero
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
+                decoration: BoxDecoration(
+                  gradient: VivumColors.heroGradient(lp.isDark),
                 ),
-              )),
-              const SizedBox(height: 100),
-              _PricingSummary(lp: lp),
-              const SizedBox(height: 100),
-              _PackagesSection(lp: lp),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _Label('OUR SERVICES'),
+                    const SizedBox(height: 20),
+                    Text(lp.t('services.title'),
+                        style: theme.textTheme.displayMedium),
+                    const SizedBox(height: 16),
+                    Text(lp.t('services.sub'),
+                        style: theme.textTheme.bodyLarge),
+                  ],
+                ),
+              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
+
+              // Service Categories
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: 80),
+                child: Column(
+                  children: [
+                    ...categories.asMap().entries.map((e) => Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: SectionReveal(
+                            key: ValueKey(e.key),
+                            delay: Duration(milliseconds: e.key * 100),
+                            child: _ServiceCategoryCard(
+                                cat: e.value, lp: lp, isEven: e.key % 2 == 0),
+                          ),
+                        )),
+                    const SizedBox(height: 100),
+                    _PricingSummary(lp: lp),
+                    const SizedBox(height: 100),
+                    _PackagesSection(lp: lp),
+                  ],
+                ),
+              ),
+              const SliverToBoxAdapter(child: VivumFooter()),
             ],
           ),
         ),
-        const VivumFooter(),
       ],
     );
   }

@@ -15,151 +15,272 @@ class AboutScreen extends StatelessWidget {
     final isWide = MediaQuery.of(context).size.width > 900;
     final theme = Theme.of(context);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Hero
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
-          decoration: BoxDecoration(
-            gradient: VivumColors.heroGradient(lp.isDark),
-          ),
+    return CustomScrollView(
+      primary: true,
+      slivers: [
+        SliverToBoxAdapter(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const _Label('WHO WE ARE'),
-              const SizedBox(height: 20),
-              Text(lp.t('about.title'), style: theme.textTheme.displayMedium),
-              const SizedBox(height: 24),
+              // Hero
               Container(
-                constraints: const BoxConstraints(maxWidth: 680),
-                child: Text(lp.t('about.story'),
-                  style: theme.textTheme.bodyLarge),
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
+                decoration: BoxDecoration(
+                  gradient: VivumColors.heroGradient(lp.isDark),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _Label('WHO WE ARE'),
+                    const SizedBox(height: 20),
+                    Text(lp.t('about.title'),
+                        style: theme.textTheme.displayMedium),
+                    const SizedBox(height: 24),
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 680),
+                      child: Text(lp.t('about.story'),
+                          style: theme.textTheme.bodyLarge),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
+
+              // Values
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: 80),
+                child: Column(
+                  children: [
+                    SectionReveal(
+                        child: Column(children: [
+                      const _Label('OUR PILLARS'),
+                      const SizedBox(height: 12),
+                      Text(lp.t('about.foundation'),
+                          style: theme.textTheme.displaySmall,
+                          textAlign: TextAlign.center),
+                    ])),
+                    const SizedBox(height: 60),
+                    isWide
+                        ? Row(children: [
+                            Expanded(
+                                child: SectionReveal(
+                                    delay: 0.ms,
+                                    fillHeight: true,
+                                    child: _PillarCard(
+                                        icon: Icons.palette_outlined,
+                                        titleKey: 'about.creative',
+                                        descKey: 'about.creative.desc',
+                                        accent: VivumColors.teal,
+                                        lp: lp,
+                                        number: '01'))),
+                            const SizedBox(width: 24),
+                            Expanded(
+                                child: SectionReveal(
+                                    delay: 150.ms,
+                                    fillHeight: true,
+                                    child: _PillarCard(
+                                        icon: Icons.code_rounded,
+                                        titleKey: 'about.tech',
+                                        descKey: 'about.tech.desc',
+                                        accent: VivumColors.amber,
+                                        lp: lp,
+                                        number: '02'))),
+                            const SizedBox(width: 24),
+                            Expanded(
+                                child: SectionReveal(
+                                    delay: 300.ms,
+                                    fillHeight: true,
+                                    child: _PillarCard(
+                                        icon: Icons.psychology_outlined,
+                                        titleKey: 'about.ai',
+                                        descKey: 'about.ai.desc',
+                                        accent: VivumColors.teal,
+                                        lp: lp,
+                                        number: '03'))),
+                          ])
+                        : Column(children: [
+                            _PillarCard(
+                                icon: Icons.palette_outlined,
+                                titleKey: 'about.creative',
+                                descKey: 'about.creative.desc',
+                                accent: VivumColors.teal,
+                                lp: lp,
+                                number: '01'),
+                            const SizedBox(height: 20),
+                            _PillarCard(
+                                icon: Icons.code_rounded,
+                                titleKey: 'about.tech',
+                                descKey: 'about.tech.desc',
+                                accent: VivumColors.amber,
+                                lp: lp,
+                                number: '02'),
+                            const SizedBox(height: 20),
+                            _PillarCard(
+                                icon: Icons.psychology_outlined,
+                                titleKey: 'about.ai',
+                                descKey: 'about.ai.desc',
+                                accent: VivumColors.teal,
+                                lp: lp,
+                                number: '03'),
+                          ]),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
 
-        // Values
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
-          child: Column(
-            children: [
-              SectionReveal(child: Column(children: [
-                const _Label('OUR PILLARS'),
-                const SizedBox(height: 12),
-                Text(lp.t('about.foundation'),
-                  style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
-              ])),
-              const SizedBox(height: 60),
-              isWide
-                  ? Row(children: [
-                      Expanded(child: SectionReveal(delay: 0.ms, fillHeight: true, child: _PillarCard(
-                        icon: Icons.palette_outlined, titleKey: 'about.creative',
-                        descKey: 'about.creative.desc', accent: VivumColors.teal, lp: lp, number: '01'))),
-                      const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 150.ms, fillHeight: true, child: _PillarCard(
-                        icon: Icons.code_rounded, titleKey: 'about.tech',
-                        descKey: 'about.tech.desc', accent: VivumColors.amber, lp: lp, number: '02'))),
-                      const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 300.ms, fillHeight: true, child: _PillarCard(
-                        icon: Icons.psychology_outlined, titleKey: 'about.ai',
-                        descKey: 'about.ai.desc', accent: VivumColors.teal, lp: lp, number: '03'))),
-                    ])
-                  : Column(children: [
-                      _PillarCard(icon: Icons.palette_outlined, titleKey: 'about.creative',
-                        descKey: 'about.creative.desc', accent: VivumColors.teal, lp: lp, number: '01'),
-                      const SizedBox(height: 20),
-                      _PillarCard(icon: Icons.code_rounded, titleKey: 'about.tech',
-                        descKey: 'about.tech.desc', accent: VivumColors.amber, lp: lp, number: '02'),
-                      const SizedBox(height: 20),
-                      _PillarCard(icon: Icons.psychology_outlined, titleKey: 'about.ai',
-                        descKey: 'about.ai.desc', accent: VivumColors.teal, lp: lp, number: '03'),
-                    ]),
+              // Markets
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: isWide ? 80 : 60),
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.5),
+                ),
+                child: Column(
+                  children: [
+                    SectionReveal(
+                        child: Column(children: [
+                      const _Label('OUR REACH'),
+                      const SizedBox(height: 12),
+                      Text(lp.t('about.markets'),
+                          style: theme.textTheme.displaySmall,
+                          textAlign: TextAlign.center),
+                    ])),
+                    const SizedBox(height: 60),
+                    isWide
+                        ? Row(children: [
+                            Expanded(
+                                child: SectionReveal(
+                                    delay: 0.ms,
+                                    fillHeight: true,
+                                    child: _MarketCard(
+                                        flag: '🇦🇪',
+                                        name: lp.t('footer.uae'),
+                                        desc: lp.t('about.markets.uae.desc'),
+                                        color: VivumColors.teal))),
+                            const SizedBox(width: 24),
+                            Expanded(
+                                child: SectionReveal(
+                                    delay: 150.ms,
+                                    fillHeight: true,
+                                    child: _MarketCard(
+                                        flag: '🇸🇦',
+                                        name: lp.t('footer.ksa'),
+                                        desc: lp.t('about.markets.ksa.desc'),
+                                        color: VivumColors.amber))),
+                            const SizedBox(width: 24),
+                            Expanded(
+                                child: SectionReveal(
+                                    delay: 300.ms,
+                                    fillHeight: true,
+                                    child: _MarketCard(
+                                        flag: '🇸🇾',
+                                        name: lp.t('footer.syria'),
+                                        desc: lp.t('about.markets.syria.desc'),
+                                        color: VivumColors.teal))),
+                          ])
+                        : Column(children: [
+                            _MarketCard(
+                                flag: '🇦🇪',
+                                name: lp.t('footer.uae'),
+                                desc: lp.t('about.markets.uae.desc'),
+                                color: VivumColors.teal),
+                            const SizedBox(height: 20),
+                            _MarketCard(
+                                flag: '🇸🇦',
+                                name: lp.t('footer.ksa'),
+                                desc: lp.t('about.markets.ksa.desc'),
+                                color: VivumColors.amber),
+                            const SizedBox(height: 20),
+                            _MarketCard(
+                                flag: '🇸🇾',
+                                name: lp.t('footer.syria'),
+                                desc: lp.t('about.markets.syria.desc'),
+                                color: VivumColors.teal),
+                          ]),
+                  ],
+                ),
+              ),
+
+              // Values
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 80 : 24, vertical: 80),
+                child: Column(
+                  children: [
+                    SectionReveal(
+                        child: Column(children: [
+                      const _Label('CORE VALUES'),
+                      const SizedBox(height: 12),
+                      Text(lp.t('about.values'),
+                          style: theme.textTheme.displaySmall,
+                          textAlign: TextAlign.center),
+                    ])),
+                    const SizedBox(height: 60),
+                    isWide
+                        ? GridView.count(
+                            crossAxisCount: 2,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisSpacing: 24,
+                            mainAxisSpacing: 24,
+                            childAspectRatio: 2.5,
+                            children: [
+                              _ValueCard(
+                                  icon: Icons.lightbulb_outline,
+                                  label: lp.t('about.value.innovation'),
+                                  desc: lp.t('about.value.innovation.desc'),
+                                  color: VivumColors.amber),
+                              _ValueCard(
+                                  icon: Icons.verified_outlined,
+                                  label: lp.t('about.value.quality'),
+                                  desc: lp.t('about.value.quality.desc'),
+                                  color: VivumColors.teal),
+                              _ValueCard(
+                                  icon: Icons.handshake_outlined,
+                                  label: lp.t('about.value.partnership'),
+                                  desc: lp.t('about.value.partnership.desc'),
+                                  color: VivumColors.amber),
+                              _ValueCard(
+                                  icon: Icons.trending_up_rounded,
+                                  label: lp.t('about.value.growth'),
+                                  desc: lp.t('about.value.growth.desc'),
+                                  color: VivumColors.teal),
+                            ],
+                          )
+                        : Column(children: [
+                            _ValueCard(
+                                icon: Icons.lightbulb_outline,
+                                label: lp.t('about.value.innovation'),
+                                desc: lp.t('about.value.innovation.desc'),
+                                color: VivumColors.amber),
+                            const SizedBox(height: 16),
+                            _ValueCard(
+                                icon: Icons.verified_outlined,
+                                label: lp.t('about.value.quality'),
+                                desc: lp.t('about.value.quality.desc'),
+                                color: VivumColors.teal),
+                            const SizedBox(height: 16),
+                            _ValueCard(
+                                icon: Icons.handshake_outlined,
+                                label: lp.t('about.value.partnership'),
+                                desc: lp.t('about.value.partnership.desc'),
+                                color: VivumColors.amber),
+                            const SizedBox(height: 16),
+                            _ValueCard(
+                                icon: Icons.trending_up_rounded,
+                                label: lp.t('about.value.growth'),
+                                desc: lp.t('about.value.growth.desc'),
+                                color: VivumColors.teal),
+                          ]),
+                  ],
+                ),
+              ),
+              const SliverToBoxAdapter(child: VivumFooter()),
             ],
           ),
         ),
-
-        // Markets
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: isWide ? 80 : 60),
-          decoration: BoxDecoration(
-            color: theme.scaffoldBackgroundColor.withValues(alpha: 0.5),
-          ),
-          child: Column(
-            children: [
-              SectionReveal(child: Column(children: [
-                const _Label('OUR REACH'),
-                const SizedBox(height: 12),
-                Text(lp.t('about.markets'),
-                  style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
-              ])),
-              const SizedBox(height: 60),
-              isWide
-                  ? Row(children: [
-                      Expanded(child: SectionReveal(delay: 0.ms, fillHeight: true, child: _MarketCard(
-                        flag: '🇦🇪', name: lp.t('footer.uae'),
-                        desc: lp.t('about.markets.uae.desc'), color: VivumColors.teal))),
-                      const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 150.ms, fillHeight: true, child: _MarketCard(
-                        flag: '🇸🇦', name: lp.t('footer.ksa'),
-                        desc: lp.t('about.markets.ksa.desc'), color: VivumColors.amber))),
-                      const SizedBox(width: 24),
-                      Expanded(child: SectionReveal(delay: 300.ms, fillHeight: true, child: _MarketCard(
-                        flag: '🇸🇾', name: lp.t('footer.syria'),
-                        desc: lp.t('about.markets.syria.desc'), color: VivumColors.teal))),
-                    ])
-                  : Column(children: [
-                      _MarketCard(flag: '🇦🇪', name: lp.t('footer.uae'),
-                        desc: lp.t('about.markets.uae.desc'), color: VivumColors.teal),
-                      const SizedBox(height: 20),
-                      _MarketCard(flag: '🇸🇦', name: lp.t('footer.ksa'),
-                        desc: lp.t('about.markets.ksa.desc'), color: VivumColors.amber),
-                      const SizedBox(height: 20),
-                      _MarketCard(flag: '🇸🇾', name: lp.t('footer.syria'),
-                        desc: lp.t('about.markets.syria.desc'), color: VivumColors.teal),
-                    ]),
-            ],
-          ),
-        ),
-
-        // Values
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
-          child: Column(
-            children: [
-              SectionReveal(child: Column(children: [
-                const _Label('CORE VALUES'),
-                const SizedBox(height: 12),
-                Text(lp.t('about.values'), style: theme.textTheme.displaySmall, textAlign: TextAlign.center),
-              ])),
-              const SizedBox(height: 60),
-              isWide
-                  ? GridView.count(
-                      crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 24, mainAxisSpacing: 24, childAspectRatio: 2.5,
-                      children: [
-                        _ValueCard(icon: Icons.lightbulb_outline, label: lp.t('about.value.innovation'), desc: lp.t('about.value.innovation.desc'), color: VivumColors.amber),
-                        _ValueCard(icon: Icons.verified_outlined, label: lp.t('about.value.quality'), desc: lp.t('about.value.quality.desc'), color: VivumColors.teal),
-                        _ValueCard(icon: Icons.handshake_outlined, label: lp.t('about.value.partnership'), desc: lp.t('about.value.partnership.desc'), color: VivumColors.amber),
-                        _ValueCard(icon: Icons.trending_up_rounded, label: lp.t('about.value.growth'), desc: lp.t('about.value.growth.desc'), color: VivumColors.teal),
-                      ],
-                    )
-                  : Column(children: [
-                      _ValueCard(icon: Icons.lightbulb_outline, label: lp.t('about.value.innovation'), desc: lp.t('about.value.innovation.desc'), color: VivumColors.amber),
-                      const SizedBox(height: 16),
-                      _ValueCard(icon: Icons.verified_outlined, label: lp.t('about.value.quality'), desc: lp.t('about.value.quality.desc'), color: VivumColors.teal),
-                      const SizedBox(height: 16),
-                      _ValueCard(icon: Icons.handshake_outlined, label: lp.t('about.value.partnership'), desc: lp.t('about.value.partnership.desc'), color: VivumColors.amber),
-                      const SizedBox(height: 16),
-                      _ValueCard(icon: Icons.trending_up_rounded, label: lp.t('about.value.growth'), desc: lp.t('about.value.growth.desc'), color: VivumColors.teal),
-                    ]),
-            ],
-          ),
-        ),
-        const VivumFooter(),
       ],
     );
   }

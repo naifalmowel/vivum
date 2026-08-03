@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import 'navbar.dart';
-import 'navbar.dart';
 
 class ScaffoldShell extends StatefulWidget {
   final Widget child;
@@ -53,7 +52,7 @@ class _ScaffoldShellState extends State<ScaffoldShell> {
           Expanded(
             child: Scrollbar(
               controller: _scrollController,
-              child: SingleChildScrollView(
+              child: PrimaryScrollController(
                 controller: _scrollController,
                 child: widget.child,
               ),
