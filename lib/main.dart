@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'theme/app_theme.dart';
 import 'l10n/translations.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'screens/home_screen.dart';
 import 'screens/about_screen.dart';
 import 'screens/services_screen.dart';
@@ -17,13 +18,14 @@ import 'screens/project_details_screen.dart';
 import 'widgets/scaffold_shell.dart';
 
 void main() async {
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Memory Management for Web/High-res images
-  // Aggressive Limit image cache to 30MB
-  PaintingBinding.instance.imageCache.maximumSizeBytes = 30 * 1024 * 1024;
-  // Limit to 10 images in memory at once
-  PaintingBinding.instance.imageCache.maximumSize = 10;
+  // Efficient Memory Management
+  // Limit image cache to 50MB (Balanced for performance and memory)
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
+  // Limit to 15 images to prevent high-res accumulation
+  PaintingBinding.instance.imageCache.maximumSize = 15;
 
   // Initialize Firebase
   // If you are using web, you might need to pass options:

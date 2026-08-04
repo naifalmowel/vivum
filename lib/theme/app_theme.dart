@@ -16,13 +16,13 @@ class VivumColors {
   static const darkMuted = Color(0xFF8B90B0);
   static const darkWhite = Color(0xFFF8F9FC);
 
-  // Light Theme Palette
-  static const lightBG = Color(0xFFF1F5F9); // Soft slate-grey instead of pure white
-  static const lightBGAlt = Color(0xFFE2E8F0); // Slightly deeper slate
+  // Light Theme Palette - Refined for cleaner look
+  static const lightBG = Color(0xFFFFFFFF); // Pure white background
+  static const lightBGAlt = Color(0xFFF8FAFC); // Very subtle grey for contrast
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightCard = Color(0xFFFFFFFF);
-  static const lightBorder = Color(0xFFCBD5E1); // Darker border for better definition
-  static const lightMuted = Color(0xFF475569); // Darker muted text for readability
+  static const lightBorder = Color(0xFFE2E8F0); 
+  static const lightMuted = Color(0xFF64748B); 
   static const lightText = Color(0xFF0F172A);
 
   static LinearGradient heroGradient(bool isDark) => isDark

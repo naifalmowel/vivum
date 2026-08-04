@@ -45,7 +45,7 @@ class _SectionRevealState extends State<SectionReveal> {
     }
 
     return VisibilityDetector(
-      key: widget.key ?? ValueKey(widget.child.hashCode ^ widget.delay.inMilliseconds),
+      key: widget.key ?? UniqueKey(), // Use UniqueKey to prevent key collisions during page transitions
       onVisibilityChanged: (info) {
         if (!mounted) return;
         if (info.visibleFraction > 0.1 && !_visible) {

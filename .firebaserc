@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "vivum-d2907"
-  }
+    "default": "vivum-d2907",
+    "production": "vivum-d2907"
+  },
+  "targets": {},
+  "etags": {}
 }

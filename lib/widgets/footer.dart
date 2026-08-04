@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
+import '../theme/personal_info.dart';
 import '../l10n/translations.dart';
 
 class VivumFooter extends StatelessWidget {
@@ -94,7 +96,7 @@ class VivumFooter extends StatelessWidget {
                 ),
                 Row(
                   children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) => Padding(
-                    padding: const EdgeInsets.only(left: 24),
+                    padding: const EdgeInsetsDirectional.only(start: 24),
                     child: Text(m, style: theme.textTheme.bodySmall),
                   )).toList(),
                 ),
@@ -113,12 +115,13 @@ class VivumFooter extends StatelessWidget {
                   lp.t('footer.rights'),
                   style: theme.textTheme.bodySmall,
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) => Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Text(m, style: theme.textTheme.bodySmall),
-                  )).toList(),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) =>
+                    Text(m, style: theme.textTheme.bodySmall),
+                  ).toList(),
                 ),
               ],
             ),
@@ -160,11 +163,15 @@ class _BrandColumn extends StatelessWidget {
           maxLines: 4, overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 28),
-        const Row(
+        const Wrap(
+          spacing: 12,
+          runSpacing: 12,
           children: [
-            _SocialIcon(icon: Icons.link, label: 'LinkedIn'),
-            _SocialIcon(icon: Icons.camera_alt_outlined, label: 'Instagram'),
-            _SocialIcon(icon: Icons.message_outlined, label: 'WhatsApp'),
+            _SocialIcon(icon: Icons.link, url: PersonalInfo.linkedin, label: 'LinkedIn'),
+            _SocialIcon(icon: Icons.camera_alt_outlined, url: PersonalInfo.instagram, label: 'Instagram'),
+            _SocialIcon(icon: Icons.facebook_rounded, url: PersonalInfo.facebook, label: 'Facebook'),
+            _SocialIcon(icon: Icons.message_rounded, url: PersonalInfo.whatsapp, label: 'WhatsApp'),
+            _SocialIcon(icon: Icons.brush_rounded, url: PersonalInfo.behance, label: 'Behance'),
           ],
         ),
       ],
@@ -174,33 +181,44 @@ class _BrandColumn extends StatelessWidget {
 
 class _SocialIcon extends StatefulWidget {
   final IconData icon;
+  final String url;
   final String label;
-  const _SocialIcon({required this.icon, required this.label});
+  const _SocialIcon({required this.icon, required this.url, required this.label});
   @override
   State<_SocialIcon> createState() => _SocialIconState();
 }
 
 class _SocialIconState extends State<_SocialIcon> {
   bool _hovered = false;
+
+  void _launch() async {
+    final uri = Uri.parse(widget.url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(right: 12),
-        width: 42, height: 42,
-        decoration: BoxDecoration(
-          color: _hovered ? VivumColors.teal.withValues(alpha: 0.15) : theme.dividerColor.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _hovered ? VivumColors.teal.withValues(alpha: 0.5) : Colors.transparent,
+      child: GestureDetector(
+        onTap: _launch,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 42, height: 42,
+          decoration: BoxDecoration(
+            color: _hovered ? VivumColors.teal.withValues(alpha: 0.15) : theme.dividerColor.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _hovered ? VivumColors.teal.withValues(alpha: 0.5) : Colors.transparent,
+            ),
           ),
+          child: Icon(widget.icon, size: 18,
+            color: _hovered ? VivumColors.teal : theme.textTheme.bodySmall?.color),
         ),
-        child: Icon(widget.icon, size: 18,
-          color: _hovered ? VivumColors.teal : theme.textTheme.bodySmall?.color),
       ),
     );
   }
@@ -250,16 +268,14 @@ class _ContactColumn extends StatelessWidget {
       children: [
         Text(lp.t('nav.contact'), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 24),
-        Text('info@vivum.agency', style: theme.textTheme.bodyMedium),
+        InkWell(
+          onTap: () => launchUrl(Uri.parse('mailto:${PersonalInfo.email}')),
+          child: Text(PersonalInfo.email, style: theme.textTheme.bodyMedium),
+        ),
         const SizedBox(height: 12),
-        Text('+971 XX XXX XXXX', style: theme.textTheme.bodyMedium),
-        const SizedBox(height: 20),
-        Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) =>
-            Text(m, style: theme.textTheme.bodySmall),
-          ).toList(),
+        InkWell(
+          onTap: () => launchUrl(Uri.parse('tel:${PersonalInfo.phoneNumber}')),
+          child: Text(PersonalInfo.phoneNumber, style: theme.textTheme.bodyMedium),
         ),
       ],
     );

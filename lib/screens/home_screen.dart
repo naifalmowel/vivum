@@ -51,7 +51,7 @@ class _HeroSection extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           // Animated mesh background
-          Positioned.fill(child: const RepaintBoundary(child: ParticleBackground())),
+          Positioned.fill(child: const ParticleBackground()),
           
           // Centered Background Logo for mobile only (Purely decorative)
           if (!isWide)
@@ -95,7 +95,7 @@ class _HeroSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(flex: 5, child: _HeroText(lp: lp)),
-                      const Expanded(flex: 5, child: RepaintBoundary(child: HeroOrbit())),
+                      const Expanded(flex: 5, child: HeroOrbit()),
                     ],
                   )
                 : _HeroText(lp: lp), // Content is just text; Logo is in the Stack background
@@ -178,8 +178,8 @@ class _HeroText extends StatelessWidget {
             VivumButton(
               label: lp.t('hero.cta2'),
               onTap: () => context.go('/contact'),
-              variant: ButtonVariant.amber,
-              icon: Icon(lp.isAr ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 18, color: Colors.white),
+              variant: ButtonVariant.teal,
+              icon: const Icon(Icons.rocket_launch_rounded, size: 18, color: Colors.white),
             ),
             VivumButton(
               label: lp.t('portfolio.view_all'),
@@ -516,7 +516,7 @@ class _PortfolioTeaser extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
       decoration: BoxDecoration(
-        color: lp.isDark ? Colors.transparent : VivumColors.lightBGAlt,
+        color: lp.isDark ? Colors.transparent : theme.colorScheme.surface,
       ),
       child: Column(
         children: [
@@ -675,9 +675,9 @@ class _PillarCardContentState extends State<_PillarCardContent> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+    return InkWell(
+      onTap: () => context.go('/services'),
+      borderRadius: BorderRadius.circular(24),
       child: AnimatedScale(
         scale: _hovered ? 1.02 : 1.0,
         duration: 200.ms,
@@ -734,15 +734,15 @@ class _CtaBanner extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: lp.isDark ? Colors.transparent : VivumColors.lightBGAlt,
+      color: lp.isDark ? Colors.transparent : VivumColors.lightBG,
       padding: EdgeInsets.only(bottom: 80),
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+        margin: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24 , vertical:24),
         padding: EdgeInsets.symmetric(horizontal: isWide ? 60 : 24, vertical: isWide ? 70 : 40),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft, end: Alignment.bottomRight,
-            colors: isDark 
+            colors: isDark
                 ? [const Color(0xFF0E2A40), const Color(0xFF0A1F35), const Color(0xFF0D1535)]
                 : [const Color(0xFFE0F2F1), const Color(0xFFB2DFDB)], // Nicer teal gradient for Light Mode
           ),
@@ -750,9 +750,9 @@ class _CtaBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.2), 
-                blurRadius: 60, 
-                spreadRadius: 10),
+                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.2),
+                blurRadius: 20,
+                spreadRadius: 3),
           ],
         ),
         child: SectionReveal(

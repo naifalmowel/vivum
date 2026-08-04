@@ -45,18 +45,12 @@ class _ScaffoldShellState extends State<ScaffoldShell> {
     
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      drawer: _MobileDrawer(lp: lp),
+      endDrawer: _MobileDrawer(lp: lp),
       body: Column(
         children: [
           const VivumNavbar(),
           Expanded(
-            child: Scrollbar(
-              controller: _scrollController,
-              child: PrimaryScrollController(
-                controller: _scrollController,
-                child: widget.child,
-              ),
-            ),
+            child: widget.child,
           ),
         ],
       ),

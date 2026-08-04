@@ -105,33 +105,29 @@ class HeroOrbit extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Background soft glow - Enhanced for tech-agency look
+              // Background soft glow - Capped for memory efficiency
               _GlowDot(
                 color: VivumColors.teal, 
-                size: size * 0.3, 
-                glowSize: size * 0.8, 
-                opacity: isDark ? 0.15 : 0.2
+                size: size * 0.25, 
+                glowSize: (size * 0.7).clamp(0, 120), // Cap blur for memory safety
+                opacity: isDark ? 0.12 : 0.15
               ).animate(onPlay: (c) => c.repeat(reverse: true))
-               .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2), duration: 4.seconds, curve: Curves.easeInOut),
+               .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.1, 1.1), duration: 4.seconds, curve: Curves.easeInOut),
               
               // Animated Orbit Rings
-              RepaintBoundary(
-                child: _OrbitRing(
-                  size: 0.85, 
-                  color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.2), 
-                  isDashed: true
-                ).animate(onPlay: (c) => c.repeat())
-                 .rotate(duration: 20.seconds),
-              ),
+              _OrbitRing(
+                size: 0.8, 
+                color: VivumColors.teal.withValues(alpha: isDark ? 0.1 : 0.2), 
+                isDashed: true
+              ).animate(onPlay: (c) => c.repeat())
+               .rotate(duration: 25.seconds),
 
-              RepaintBoundary(
-                child: _OrbitRing(
-                  size: 0.65, 
-                  color: VivumColors.amber.withValues(alpha: isDark ? 0.08 : 0.15), 
-                  isDashed: true
-                ).animate(onPlay: (c) => c.repeat())
-                 .rotate(duration: 15.seconds, begin: 1, end: 0),
-              ),
+              _OrbitRing(
+                size: 0.6, 
+                color: VivumColors.amber.withValues(alpha: isDark ? 0.08 : 0.15), 
+                isDashed: true
+              ).animate(onPlay: (c) => c.repeat())
+               .rotate(duration: 20.seconds, begin: 1, end: 0),
 
               // The Glassy V shape
               Stack(
@@ -200,15 +196,8 @@ class _GlassBar extends StatelessWidget {
       width: width, 
       height: height,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: isDark ? 0.3 : 0.5), // Use solid color instead of gradient
+        color: color.withValues(alpha: isDark ? 0.3 : 0.5), 
         borderRadius: BorderRadius.circular(width / 2),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: isDark ? 0.1 : 0.2), 
-            blurRadius: width, 
-            spreadRadius: 0
-          )
-        ],
       ),
     ).animate(onPlay: (c) => c.repeat(reverse: true))
      .scaleY(begin: 0.98, end: 1.02, duration: 2.seconds, delay: delay, curve: Curves.easeInOut);
@@ -225,19 +214,18 @@ class _GlowDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Use RadialGradient instead of BoxShadow for 10x better performance and memory
     return Container(
-      width: size,
-      height: size,
+      width: size + glowSize,
+      height: size + glowSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withValues(alpha: opacity),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.5),
-            blurRadius: glowSize,
-            spreadRadius: 2,
-          ),
-        ],
+        gradient: RadialGradient(
+          colors: [
+            color.withValues(alpha: opacity),
+            color.withValues(alpha: 0),
+          ],
+        ),
       ),
     );
   }

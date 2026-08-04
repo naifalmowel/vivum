@@ -102,10 +102,10 @@ class ServicesScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SliverToBoxAdapter(child: VivumFooter()),
             ],
           ),
         ),
+        const SliverToBoxAdapter(child: VivumFooter()),
       ],
     );
   }

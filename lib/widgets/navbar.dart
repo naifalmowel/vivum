@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
+import 'glow_button.dart';
 
 class VivumNavbar extends StatefulWidget {
   const VivumNavbar({super.key});
@@ -94,10 +95,12 @@ class _VivumNavbarState extends State<VivumNavbar> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // CTA
-                  _GlowButton(
+                  // CTA - Unified with Hero style
+                  VivumButton(
                     label: app.t('nav.start'),
                     onTap: () => context.go('/contact'),
+                    variant: ButtonVariant.teal,
+                    icon: const Icon(Icons.rocket_launch_rounded, size: 16, color: Colors.white),
                   ),
                 ] else ...[
                   IconButton(
@@ -118,7 +121,7 @@ class _VivumNavbarState extends State<VivumNavbar> {
                       Icons.menu,
                       color: theme.colorScheme.onSurface,
                     ),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
                   ),
                 ],
               ],
@@ -214,81 +217,3 @@ class _NavItemState extends State<_NavItem> {
   }
 }
 
-class _GlowButton extends StatefulWidget {
-  final String label;
-  final VoidCallback onTap;
-  const _GlowButton({required this.label, required this.onTap});
-  @override
-  State<_GlowButton> createState() => _GlowButtonState();
-}
-
-class _GlowButtonState extends State<_GlowButton> with SingleTickerProviderStateMixin {
-  bool _hovered = false;
-  late AnimationController _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _anim = AnimationController(vsync: this, duration: 2000.ms)..repeat();
-  }
-
-  @override
-  void dispose() {
-    _anim.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedScale(
-          scale: _hovered ? 1.05 : 1.0,
-          duration: 200.ms,
-          child: Stack(
-            children: [
-              AnimatedContainer(
-                duration: 300.ms,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [VivumColors.teal, VivumColors.tealDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: VivumColors.teal.withValues(alpha: _hovered ? 0.4 : 0.2),
-                      blurRadius: _hovered ? 20 : 10,
-                      spreadRadius: _hovered ? 2 : 0,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.label,
-                      style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w700,
-                        color: Colors.white, letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.rocket_launch_rounded, size: 16, color: Colors.white),
-                  ],
-                ),
-              ),
-              // Shimmer effect removed for performance if needed, or kept very simple
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
