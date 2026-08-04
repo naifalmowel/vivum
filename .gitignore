@@ -6,8 +6,8 @@
 .pub/
 build/
 
-# Web-specific
-build/web/
+# Symbol files
+*.pdb
 
 # IDE-specific
 .idea/
@@ -15,9 +15,12 @@ build/web/
 *.ipr
 *.iws
 .vscode/
+.history/
 
 # Artifacts
 .artifacts/
+.DS_Store
+Thumbs.db
 
 # Logs
 logs
@@ -26,7 +29,3 @@ logs
 # Firebase
 .firebase/
 firebase-debug.log*
-
-# OS-specific
-.DS_Store
-Thumbs.db

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
 import '../theme/personal_info.dart';
 import '../l10n/translations.dart';
@@ -11,19 +12,22 @@ class VivumFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lp = AppProvider.of(context);
-    final isWide = MediaQuery.of(context).size.width > 768;
+    final isWide = MediaQuery
+        .of(context)
+        .size
+        .width > 768;
     final theme = Theme.of(context);
 
     return Container(
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: theme.dividerColor, width: 1)),
-        color: theme.brightness == Brightness.dark 
-            ? const Color(0xFF07091A) 
+        color: theme.brightness == Brightness.dark
+            ? const Color(0xFF07091A)
             : const Color(0xFFF1F5F9),
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: isWide ? 80 : 24, 
-        vertical: 60
+          horizontal: isWide ? 80 : 24,
+          vertical: 60
       ),
       child: Column(
         children: [
@@ -34,22 +38,22 @@ class VivumFooter extends StatelessWidget {
                 Expanded(flex: 2, child: _BrandColumn(lp: lp)),
                 const SizedBox(width: 40),
                 Expanded(child: _LinkColumn(
-                  title: lp.t('nav.services'), 
-                  links: [
-                    (lp.t('services.brand.title'), '/services'),
-                    (lp.t('services.digital.title'), '/services'),
-                    (lp.t('services.ai.title'), '/services'),
-                    (lp.t('services.it.title'), '/services'),
-                  ]
+                    title: lp.t('nav.services'),
+                    links: [
+                      (lp.t('services.brand.title'), '/services'),
+                      (lp.t('services.digital.title'), '/services'),
+                      (lp.t('services.ai.title'), '/services'),
+                      (lp.t('services.it.title'), '/services'),
+                    ]
                 )),
                 Expanded(child: _LinkColumn(
-                  title: lp.t('footer.company'), 
-                  links: [
-                    (lp.t('nav.about'), '/about'),
-                    (lp.t('nav.portfolio'), '/portfolio'),
-                    (lp.t('nav.process'), '/process'),
-                    (lp.t('nav.contact'), '/contact'),
-                  ]
+                    title: lp.t('footer.company'),
+                    links: [
+                      (lp.t('nav.about'), '/about'),
+                      (lp.t('nav.portfolio'), '/portfolio'),
+                      (lp.t('nav.process'), '/process'),
+                      (lp.t('nav.contact'), '/contact'),
+                    ]
                 )),
                 Expanded(child: _ContactColumn(lp: lp)),
               ],
@@ -61,23 +65,23 @@ class VivumFooter extends StatelessWidget {
                 _BrandColumn(lp: lp),
                 const SizedBox(height: 48),
                 _LinkColumn(
-                  title: lp.t('nav.services'), 
-                  links: [
-                    (lp.t('services.brand.title'), '/services'),
-                    (lp.t('services.digital.title'), '/services'),
-                    (lp.t('services.ai.title'), '/services'),
-                    (lp.t('services.it.title'), '/services'),
-                  ]
+                    title: lp.t('nav.services'),
+                    links: [
+                      (lp.t('services.brand.title'), '/services'),
+                      (lp.t('services.digital.title'), '/services'),
+                      (lp.t('services.ai.title'), '/services'),
+                      (lp.t('services.it.title'), '/services'),
+                    ]
                 ),
                 const SizedBox(height: 32),
                 _LinkColumn(
-                  title: lp.t('footer.company'), 
-                  links: [
-                    (lp.t('nav.about'), '/about'),
-                    (lp.t('nav.portfolio'), '/portfolio'),
-                    (lp.t('nav.process'), '/process'),
-                    (lp.t('nav.contact'), '/contact'),
-                  ]
+                    title: lp.t('footer.company'),
+                    links: [
+                      (lp.t('nav.about'), '/about'),
+                      (lp.t('nav.portfolio'), '/portfolio'),
+                      (lp.t('nav.process'), '/process'),
+                      (lp.t('nav.contact'), '/contact'),
+                    ]
                 ),
                 const SizedBox(height: 48),
                 _ContactColumn(lp: lp),
@@ -95,10 +99,15 @@ class VivumFooter extends StatelessWidget {
                   style: theme.textTheme.bodySmall,
                 ),
                 Row(
-                  children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) => Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 24),
-                    child: Text(m, style: theme.textTheme.bodySmall),
-                  )).toList(),
+                  children: [
+                    lp.t('footer.uae'),
+                    lp.t('footer.ksa'),
+                    lp.t('footer.syria')
+                  ].map((m) =>
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(start: 24),
+                        child: Text(m, style: theme.textTheme.bodySmall),
+                      )).toList(),
                 ),
               ],
             )
@@ -119,8 +128,12 @@ class VivumFooter extends StatelessWidget {
                 Wrap(
                   spacing: 16,
                   runSpacing: 8,
-                  children: [lp.t('footer.uae'), lp.t('footer.ksa'), lp.t('footer.syria')].map((m) =>
-                    Text(m, style: theme.textTheme.bodySmall),
+                  children: [
+                    lp.t('footer.uae'),
+                    lp.t('footer.ksa'),
+                    lp.t('footer.syria')
+                  ].map((m) =>
+                      Text(m, style: theme.textTheme.bodySmall),
                   ).toList(),
                 ),
               ],
@@ -133,6 +146,7 @@ class VivumFooter extends StatelessWidget {
 
 class _BrandColumn extends StatelessWidget {
   final AppProvider lp;
+
   const _BrandColumn({required this.lp});
 
   @override
@@ -144,7 +158,7 @@ class _BrandColumn extends StatelessWidget {
         RichText(
           text: TextSpan(
             style: TextStyle(
-              fontSize: 28, fontWeight: FontWeight.w900, 
+              fontSize: 28, fontWeight: FontWeight.w900,
               color: theme.colorScheme.onSurface,
               fontFamily: 'Cairo',
             ),
@@ -163,15 +177,30 @@ class _BrandColumn extends StatelessWidget {
           maxLines: 4, overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 28),
-        const Wrap(
+         Wrap(
           spacing: 12,
           runSpacing: 12,
           children: [
-            _SocialIcon(icon: Icons.link, url: PersonalInfo.linkedin, label: 'LinkedIn'),
-            _SocialIcon(icon: Icons.camera_alt_outlined, url: PersonalInfo.instagram, label: 'Instagram'),
-            _SocialIcon(icon: Icons.facebook_rounded, url: PersonalInfo.facebook, label: 'Facebook'),
-            _SocialIcon(icon: Icons.message_rounded, url: PersonalInfo.whatsapp, label: 'WhatsApp'),
-            _SocialIcon(icon: Icons.brush_rounded, url: PersonalInfo.behance, label: 'Behance'),
+            _SocialIcon(
+              icon: const FaIcon(FontAwesomeIcons.linkedinIn, size: 18),
+              url: PersonalInfo.linkedin,
+            ),
+            _SocialIcon(
+              icon: const FaIcon(FontAwesomeIcons.instagram, size: 18),
+              url: PersonalInfo.instagram,
+            ),
+            _SocialIcon(
+              icon: const FaIcon(FontAwesomeIcons.facebookF, size: 18),
+              url: PersonalInfo.facebook,
+            ),
+            _SocialIcon(
+              icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
+              url: PersonalInfo.whatsapp,
+            ),
+            _SocialIcon(
+              icon: const FaIcon(FontAwesomeIcons.behance, size: 18),
+              url: PersonalInfo.behance,
+            ),
           ],
         ),
       ],
@@ -180,10 +209,11 @@ class _BrandColumn extends StatelessWidget {
 }
 
 class _SocialIcon extends StatefulWidget {
-  final IconData icon;
+  final Widget icon;
   final String url;
-  final String label;
-  const _SocialIcon({required this.icon, required this.url, required this.label});
+
+  const _SocialIcon({required this.icon, required this.url});
+
   @override
   State<_SocialIcon> createState() => _SocialIconState();
 }
@@ -208,16 +238,27 @@ class _SocialIconState extends State<_SocialIcon> {
         onTap: _launch,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          width: 42, height: 42,
+          width: 42,
+          height: 42,
           decoration: BoxDecoration(
-            color: _hovered ? VivumColors.teal.withValues(alpha: 0.15) : theme.dividerColor.withValues(alpha: 0.5),
+            color: _hovered ? VivumColors.teal.withValues(alpha: 0.15) : theme
+                .dividerColor.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: _hovered ? VivumColors.teal.withValues(alpha: 0.5) : Colors.transparent,
+              color: _hovered ? VivumColors.teal.withValues(alpha: 0.5) : Colors
+                  .transparent,
             ),
           ),
-          child: Icon(widget.icon, size: 18,
-            color: _hovered ? VivumColors.teal : theme.textTheme.bodySmall?.color),
+          child: Center(
+            child: Theme(
+              data: theme.copyWith(
+                iconTheme: IconThemeData(
+                  color: _hovered ? VivumColors.teal : theme.textTheme.bodySmall?.color,
+                ),
+              ),
+              child: widget.icon,
+            ),
+          ),
         ),
       ),
     );
@@ -227,6 +268,7 @@ class _SocialIconState extends State<_SocialIcon> {
 class _LinkColumn extends StatelessWidget {
   final String title;
   final List<(String, String)> links;
+
   const _LinkColumn({required this.title, required this.links});
 
   @override
@@ -236,21 +278,23 @@ class _LinkColumn extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
-          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700)),
         const SizedBox(height: 24),
-        ...links.map((l) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: InkWell(
-            onTap: () => context.go(l.$2),
-            borderRadius: BorderRadius.circular(4),
-            child: Text(
-              l.$1, 
-              style: theme.textTheme.bodyMedium?.copyWith(
-                height: 1.4,
-              )
-            ),
-          ),
-        )),
+        ...links.map((l) =>
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () => context.go(l.$2),
+                borderRadius: BorderRadius.circular(4),
+                child: Text(
+                    l.$1,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      height: 1.4,
+                    )
+                ),
+              ),
+            )),
       ],
     );
   }
@@ -258,6 +302,7 @@ class _LinkColumn extends StatelessWidget {
 
 class _ContactColumn extends StatelessWidget {
   final AppProvider lp;
+
   const _ContactColumn({required this.lp});
 
   @override
@@ -266,7 +311,8 @@ class _ContactColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(lp.t('nav.contact'), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        Text(lp.t('nav.contact'), style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700)),
         const SizedBox(height: 24),
         InkWell(
           onTap: () => launchUrl(Uri.parse('mailto:${PersonalInfo.email}')),
@@ -275,7 +321,8 @@ class _ContactColumn extends StatelessWidget {
         const SizedBox(height: 12),
         InkWell(
           onTap: () => launchUrl(Uri.parse('tel:${PersonalInfo.phoneNumber}')),
-          child: Text(PersonalInfo.phoneNumber, style: theme.textTheme.bodyMedium),
+          child: Text(
+              PersonalInfo.phoneNumber, style: theme.textTheme.bodyMedium),
         ),
       ],
     );

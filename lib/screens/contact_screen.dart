@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
+import '../theme/personal_info.dart';
 import '../l10n/translations.dart';
 import '../widgets/footer.dart';
 import '../widgets/section_reveal.dart';
@@ -367,15 +370,16 @@ class _ContactInfo extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Follow Us', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text(lp.t('footer.follow'), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 16),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 children: [
-                  const _SocialBtn(icon: Icons.link, label: 'LinkedIn', color: Color(0xFF0A66C2)),
-                  const _SocialBtn(icon: Icons.camera_alt_outlined, label: 'Instagram', color: Color(0xFFE1306C)),
-                  _SocialBtn(icon: Icons.alternate_email_rounded, label: 'Twitter', color: VivumColors.teal),
+                  _SocialBtn(icon: const FaIcon(FontAwesomeIcons.linkedinIn, size: 14), label: 'LinkedIn', color: const Color(0xFF0A66C2), url: PersonalInfo.linkedin),
+                  _SocialBtn(icon: const FaIcon(FontAwesomeIcons.instagram, size: 14), label: 'Instagram', color: const Color(0xFFE1306C), url: PersonalInfo.instagram),
+                  _SocialBtn(icon: const FaIcon(FontAwesomeIcons.facebookF, size: 14), label: 'Facebook', color: const Color(0xFF1877F2), url: PersonalInfo.facebook),
+                  _SocialBtn(icon: const FaIcon(FontAwesomeIcons.behance, size: 14), label: 'Behance', color: const Color(0xFF1769FF), url: PersonalInfo.behance),
                 ],
               ),
             ],
@@ -431,36 +435,55 @@ class _LocationRow extends StatelessWidget {
 }
 
 class _SocialBtn extends StatefulWidget {
-  final IconData icon;
+  final Widget icon;
   final String label;
   final Color color;
-  const _SocialBtn({required this.icon, required this.label, required this.color});
+  final String url;
+  const _SocialBtn({required this.icon, required this.label, required this.color, required this.url});
   @override
   State<_SocialBtn> createState() => _SocialBtnState();
 }
 
 class _SocialBtnState extends State<_SocialBtn> {
   bool _hovered = false;
+
+  void _launch() async {
+    final uri = Uri.parse(widget.url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: 200.ms,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: _hovered ? widget.color.withValues(alpha: 0.15) : theme.dividerColor.withValues(alpha: 0.5),
-          border: Border.all(color: _hovered ? widget.color.withValues(alpha: 0.4) : Colors.transparent),
-          borderRadius: BorderRadius.circular(10),
+      child: GestureDetector(
+        onTap: _launch,
+        child: AnimatedContainer(
+          duration: 200.ms,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: _hovered ? widget.color.withValues(alpha: 0.15) : theme.dividerColor.withValues(alpha: 0.5),
+            border: Border.all(color: _hovered ? widget.color.withValues(alpha: 0.4) : Colors.transparent),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Theme(
+              data: theme.copyWith(
+                iconTheme: IconThemeData(
+                  color: _hovered ? widget.color : theme.textTheme.bodySmall?.color,
+                ),
+              ),
+              child: widget.icon,
+            ),
+            const SizedBox(width: 6),
+            Text(widget.label, style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 12, color: _hovered ? widget.color : theme.textTheme.bodySmall?.color, fontWeight: FontWeight.w500)),
+          ]),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(widget.icon, size: 14, color: _hovered ? widget.color : theme.textTheme.bodySmall?.color),
-          const SizedBox(width: 6),
-          Text(widget.label, style: theme.textTheme.bodySmall?.copyWith(
-            fontSize: 12, color: _hovered ? widget.color : theme.textTheme.bodySmall?.color, fontWeight: FontWeight.w500)),
-        ]),
       ),
     );
   }
