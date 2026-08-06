@@ -124,7 +124,11 @@ class AppProvider extends InheritedWidget {
     'process.step5.title': 'Launch & Support',
     'process.step5.desc': 'Deploying with confidence and providing continuous monitoring, updates, and growth support.',
 
-    // About
+    'about.label': 'WHO WE ARE',
+    'about.reach.label': 'OUR REACH',
+    'about.values.label': 'CORE VALUES',
+    'process.label': 'OUR PROCESS',
+    'contact.label': 'GET IN TOUCH',
     'about.title': 'Who We Are',
     'about.story': 'VIVUM is a regional digital agency helping businesses across UAE, Saudi Arabia, and Syria transform their ideas into powerful digital experiences. We combine creative design, cutting-edge technology, and artificial intelligence to deliver solutions that drive real business growth.',
     'about.foundation': 'Built on Three Foundations',
@@ -266,7 +270,11 @@ class AppProvider extends InheritedWidget {
     'process.step5.title': 'الإطلاق والدعم',
     'process.step5.desc': 'النشر بثقة مع مراقبة مستمرة وتحديثات ودعم للنمو.',
 
-    // About
+    'about.label': 'من نحن',
+    'about.reach.label': 'أسواقنا',
+    'about.values.label': 'قيمنا الأساسية',
+    'process.label': 'منهجيتنا',
+    'contact.label': 'تواصل معنا',
     'about.title': 'من نحن',
     'about.story': 'فيفوم وكالة رقمية إقليمية تساعد الأعمال في الإمارات والسعودية وسوريا على تحويل أفكارها إلى تجارب رقمية قوية. نجمع التصميم الإبداعي والتكنولوجيا المتقدمة والذكاء الاصطناعي لتقديم حلول تحقق نمواً حقيقياً.',
     'about.foundation': 'مبنية على ثلاث ركائز أساسية',

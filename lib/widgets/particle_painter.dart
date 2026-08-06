@@ -293,3 +293,59 @@ class ParticleBackground extends StatelessWidget {
     return VivumBackground(isAr: lp.isAr, isDark: lp.isDark);
   }
 }
+
+/// A specialized background for internal page headers
+class InternalPageHeaderBg extends StatelessWidget {
+  final String ghostText;
+  final Widget? icon; // Keep for flexibility, but we will remove from screens
+  const InternalPageHeaderBg({super.key, required this.ghostText, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final size = MediaQuery.of(context).size;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return SizedBox.expand(
+      child: Stack(
+        alignment: Alignment.center, // Center contents
+        children: [
+          // Base Mesh Background
+          const Positioned.fill(child: ParticleBackground()),
+          
+          // Large Ghost Text (Branding) - Centered
+          Opacity(
+            opacity: isDark ? 0.04 : 0.06,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  ghostText.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: size.width * 0.18,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 15,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
+  
+          // Floating Icon (if provided, otherwise empty)
+          if (icon != null)
+            Opacity(
+              opacity: 0.3,
+              child: SizedBox(
+                width: size.width * 0.3,
+                height: size.width * 0.3,
+                child: icon,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

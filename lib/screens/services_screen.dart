@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
+import '../widgets/particle_painter.dart';
 import '../widgets/section_reveal.dart';
 
 import '../widgets/footer.dart';
@@ -61,24 +62,35 @@ class ServicesScreen extends StatelessWidget {
               // Page Hero
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                    horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
-                decoration: BoxDecoration(
-                  gradient: VivumColors.heroGradient(lp.isDark),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                constraints: BoxConstraints(minHeight: isWide ? 400 : 300),
+                child: Stack(
                   children: [
-                    const _Label('OUR SERVICES'),
-                    const SizedBox(height: 20),
-                    Text(lp.t('services.title'),
-                        style: theme.textTheme.displayMedium),
-                    const SizedBox(height: 16),
-                    Text(lp.t('services.sub'),
-                        style: theme.textTheme.bodyLarge),
+                    Positioned.fill(
+                      child: InternalPageHeaderBg(
+                        ghostText: 'SERVICES',
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 60),
+                          _Label(lp.t('services.label')),
+                          const SizedBox(height: 20),
+                          Text(lp.t('services.title'),
+                              style: theme.textTheme.displayMedium),
+                          const SizedBox(height: 16),
+                          Text(lp.t('services.sub'),
+                              style: theme.textTheme.bodyLarge),
+                          const SizedBox(height: 60),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
+              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.05),
 
               // Service Categories
               Padding(

@@ -98,16 +98,12 @@ class VivumFooter extends StatelessWidget {
                   '© 2025 VIVUM Digital Agency. ${lp.t('footer.rights')}',
                   style: theme.textTheme.bodySmall,
                 ),
-                Row(
+                const Row(
                   children: [
-                    lp.t('footer.uae'),
-                    lp.t('footer.ksa'),
-                    lp.t('footer.syria')
-                  ].map((m) =>
-                      Padding(
-                        padding: const EdgeInsetsDirectional.only(start: 24),
-                        child: Text(m, style: theme.textTheme.bodySmall),
-                      )).toList(),
+                    _CountryFlag(flagAsset: 'assets/flags/uae.webp', nameKey: 'footer.uae'),
+                    _CountryFlag(flagAsset: 'assets/flags/sau.webp', nameKey: 'footer.ksa'),
+                    _CountryFlag(flagAsset: 'assets/flags/syr.webp', nameKey: 'footer.syria'),
+                  ],
                 ),
               ],
             )
@@ -125,16 +121,14 @@ class VivumFooter extends StatelessWidget {
                   style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 20),
-                Wrap(
+                const Wrap(
                   spacing: 16,
-                  runSpacing: 8,
+                  runSpacing: 12,
                   children: [
-                    lp.t('footer.uae'),
-                    lp.t('footer.ksa'),
-                    lp.t('footer.syria')
-                  ].map((m) =>
-                      Text(m, style: theme.textTheme.bodySmall),
-                  ).toList(),
+                    _CountryFlag(flagAsset: 'assets/flags/uae.webp', nameKey: 'footer.uae'),
+                    _CountryFlag(flagAsset: 'assets/flags/sau.webp', nameKey: 'footer.ksa'),
+                    _CountryFlag(flagAsset: 'assets/flags/syr.webp', nameKey: 'footer.syria'),
+                  ],
                 ),
               ],
             ),
@@ -265,6 +259,31 @@ class _SocialIconState extends State<_SocialIcon> {
   }
 }
 
+class _CountryFlag extends StatelessWidget {
+  final String flagAsset;
+  final String nameKey;
+  const _CountryFlag({required this.flagAsset, required this.nameKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final lp = AppProvider.of(context);
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(start: 24),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: Image.asset(flagAsset, width: 20, height: 14, fit: BoxFit.cover),
+          ),
+          const SizedBox(width: 8),
+          Text(lp.t(nameKey), style: theme.textTheme.bodySmall),
+        ],
+      ),
+    );
+  }
+}
 class _LinkColumn extends StatelessWidget {
   final String title;
   final List<(String, String)> links;

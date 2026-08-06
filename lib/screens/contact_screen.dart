@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../theme/personal_info.dart';
 import '../l10n/translations.dart';
 import '../widgets/footer.dart';
+import '../widgets/particle_painter.dart';
 import '../widgets/section_reveal.dart';
 import '../widgets/glow_button.dart';
 
@@ -52,26 +53,38 @@ class _ContactScreenState extends State<ContactScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Hero
+              // Page Hero
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                    horizontal: isWide ? 80 : 24, vertical: isWide ? 100 : 60),
-                decoration: BoxDecoration(
-                  gradient: VivumColors.heroGradient(lp.isDark),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                constraints: BoxConstraints(minHeight: isWide ? 400 : 300),
+                child: Stack(
                   children: [
-                    const _Label('GET IN TOUCH'),
-                    const SizedBox(height: 20),
-                    Text(lp.t('contact.title'),
-                        style: theme.textTheme.displayMedium),
-                    const SizedBox(height: 16),
-                    Text(lp.t('contact.sub'), style: theme.textTheme.bodyLarge),
+                    Positioned.fill(
+                      child: InternalPageHeaderBg(
+                        ghostText: 'CONTACT',
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 60),
+                          _Label(lp.t('contact.label')),
+                          const SizedBox(height: 20),
+                          Text(lp.t('contact.title'),
+                              style: theme.textTheme.displayMedium),
+                          const SizedBox(height: 16),
+                          Text(lp.t('contact.sub'),
+                              style: theme.textTheme.bodyLarge),
+                          const SizedBox(height: 60),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
+              ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.05),
 
               // Form + Info
               Padding(
@@ -350,11 +363,11 @@ class _ContactInfo extends StatelessWidget {
               Text(lp.t('contact.coverage'),
                 style: theme.textTheme.bodySmall),
               const SizedBox(height: 16),
-              const _LocationRow(flag: '🇦🇪', name: 'United Arab Emirates'),
+              const _LocationRow(flagAsset: 'assets/flags/uae.webp', name: 'United Arab Emirates'),
               const SizedBox(height: 10),
-              const _LocationRow(flag: '🇸🇦', name: 'Saudi Arabia'),
+              const _LocationRow(flagAsset: 'assets/flags/sau.webp', name: 'Saudi Arabia'),
               const SizedBox(height: 10),
-              const _LocationRow(flag: '🇸🇾', name: 'Syria'),
+              const _LocationRow(flagAsset: 'assets/flags/syr.webp', name: 'Syria'),
             ],
           ),
         ),
@@ -421,13 +434,16 @@ class _InfoCard extends StatelessWidget {
 }
 
 class _LocationRow extends StatelessWidget {
-  final String flag, name;
-  const _LocationRow({required this.flag, required this.name});
+  final String flagAsset, name;
+  const _LocationRow({required this.flagAsset, required this.name});
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Row(children: [
-      Text(flag, style: const TextStyle(fontSize: 20)),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: Image.asset(flagAsset, width: 24, height: 16, fit: BoxFit.cover),
+      ),
       const SizedBox(width: 12),
       Expanded(child: Text(name, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface))),
     ]);

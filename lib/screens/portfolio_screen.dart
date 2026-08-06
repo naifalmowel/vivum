@@ -5,6 +5,7 @@ import '../l10n/translations.dart';
 import '../services/storage_service.dart';
 import '../services/database_service.dart';
 import '../widgets/footer.dart';
+import '../widgets/particle_painter.dart';
 import '../widgets/project_widgets.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -66,38 +67,48 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               SliverToBoxAdapter(
                 child: Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: isWide ? 80 : 24, vertical: 80),
-                  decoration: BoxDecoration(
-                      gradient: VivumColors.heroGradient(lp.isDark)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  constraints: BoxConstraints(minHeight: isWide ? 400 : 300),
+                  child: Stack(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const _TealLabel('SELECTED WORK'),
-                          if (lp.isAdminMode)
-                            ElevatedButton.icon(
-                              onPressed: () => _showProjectForm(),
-                              icon: const Icon(Icons.add_rounded),
-                              label: const Text('Add New Project'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: VivumColors.teal,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                        ],
+                      Positioned.fill(
+                        child: InternalPageHeaderBg(
+                          ghostText: 'WORK',
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      Text(lp.t('portfolio.title'),
-                          style: theme.textTheme.displayMedium),
-                      const SizedBox(height: 16),
-                      Text(lp.t('portfolio.sub'),
-                          style: theme.textTheme.bodyLarge),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 60),
+                            _TealLabel(lp.t('portfolio.label')),
+                            const SizedBox(height: 20),
+                            Text(lp.t('portfolio.title'),
+                                style: theme.textTheme.displayMedium),
+                            const SizedBox(height: 16),
+                            Text(lp.t('portfolio.sub'),
+                                style: theme.textTheme.bodyLarge),
+                            const SizedBox(height: 60),
+                          ],
+                        ),
+                      ),
+                      if (lp.isAdminMode)
+                        Positioned(
+                          top: 100, right: isWide ? 80 : 24,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _showProjectForm(),
+                            icon: const Icon(Icons.add_rounded),
+                            label: const Text('Add New Project'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: VivumColors.teal,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.1),
+                ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.05),
               ),
 
               // Filters
