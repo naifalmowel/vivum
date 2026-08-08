@@ -67,7 +67,7 @@ class ServicesScreen extends StatelessWidget {
                   children: [
                     Positioned.fill(
                       child: InternalPageHeaderBg(
-                        ghostText: 'SERVICES',
+                        glowColor: VivumColors.teal,
                       ),
                     ),
                     Padding(

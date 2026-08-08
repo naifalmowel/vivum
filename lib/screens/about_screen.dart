@@ -31,7 +31,7 @@ class AboutScreen extends StatelessWidget {
                   children: [
                     Positioned.fill(
                       child: InternalPageHeaderBg(
-                        ghostText: 'ABOUT',
+                        glowColor: VivumColors.amber,
                       ),
                     ),
                     Padding(
@@ -330,7 +330,7 @@ class _PillarCard extends StatelessWidget {
               decoration: BoxDecoration(color: accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: accent.withValues(alpha: 0.2))),
               child: Icon(icon, color: accent, size: 24)),
-            Text(number, style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: theme.dividerColor.withValues(alpha: 0.3))),
+            Text(number, style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: theme.dividerColor.withValues(alpha: 0.75))),
           ]),
           const SizedBox(height: 24),
           Text(lp.t(titleKey), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),

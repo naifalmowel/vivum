@@ -72,7 +72,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     children: [
                       Positioned.fill(
                         child: InternalPageHeaderBg(
-                          ghostText: 'WORK',
+                          glowColor: VivumColors.amber,
                         ),
                       ),
                       Padding(

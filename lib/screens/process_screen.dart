@@ -39,7 +39,7 @@ class ProcessScreen extends StatelessWidget {
                   children: [
                     Positioned.fill(
                       child: InternalPageHeaderBg(
-                        ghostText: 'PROCESS',
+                        glowColor: VivumColors.teal,
                       ),
                     ),
                     Padding(

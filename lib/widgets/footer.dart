@@ -21,9 +21,7 @@ class VivumFooter extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: theme.dividerColor, width: 1)),
-        color: theme.brightness == Brightness.dark
-            ? const Color(0xFF07091A)
-            : const Color(0xFFF1F5F9),
+        color: theme.scaffoldBackgroundColor, // Use theme background color
       ),
       padding: EdgeInsets.symmetric(
           horizontal: isWide ? 80 : 24,

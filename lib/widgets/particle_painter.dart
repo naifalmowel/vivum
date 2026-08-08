@@ -294,11 +294,11 @@ class ParticleBackground extends StatelessWidget {
   }
 }
 
-/// A specialized background for internal page headers
+/// A specialized atmospheric background for internal page headers.
+/// Uses RadialGradients for maximum performance (0% GPU lag).
 class InternalPageHeaderBg extends StatelessWidget {
-  final String ghostText;
-  final Widget? icon; // Keep for flexibility, but we will remove from screens
-  const InternalPageHeaderBg({super.key, required this.ghostText, this.icon});
+  final Color glowColor;
+  const InternalPageHeaderBg({super.key, required this.glowColor});
 
   @override
   Widget build(BuildContext context) {
@@ -308,44 +308,52 @@ class InternalPageHeaderBg extends StatelessWidget {
 
     return SizedBox.expand(
       child: Stack(
-        alignment: Alignment.center, // Center contents
         children: [
           // Base Mesh Background
           const Positioned.fill(child: ParticleBackground()),
           
-          // Large Ghost Text (Branding) - Centered
-          Opacity(
-            opacity: isDark ? 0.04 : 0.06,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Text(
-                  ghostText.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: size.width * 0.18,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 15,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
+          // Primary Glow (Top Right)
+          Positioned(
+            top: -size.height * 0.2,
+            right: -size.width * 0.1,
+            child: _AtmosphericGlow(
+              color: glowColor.withValues(alpha: isDark ? 0.15 : 0.12),
+              size: size.width * 0.6,
             ),
           ),
-  
-          // Floating Icon (if provided, otherwise empty)
-          if (icon != null)
-            Opacity(
-              opacity: 0.3,
-              child: SizedBox(
-                width: size.width * 0.3,
-                height: size.width * 0.3,
-                child: icon,
-              ),
+
+          // Secondary Accent Glow (Bottom Left)
+          Positioned(
+            bottom: -size.height * 0.1,
+            left: -size.width * 0.05,
+            child: _AtmosphericGlow(
+              color: (isDark ? VivumColors.teal : VivumColors.amber).withValues(alpha: 0.05),
+              size: size.width * 0.4,
             ),
+          ),
         ],
       ),
     );
+  }
+}
+
+class _AtmosphericGlow extends StatelessWidget {
+  final Color color;
+  final double size;
+  const _AtmosphericGlow({required this.color, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color, color.withValues(alpha: 0)],
+        ),
+      ),
+    ).animate(onPlay: (c) => c.repeat(reverse: true))
+     .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 6.seconds, curve: Curves.easeInOut);
   }
 }

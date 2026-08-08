@@ -8,33 +8,33 @@ class VivumColors {
   static const amber = Color(0xFFF5A61A);
   static const amberLight = Color(0xFFF7B84B);
 
-  // Dark Theme Palette
-  static const darkBG = Color(0xFF07091A);
-  static const darkSurface = Color(0xFF0F1226);
-  static const darkCard = Color(0xFF12152E);
-  static const darkBorder = Color(0xFF1E2145);
-  static const darkMuted = Color(0xFF8B90B0);
-  static const darkWhite = Color(0xFFF8F9FC);
+  // Dark Theme Palette - Soft Slate Charcoal (More eye-friendly)
+  static const darkBG = Color(0xFF15171E); 
+  static const darkSurface = Color(0xFF1C1F26);
+  static const darkCard = Color(0xFF232730);
+  static const darkBorder = Color(0xFF2E333D);
+  static const darkMuted = Color(0xFF9499B8);
+  static const darkWhite = Color(0xFFE2E4E9); // Softened white text
 
-  // Light Theme Palette - Refined for cleaner look
-  static const lightBG = Color(0xFFFFFFFF); // Pure white background
-  static const lightBGAlt = Color(0xFFF8FAFC); // Very subtle grey for contrast
-  static const lightSurface = Color(0xFFFFFFFF);
+  // Light Theme Palette - Soft Off-White/Warm Grey (Reduced glare)
+  static const lightBG = Color(0xFFF5F7FA); // Soft slate white, easier on eyes
+  static const lightBGAlt = Color(0xFFEDF1F5); 
+  static const lightSurface = Color(0xFFFDFDFD); // Slightly off-white
   static const lightCard = Color(0xFFFFFFFF);
-  static const lightBorder = Color(0xFFE2E8F0); 
-  static const lightMuted = Color(0xFF64748B); 
-  static const lightText = Color(0xFF0F172A);
+  static const lightBorder = Color(0xFFD1D9E0); 
+  static const lightMuted = Color(0xFF5A6672); // Darker muted for better readability
+  static const lightText = Color(0xFF1A1F2E); // Soft dark blue-black
 
   static LinearGradient heroGradient(bool isDark) => isDark
       ? const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF07091A), Color(0xFF0D1035), Color(0xFF07091A)],
+          colors: [Color(0xFF15171E), Color(0xFF1E2129), Color(0xFF15171E)],
         )
       : const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF8FAFF), Color(0xFFE2E8F0), Color(0xFFF1F5F9)],
+          colors: [Color(0xFFF5F7FA), Color(0xFFE9EDF2), Color(0xFFF5F7FA)],
         );
 
   static const LinearGradient tealGradient = LinearGradient(
@@ -49,12 +49,12 @@ class VivumColors {
       ? const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF141730), Color(0xFF0F1228)],
+          colors: [Color(0xFF232730), Color(0xFF1C1F26)],
         )
       : const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xFFF1F5F9)],
+          colors: [Color(0xFFFFFFFF), Color(0xFFF5F7FA)],
         );
 }
 

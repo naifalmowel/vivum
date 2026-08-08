@@ -61,7 +61,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   children: [
                     Positioned.fill(
                       child: InternalPageHeaderBg(
-                        ghostText: 'CONTACT',
+                        glowColor: VivumColors.teal,
                       ),
                     ),
                     Padding(
