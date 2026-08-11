@@ -81,7 +81,6 @@ class VivumApp extends StatefulWidget {
 class _VivumAppState extends State<VivumApp> {
   String _lang = 'en';
   ThemeMode _themeMode = ThemeMode.dark;
-  bool _isAdminMode = false;
 
   void _toggleLang() => setState(() => _lang = _lang == 'en' ? 'ar' : 'en');
 
@@ -90,17 +89,13 @@ class _VivumAppState extends State<VivumApp> {
       _themeMode =
       _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
 
-  void _toggleAdmin() => setState(() => _isAdminMode = !_isAdminMode);
-
   @override
   Widget build(BuildContext context) {
     return AppProvider(
       lang: _lang,
       themeMode: _themeMode,
-      isAdminMode: _isAdminMode,
       onToggleLang: _toggleLang,
       onToggleTheme: _toggleTheme,
-      onToggleAdmin: _toggleAdmin,
       child: Builder(
         builder: (context) {
           final appProvider = AppProvider.of(context);

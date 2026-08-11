@@ -48,9 +48,6 @@ class _VivumNavbarState extends State<VivumNavbar> {
                 // Logo
                 InkWell(
                   onTap: () => context.go('/'),
-                  onLongPress: () {
-                    app.onToggleAdmin();
-                  },
                   borderRadius: BorderRadius.circular(8),
                   child: const _VivumLogoText(),
                 ),

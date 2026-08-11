@@ -40,4 +40,19 @@ class DatabaseService {
       return snapshot.docs.map((doc) => doc.data()).toList();
     });
   }
+
+  // Save Contact Request
+  static Future<void> saveContactRequest(Map<String, dynamic> data) async {
+    try {
+      final id = DateTime.now().millisecondsSinceEpoch.toString();
+      await _db.collection('contact_requests').doc(id).set({
+        ...data,
+        'createdAt': FieldValue.serverTimestamp(),
+        'id': id,
+      });
+    } catch (e) {
+      debugPrint('Error saving contact request: $e');
+      rethrow;
+    }
+  }
 }

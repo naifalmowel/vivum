@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
-import '../services/storage_service.dart';
 import '../services/database_service.dart';
 import '../widgets/footer.dart';
 import '../widgets/particle_painter.dart';
@@ -33,13 +33,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       imageUrls: [],
     ),
   ];
-
-  void _showProjectForm([Project? project]) {
-    showDialog(
-      context: context,
-      builder: (c) => _ProjectFormDialog(project: project),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,19 +86,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ],
                         ),
                       ),
-                      if (lp.isAdminMode)
-                        Positioned(
-                          top: 100, right: isWide ? 80 : 24,
-                          child: ElevatedButton.icon(
-                            onPressed: () => _showProjectForm(),
-                            icon: const Icon(Icons.add_rounded),
-                            label: const Text('Add New Project'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: VivumColors.teal,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.05),
@@ -149,8 +129,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => ProjectCard(
                             project: filtered[index],
-                            isAdminMode: lp.isAdminMode,
-                            onEdit: () => _showProjectForm(filtered[index]),
                           ),
                           childCount: filtered.length,
                         ),
@@ -161,8 +139,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             padding: const EdgeInsets.only(bottom: 20),
                             child: ProjectCard(
                               project: filtered[index],
-                              isAdminMode: lp.isAdminMode,
-                              onEdit: () => _showProjectForm(filtered[index]),
                             ),
                           ),
                           childCount: filtered.length,

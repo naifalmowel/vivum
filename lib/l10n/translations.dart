@@ -3,19 +3,15 @@ import 'package:flutter/material.dart';
 class AppProvider extends InheritedWidget {
   final String lang;
   final ThemeMode themeMode;
-  final bool isAdminMode;
   final VoidCallback onToggleLang;
   final VoidCallback onToggleTheme;
-  final VoidCallback onToggleAdmin;
 
   const AppProvider({
     super.key,
     required this.lang,
     required this.themeMode,
-    required this.isAdminMode,
     required this.onToggleLang,
     required this.onToggleTheme,
-    required this.onToggleAdmin,
     required super.child,
   });
 
@@ -39,7 +35,7 @@ class AppProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AppProvider old) => 
-      old.lang != lang || old.themeMode != themeMode || old.isAdminMode != isAdminMode;
+      old.lang != lang || old.themeMode != themeMode;
 
   static const _en = {
     // Nav

@@ -75,14 +75,10 @@ class Project {
 
 class ProjectCard extends StatefulWidget {
   final Project project;
-  final bool isAdminMode;
-  final VoidCallback? onEdit;
   final String? viewLabel;
 
   const ProjectCard({
     required this.project,
-    this.isAdminMode = false,
-    this.onEdit,
     this.viewLabel,
   });
 
@@ -99,31 +95,6 @@ class _ProjectCardState extends State<ProjectCard> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
-  }
-
-  void _delete() async {
-    final lp = AppProvider.of(context);
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: Text(lp.t('portfolio.delete.title')),
-        content: Text(lp.t('portfolio.delete.confirm',
-            args: {'title': widget.project.title})),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(c, false),
-              child: Text(lp.t('common.cancel'))),
-          TextButton(
-              onPressed: () => Navigator.pop(c, true),
-              child: Text(lp.t('common.delete'),
-                  style: const TextStyle(color: Colors.red))),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      await DatabaseService.deleteProject(widget.project.id);
-    }
   }
 
   @override
@@ -310,30 +281,6 @@ class _ProjectCardState extends State<ProjectCard> {
                             ),
                           ),
                         ),
-                        if (widget.isAdminMode)
-                          Positioned(
-                            top: 12,
-                            right: 12,
-                            child: Row(
-                              children: [
-                                IconButton.filled(
-                                  onPressed: widget.onEdit,
-                                  icon:
-                                      const Icon(Icons.edit_rounded, size: 18),
-                                  style: IconButton.styleFrom(
-                                      backgroundColor: VivumColors.amber),
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton.filled(
-                                  onPressed: _delete,
-                                  icon: const Icon(Icons.delete_outline_rounded,
-                                      size: 18),
-                                  style: IconButton.styleFrom(
-                                      backgroundColor: Colors.redAccent),
-                                ),
-                              ],
-                            ),
-                          ),
                       ],
                     ),
                   ),

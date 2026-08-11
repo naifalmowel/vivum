@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/database_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/personal_info.dart';
 import '../l10n/translations.dart';
@@ -20,6 +21,7 @@ class _ContactScreenState extends State<ContactScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   final _companyCtrl = TextEditingController();
   final _messageCtrl = TextEditingController();
   String _service = 'Brand Identity';
@@ -28,7 +30,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
   @override
   void dispose() {
-    _nameCtrl.dispose(); _emailCtrl.dispose();
+    _nameCtrl.dispose(); _emailCtrl.dispose(); _phoneCtrl.dispose();
     _companyCtrl.dispose(); _messageCtrl.dispose();
     super.dispose();
   }
@@ -36,8 +38,34 @@ class _ContactScreenState extends State<ContactScreen> {
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 1500));
-    setState(() { _loading = false; _submitted = true; });
+    
+    try {
+      final data = {
+        'name': _nameCtrl.text,
+        'email': _emailCtrl.text,
+        'phone': _phoneCtrl.text,
+        'company': _companyCtrl.text,
+        'service': _service,
+        'message': _messageCtrl.text,
+        'isRead': false,
+        'isReplied': false,
+      };
+      
+      await DatabaseService.saveContactRequest(data);
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _submitted = true;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    }
   }
 
   @override
@@ -101,6 +129,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                 formKey: _formKey,
                                 nameCtrl: _nameCtrl,
                                 emailCtrl: _emailCtrl,
+                                phoneCtrl: _phoneCtrl,
                                 companyCtrl: _companyCtrl,
                                 messageCtrl: _messageCtrl,
                                 service: _service,
@@ -126,6 +155,7 @@ class _ContactScreenState extends State<ContactScreen> {
                             formKey: _formKey,
                             nameCtrl: _nameCtrl,
                             emailCtrl: _emailCtrl,
+                            phoneCtrl: _phoneCtrl,
                             companyCtrl: _companyCtrl,
                             messageCtrl: _messageCtrl,
                             service: _service,
@@ -153,7 +183,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
 class _ContactForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  final TextEditingController nameCtrl, emailCtrl, companyCtrl, messageCtrl;
+  final TextEditingController nameCtrl, emailCtrl, phoneCtrl, companyCtrl, messageCtrl;
   final String service;
   final ValueChanged<String> onServiceChanged;
   final VoidCallback onSubmit;
@@ -162,6 +192,7 @@ class _ContactForm extends StatelessWidget {
 
   const _ContactForm({
     required this.formKey, required this.nameCtrl, required this.emailCtrl,
+    required this.phoneCtrl,
     required this.companyCtrl, required this.messageCtrl, required this.service,
     required this.onServiceChanged, required this.onSubmit,
     required this.loading, required this.submitted, required this.lp,
@@ -253,6 +284,24 @@ class _ContactForm extends StatelessWidget {
               decoration: inputDeco.copyWith(labelText: lp.t('contact.email')),
               style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurface),
               validator: (v) => v!.isEmpty || !v.contains('@') ? 'Valid email required' : null,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: phoneCtrl,
+              decoration: inputDeco.copyWith(
+                labelText: lp.isAr ? 'رقم الهاتف' : 'Phone Number',
+                hintText: '+971 XX XXX XXXX',
+              ),
+              style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurface),
+              keyboardType: TextInputType.phone,
+              validator: (v) {
+                if (v == null || v.isEmpty) return lp.isAr ? 'مطلوب' : 'Required';
+                // Basic phone validation: at least 7 digits
+                if (v.replaceAll(RegExp(r'[^0-9]'), '').length < 7) {
+                  return lp.isAr ? 'رقم غير صحيح' : 'Invalid number';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
             TextFormField(
