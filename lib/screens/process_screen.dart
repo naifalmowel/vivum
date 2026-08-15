@@ -73,52 +73,201 @@ class ProcessScreen extends StatelessWidget {
                     : _NarrowTimeline(steps: steps, lp: lp),
               ),
 
-              // Testimonials placeholder
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+              // Testimonials with Ticker
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 100),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                ),
                 child: Column(
                   children: [
                     SectionReveal(
                         child: Column(children: [
-                      const _Label('WHAT CLIENTS SAY'),
+                      _Label(lp.isAr ? 'ماذا يقولون عنا' : 'WHAT THEY SAY'), 
                       const SizedBox(height: 12),
-                      Text('Client Testimonials',
-                          style: theme.textTheme.headlineLarge),
+                      Text(lp.isAr ? 'قصص نجاح شركائنا' : 'Client Success Stories',
+                          style: theme.textTheme.displaySmall),
                     ])),
-                    const SizedBox(height: 48),
-                    isWide
-                        ? Row(
-                            children: List.generate(
-                                3,
-                                (i) => Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                            right: i < 2 ? 20 : 0),
-                                        child: SectionReveal(
-                                          delay: Duration(milliseconds: i * 150),
-                                          child: const _TestimonialPlaceholder(),
-                                        ),
-                                      ),
-                                    )),
-                          )
-                        : Column(
-                            children: List.generate(
-                                3,
-                                (i) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 20),
-                                      child: const _TestimonialPlaceholder(),
-                                    )),
-                          ),
+                    const SizedBox(height: 80),
+                    _TestimonialTicker(lp: lp),
                   ],
                 ),
               ),
-              const SizedBox(height: 80),
-              const VivumFooter(),
             ],
           ),
         ),
+        const SliverToBoxAdapter(child: VivumFooter()),
       ],
     );
+  }
+}
+
+class _TestimonialTicker extends StatefulWidget {
+  final AppProvider lp;
+  const _TestimonialTicker({required this.lp});
+
+  @override
+  State<_TestimonialTicker> createState() => _TestimonialTickerState();
+}
+
+class _TestimonialTickerState extends State<_TestimonialTicker> {
+  late final ScrollController _scrollController;
+  bool _isPaused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startScrolling());
+  }
+
+  void _startScrolling() {
+    if (!_scrollController.hasClients || _isPaused) return;
+    
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    
+    if (currentScroll >= maxScroll - 1) {
+      _scrollController.jumpTo(0);
+      _startScrolling();
+      return;
+    }
+    
+    final remainingDistance = maxScroll - currentScroll;
+    final duration = Duration(milliseconds: (remainingDistance * 50).toInt());
+
+    _scrollController.animateTo(
+      maxScroll,
+      duration: duration,
+      curve: Curves.linear,
+    ).then((_) {
+      if (mounted && !_isPaused) {
+        _scrollController.jumpTo(0);
+        _startScrolling();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final testimonials = [
+      ('t.1', 't.1.author'), ('t.2', 't.2.author'), ('t.3', 't.3.author'), 
+      ('t.4', 't.4.author'), ('t.5', 't.5.author'), ('t.6', 't.6.author')
+    ];
+
+    final displayList = [...testimonials, ...testimonials, ...testimonials, ...testimonials];
+
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() => _isPaused = true);
+        _scrollController.jumpTo(_scrollController.offset); 
+      },
+      onExit: (_) {
+        setState(() => _isPaused = false);
+        _startScrolling();
+      },
+      child: GestureDetector(
+        onLongPressStart: (_) {
+          setState(() => _isPaused = true);
+          _scrollController.jumpTo(_scrollController.offset);
+        },
+        onLongPressEnd: (_) {
+          setState(() => _isPaused = false);
+          _startScrolling();
+        },
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            if (notification is ScrollStartNotification && notification.dragDetails != null) {
+              setState(() => _isPaused = true);
+            } else if (notification is ScrollEndNotification) {
+              if (_isPaused) {
+                setState(() => _isPaused = false);
+                Future.delayed(const Duration(seconds: 1), () {
+                  if (mounted && !_isPaused) _startScrolling();
+                });
+              }
+            }
+            return false;
+          },
+          child: SizedBox(
+            height: 250,
+            child: ListView.builder(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: displayList.length,
+              itemBuilder: (context, index) {
+              final t = displayList[index];
+              return Container(
+                width: 380,
+                margin: const EdgeInsets.only(right: 24),
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.5)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
+                    )
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: List.generate(5, (_) => 
+                      const Icon(Icons.star_rounded, color: VivumColors.amber, size: 18))),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: Text(
+                        widget.lp.t(t.$1),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontStyle: FontStyle.italic,
+                          height: 1.6,
+                          fontSize: 15,
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Container(
+                          width: 32, height: 2,
+                          color: VivumColors.teal.withValues(alpha: 0.4),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            widget.lp.t(t.$2),
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: VivumColors.teal,
+                              fontSize: 13,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    ));
   }
 }
 
@@ -312,55 +461,6 @@ class _NarrowTimeline extends StatelessWidget {
           ),
         );
       }).toList(),
-    );
-  }
-}
-
-class _TestimonialPlaceholder extends StatelessWidget {
-  const _TestimonialPlaceholder();
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border.all(color: theme.dividerColor),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: List.generate(5, (_) =>
-            const Padding(padding: EdgeInsets.only(right: 3),
-              child: Icon(Icons.star_rounded, color: VivumColors.amber, size: 16)))),
-          const SizedBox(height: 16),
-          Container(
-            height: 12, width: double.infinity,
-            decoration: BoxDecoration(color: theme.dividerColor, borderRadius: BorderRadius.circular(6)),
-          ),
-          const SizedBox(height: 8),
-          Container(height: 12, width: 200,
-            decoration: BoxDecoration(color: theme.dividerColor, borderRadius: BorderRadius.circular(6))),
-          const SizedBox(height: 20),
-          Row(children: [
-            Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: theme.dividerColor)),
-            const SizedBox(width: 12),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(height: 10, width: 100,
-                decoration: BoxDecoration(color: theme.dividerColor, borderRadius: BorderRadius.circular(4))),
-              const SizedBox(height: 6),
-              Container(height: 8, width: 70,
-                decoration: BoxDecoration(color: theme.dividerColor.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(4))),
-            ]),
-          ]),
-          const SizedBox(height: 16),
-          Center(child: Text('Client testimonial coming soon',
-            style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic))),
-        ],
-      ),
     );
   }
 }

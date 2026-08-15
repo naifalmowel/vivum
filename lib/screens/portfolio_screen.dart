@@ -7,6 +7,7 @@ import '../services/database_service.dart';
 import '../widgets/footer.dart';
 import '../widgets/particle_painter.dart';
 import '../widgets/project_widgets.dart';
+import '../widgets/section_reveal.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({super.key});
@@ -15,7 +16,10 @@ class PortfolioScreen extends StatefulWidget {
 }
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
-  String _filter = 'All';
+  String _activeCategory = 'All';
+  String _activeYear = 'All';
+  String _activeLocation = 'All';
+  String _activeSkill = 'All';
 
   static const _fallbackProjects = [
     Project(
@@ -23,13 +27,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       title: 'Gulf Sky Engineering Consultants',
       industry: 'Engineering',
       location: 'UAE',
+      year: '2024',
       category: 'Web',
       challenge: 'Create a modern online presence reflecting engineering expertise.',
       solution: 'Designed and developed a responsive corporate website.',
       tech: ['Flutter Web', 'Firebase', 'UI/UX'],
       result: 'Established professional digital presence.',
       colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
-      accentColor: VivumColors.teal,
+      accentColor: Color(0xFF00B5CC),
       imageUrls: [],
     ),
   ];
@@ -39,7 +44,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final lp = AppProvider.of(context);
     final isWide = MediaQuery.of(context).size.width > 900;
     final theme = Theme.of(context);
-    final filters = ['All', 'Branding', 'Web', 'App', 'AI'];
 
     return StreamBuilder<List<Map<String, dynamic>>>(
         stream: DatabaseService.getProjectsStream(),
@@ -49,12 +53,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               ? data.map((m) => Project.fromMap(m)).toList()
               : _fallbackProjects;
 
-          final filtered = _filter == 'All'
-              ? firebaseProjects
-              : firebaseProjects.where((p) => p.category == _filter).toList();
+          // Extract unique values for filters
+          final categories = ['All', ...firebaseProjects.map((p) => p.category).toSet()];
+          final years = ['All', ...firebaseProjects.map((p) => p.year).toSet().toList()..sort((a, b) => b.compareTo(a))];
+          final locations = ['All', ...firebaseProjects.map((p) => p.location).toSet()];
+          final allSkills = firebaseProjects.expand((p) => p.tech).toSet();
+          final skills = ['All', ...allSkills];
+
+          final filtered = firebaseProjects.where((p) {
+            final catMatch = _activeCategory == 'All' || p.category == _activeCategory;
+            final yearMatch = _activeYear == 'All' || p.year == _activeYear;
+            final locMatch = _activeLocation == 'All' || p.location == _activeLocation;
+            final skillMatch = _activeSkill == 'All' || p.tech.contains(_activeSkill);
+            return catMatch && yearMatch && locMatch && skillMatch;
+          }).toList();
 
           return CustomScrollView(
-            primary: true, // Use the shared PrimaryScrollController
+            primary: true,
             slivers: [
               // Header
               SliverToBoxAdapter(
@@ -91,66 +106,153 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.05),
               ),
 
-              // Filters
+              // Enhanced Filter Bar
               SliverToBoxAdapter(
                 child: Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: isWide ? 80 : 24, vertical: 32),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: filters
-                          .map((f) => Padding(
-                                padding: const EdgeInsets.only(right: 12),
-                                child: _FilterChip(
-                                  label: f,
-                                  isActive: _filter == f,
-                                  onTap: () => setState(() => _filter = f),
-                                ),
-                              ))
-                          .toList(),
-                    ),
+                  padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _FilterGroup(
+                              title: lp.t('portfolio.filter.cat'),
+                              items: categories,
+                              activeItem: _activeCategory,
+                              onChanged: (v) => setState(() => _activeCategory = v),
+                            ),
+                            const SizedBox(width: 40),
+                            _FilterGroup(
+                              title: lp.t('portfolio.filter.year'),
+                              items: years,
+                              activeItem: _activeYear,
+                              onChanged: (v) => setState(() => _activeYear = v),
+                            ),
+                            const SizedBox(width: 40),
+                            _FilterGroup(
+                              title: lp.t('portfolio.filter.loc'),
+                              items: locations,
+                              activeItem: _activeLocation,
+                              onChanged: (v) => setState(() => _activeLocation = v),
+                            ),
+                            const SizedBox(width: 40),
+                            _FilterGroup(
+                              title: lp.t('portfolio.filter.skill'),
+                              items: skills,
+                              activeItem: _activeSkill,
+                              onChanged: (v) => setState(() => _activeSkill = v),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
 
               // Project Grid/List
-              SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
-                sliver: isWide
-                    ? SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 24,
-                          crossAxisSpacing: 24,
-                          childAspectRatio: 0.8, // Adjust as needed
+              if (filtered.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.rocket_launch_outlined, size: 64, color: theme.dividerColor),
+                        const SizedBox(height: 24),
+                        Text(
+                          lp.t('portfolio.empty_msg'),
+                          style: theme.textTheme.headlineSmall?.copyWith(color: theme.dividerColor),
                         ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => ProjectCard(
-                            project: filtered[index],
-                          ),
-                          childCount: filtered.length,
-                        ),
-                      )
-                    : SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: ProjectCard(
-                              project: filtered[index],
-                            ),
-                          ),
-                          childCount: filtered.length,
+                      ],
+                    ),
+                  ),
+                )
+              else if (isWide)
+                SliverPadding(
+                  key: const ValueKey('grid_padding'),
+                  padding: const EdgeInsets.symmetric(horizontal: 80),
+                  sliver: SliverGrid(
+                    key: const ValueKey('portfolio_grid'),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 32,
+                      crossAxisSpacing: 32,
+                      childAspectRatio: 0.85,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => SectionReveal(
+                        key: ValueKey('grid_${filtered[index].id}'),
+                        delay: Duration(milliseconds: index % 2 * 100),
+                        child: ProjectCard(project: filtered[index]),
+                      ),
+                      childCount: filtered.length,
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  key: const ValueKey('list_padding'),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  sliver: SliverList(
+                    key: const ValueKey('portfolio_list'),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        child: SectionReveal(
+                          key: ValueKey('list_${filtered[index].id}'),
+                          child: ProjectCard(project: filtered[index]),
                         ),
                       ),
-              ),
+                      childCount: filtered.length,
+                    ),
+                  ),
+                ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 80)),
+              const SliverToBoxAdapter(child: SizedBox(height: 120)),
               const SliverToBoxAdapter(child: VivumFooter()),
             ],
           );
         });
+  }
+}
+
+class _FilterGroup extends StatelessWidget {
+  final String title;
+  final List<String> items;
+  final String activeItem;
+  final ValueChanged<String> onChanged;
+
+  const _FilterGroup({
+    required this.title,
+    required this.items,
+    required this.activeItem,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title.toUpperCase(), 
+          style: theme.textTheme.labelSmall?.copyWith(letterSpacing: 2, color: VivumColors.teal, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        Row(
+          children: items.map((f) => Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: _FilterChip(
+              label: f,
+              isActive: activeItem == f,
+              onTap: () => onChanged(f),
+            ),
+          )).toList(),
+        ),
+      ],
+    );
   }
 }
 
@@ -159,7 +261,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
 class _ProjectFormDialog extends StatefulWidget {
   final Project? project;
-  const _ProjectFormDialog({this.project});
+  const _ProjectFormDialog() : project = null;
   @override
   State<_ProjectFormDialog> createState() => _ProjectFormDialogState();
 }

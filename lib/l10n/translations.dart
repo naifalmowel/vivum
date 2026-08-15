@@ -123,6 +123,11 @@ class AppProvider extends InheritedWidget {
     'about.label': 'WHO WE ARE',
     'about.reach.label': 'OUR REACH',
     'about.values.label': 'CORE VALUES',
+    'portfolio.empty_msg': 'No projects found.. Stay tuned!',
+    'portfolio.filter.cat': 'Category',
+    'portfolio.filter.year': 'Year',
+    'portfolio.filter.loc': 'Location',
+    'portfolio.filter.skill': 'Skills',
     'process.label': 'OUR PROCESS',
     'contact.label': 'GET IN TOUCH',
     'about.title': 'Who We Are',
@@ -156,6 +161,18 @@ class AppProvider extends InheritedWidget {
     'portfolio.view_all': 'View Our Work',
     'cta.title': 'Ready to Transform Your Business?',
     'cta.sub': 'Join businesses across UAE, Saudi Arabia, and Syria who trust VIVUM.',
+
+    // Testimonials
+    't.1': 'VIVUM transformed our digital presence. Their AI automation saved us 20 hours a week!',
+    't.1.author': 'Sarah J., CEO',
+    't.2': 'Professional, creative, and fast. The best agency in the region.',
+    't.2.author': 'Mike R., Marketing Director',
+    't.3': 'The attention to detail in the UI/UX is world-class. Highly recommended.',
+    't.3.author': 'David K., Founder',
+    't.4': 'Their process is so refined, it takes all the stress out of development.',
+    't.4.author': 'Elena M., Product Manager',
+    't.5': 'VIVUM doesn\'t just build websites; they build business growth engines.',
+    't.5.author': 'James L., Serial Entrepreneur',
 
     // Contact
     'contact.title': 'Let\'s Build Something Great',
@@ -269,6 +286,11 @@ class AppProvider extends InheritedWidget {
     'about.label': 'من نحن',
     'about.reach.label': 'أسواقنا',
     'about.values.label': 'قيمنا الأساسية',
+    'portfolio.empty_msg': 'لا توجد مشاريع حالياً.. انتظرونا قريباً!',
+    'portfolio.filter.cat': 'القسم',
+    'portfolio.filter.year': 'السنة',
+    'portfolio.filter.loc': 'الموقع',
+    'portfolio.filter.skill': 'المهارات',
     'process.label': 'منهجيتنا',
     'contact.label': 'تواصل معنا',
     'about.title': 'من نحن',
@@ -302,6 +324,20 @@ class AppProvider extends InheritedWidget {
     'portfolio.view_all': 'شاهد أعمالنا',
     'cta.title': 'جاهز لتحويل عملك؟',
     'cta.sub': 'انضم إلى الشركات في الإمارات والسعودية وسوريا التي تثق بـ فيفوم.',
+
+    // Testimonials
+    't.1': 'فيفوم حولت حضورنا الرقمي بالكامل. أتمتة الذكاء الاصطناعي وفرت علينا 20 ساعة عمل أسبوعياً!',
+    't.1.author': 'سارة ج.، مديرة تنفيذية',
+    't.2': 'عمل احترافي، إبداعي، وسريع. الوكالة الأفضل في المنطقة بلا منازع.',
+    't.2.author': 'مايك ر.، مدير تسويق',
+    't.3': 'الاهتمام بالتفاصيل في تجربة المستخدم عالمي. أنصح بهم بشدة.',
+    't.3.author': 'ديفيد ك.، مؤسس شركة',
+    't.4': 'والله يا جماعة شغلهم بيبيض الوش، دقة ومواعيد متل الساعة!',
+    't.4.author': 'رامي (دمشق)',
+    't.5': 'من الآخر، إذا بدك تطبيق يكتسح السوق، روح لعند فيفوم وأنت مغمض.',
+    't.5.author': 'أبو فهد (الرياض)',
+    't.6': 'ما شاء الله، فريق مبدع وفهمان شو يعني براندينق صح.',
+    't.6.author': 'نورة (دبي)',
 
     // Contact
     'contact.title': 'لنبني شيئاً عظيماً معاً',

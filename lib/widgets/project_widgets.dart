@@ -1,17 +1,16 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../l10n/translations.dart';
 import '../theme/app_theme.dart';
-import '../services/database_service.dart';
 
 class Project {
   final String id,
       title,
       industry,
       location,
+      year, // Added year
       category,
       challenge,
       solution,
@@ -26,6 +25,7 @@ class Project {
     required this.title,
     required this.industry,
     required this.location,
+    required this.year,
     required this.category,
     required this.challenge,
     required this.solution,
@@ -42,6 +42,7 @@ class Project {
       'title': title,
       'industry': industry,
       'location': location,
+      'year': year,
       'category': category,
       'challenge': challenge,
       'solution': solution,
@@ -59,6 +60,7 @@ class Project {
       title: map['title'] ?? '',
       industry: map['industry'] ?? '',
       location: map['location'] ?? '',
+      year: (map['year'] ?? '').toString(),
       category: map['category'] ?? '',
       challenge: map['challenge'] ?? '',
       solution: map['solution'] ?? '',
@@ -114,231 +116,196 @@ class _ProjectCardState extends State<ProjectCard> {
         onTap: () {
           final cleanId = p.id.trim();
           if (cleanId.isNotEmpty) {
-            // Wrap navigation to avoid MouseTracker assertion issues during build/update
             Future.microtask(() => context.go('/project/$cleanId'));
           }
         },
-        child: AnimatedScale(
-          scale: _hovered ? 1.02 : 1.0,
-          duration: 200.ms,
-          curve: Curves.easeOutCubic,
-          child: AnimatedContainer(
-            duration: 300.ms,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              border: Border.all(
-                  color: _hovered
-                      ? p.accentColor.withValues(alpha: 0.5)
-                      : theme.dividerColor),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: _hovered
-                  ? [
-                      BoxShadow(
-                          color: p.accentColor.withValues(alpha: 0.15),
-                          blurRadius: 40,
-                          offset: const Offset(0, 15))
-                    ]
-                  : [
-                      BoxShadow(
-                          color: theme.shadowColor.withValues(alpha: 0.08),
-                          blurRadius: 20,
-                          offset: const Offset(0, 5))
-                    ],
+        child: AnimatedContainer(
+          duration: 500.ms,
+          curve: Curves.easeOutQuart,
+          transform: Matrix4.translationValues(0, _hovered ? -15.0 : 0, 0),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: _hovered ? p.accentColor.withValues(alpha: 0.5) : theme.dividerColor.withValues(alpha: 0.5),
+              width: _hovered ? 2 : 1,
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 220,
-                    child: Stack(
-                      children: [
-                        if (p.imageUrls.isEmpty)
-                        Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
+            boxShadow: [
+              BoxShadow(
+                color: _hovered 
+                  ? p.accentColor.withValues(alpha: 0.2) 
+                  : Colors.black.withValues(alpha: 0.04),
+                blurRadius: _hovered ? 50 : 20,
+                offset: Offset(0, _hovered ? 25 : 10),
+              )
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top Visual Part with Glass Effect - Use AspectRatio for fixed bounds
+                AspectRatio(
+                  aspectRatio: 1.4,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: p.imageUrls.isEmpty
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: p.colors.length >= 2
-                                        ? p.colors
-                                        : [
-                                            VivumColors.teal,
-                                            VivumColors.amber
-                                          ])))
-                        else
-                          PageView.builder(
-                            controller: _pageController,
-                            itemCount: p.imageUrls.length,
-                            onPageChanged: (idx) =>
-                                setState(() => _currentImageIndex = idx),
-                            itemBuilder: (context, idx) => Image.network(
-                                p.imageUrls[idx],
-                                fit: BoxFit.cover,
-                                // Memory optimization: cards don't need full resolution
-                                cacheWidth: 600,
+                                    colors: p.colors.length >= 2 ? p.colors : [VivumColors.teal, VivumColors.amber],
+                                  ),
+                                ),
+                              )
+                            : PageView.builder(
+                                controller: _pageController,
+                                itemCount: p.imageUrls.length,
+                                onPageChanged: (idx) => setState(() => _currentImageIndex = idx),
+                                itemBuilder: (context, idx) => Image.network(
+                                  p.imageUrls[idx],
+                                  fit: BoxFit.cover,
+                                  cacheWidth: 800,
+                                ),
                               ),
-                          ),
-                        if (p.imageUrls.length > 1 && _hovered) ...[
-                          Positioned(
-                            left: 8,
-                            top: 0,
-                            bottom: 0,
-                            child: Center(
-                              child: IconButton.filled(
-                                onPressed: () => _pageController.previousPage(
-                                    duration: 300.ms, curve: Curves.easeInOut),
-                                icon: const Icon(Icons.chevron_left_rounded),
-                                style: IconButton.styleFrom(
-                                    backgroundColor: Colors.black26),
+                      ),
+                      // Dynamic Glass Overlay
+                      Positioned.fill(
+                        child: AnimatedOpacity(
+                          duration: 400.ms,
+                          opacity: _hovered ? 0.3 : 0.6,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withValues(alpha: 0.8),
+                                ],
                               ),
                             ),
                           ),
-                          Positioned(
-                            right: 8,
-                            top: 0,
-                            bottom: 0,
-                            child: Center(
-                              child: IconButton.filled(
-                                onPressed: () => _pageController.nextPage(
-                                    duration: 300.ms, curve: Curves.easeInOut),
-                                icon: const Icon(Icons.chevron_right_rounded),
-                                style: IconButton.styleFrom(
-                                    backgroundColor: Colors.black26),
+                        ),
+                      ),
+                      // Badges
+                      Positioned(
+                        top: 20, left: 20,
+                        child: Row(
+                          children: [
+                            _SmallBadge(text: p.year),
+                            const SizedBox(width: 8),
+                            _SmallBadge(text: p.location, icon: Icons.location_on_outlined),
+                          ],
+                        ),
+                      ),
+                      //Content
+                      Positioned(
+                        bottom: 24, left: 24, right: 24,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(p.category.toUpperCase(), 
+                              style: TextStyle(color: p.accentColor, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                            const SizedBox(height: 6),
+                            Text(p.title, 
+                              style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, height: 1.1)),
+                          ],
+                        ),
+                      ),
+                      // Hover View Button
+                      if (_hovered)
+                        Positioned.fill(
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
                               ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(lp.t('portfolio.view'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 16),
+                                ],
+                              ),
+                            ).animate().scale(duration: 300.ms, curve: Curves.bounceOut),
+                          ),
+                        ),
+                      // Dots
+                      if (p.imageUrls.length > 1)
+                        Positioned(
+                          bottom: 24, right: 24,
+                          child: Row(
+                            children: List.generate(p.imageUrls.length, (i) => AnimatedContainer(
+                              duration: 300.ms,
+                              width: _currentImageIndex == i ? 16 : 6,
+                              height: 6,
+                              margin: const EdgeInsets.only(left: 4),
+                              decoration: BoxDecoration(
+                                color: _currentImageIndex == i ? p.accentColor : Colors.white54,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            )),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                // Bottom Info with Tags
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(p.challenge, 
+                        maxLines: 2, 
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13, height: 1.6)),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: p.tech.take(3).map((t) => Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: p.accentColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: p.accentColor.withValues(alpha: 0.2)),
+                                ),
+                                child: Text('#$t', 
+                                  style: TextStyle(color: p.accentColor, fontSize: 9, fontWeight: FontWeight.w800)),
+                              )).toList(),
                             ),
+                          ),
+                          const SizedBox(width: 12),
+                          AnimatedContainer(
+                            duration: 300.ms,
+                            width: 32, height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _hovered ? p.accentColor : theme.dividerColor.withValues(alpha: 0.3),
+                            ),
+                            child: Icon(Icons.arrow_forward_rounded, 
+                              size: 16, 
+                              color: _hovered ? Colors.white : theme.dividerColor),
                           ),
                         ],
-                        Positioned.fill(
-                          child: IgnorePointer(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withValues(alpha: 0.7)
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (p.imageUrls.length > 1)
-                          Positioned(
-                            bottom: 12,
-                            right: 12,
-                            child: Row(
-                              children: List.generate(
-                                p.imageUrls.length,
-                                (index) => Container(
-                                  width: 6,
-                                  height: 6,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 2),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _currentImageIndex == index
-                                        ? p.accentColor
-                                        : Colors.white.withValues(alpha: 0.5),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        Positioned.fill(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: p.accentColor.withValues(alpha: 0.2),
-                                    border: Border.all(
-                                        color: p.accentColor
-                                            .withValues(alpha: 0.4)),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text('${p.industry} • ${p.location}',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          color: p.accentColor,
-                                          fontWeight: FontWeight.w600)),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(p.title,
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _InfoRow(
-                            label: lp.t('portfolio.challenge'),
-                            value: p.challenge,
-                            color: theme.textTheme.bodyMedium?.color),
-                        const SizedBox(height: 10),
-                        _InfoRow(
-                            label: lp.t('portfolio.solution'),
-                            value: p.solution,
-                            color: theme.colorScheme.onSurface),
-                        const SizedBox(height: 16),
-                        Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: p.tech
-                                .map((t) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                        color: theme.dividerColor,
-                                        borderRadius: BorderRadius.circular(6)),
-                                    child: Text(t,
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(fontSize: 11))))
-                                .toList()),
-                        const SizedBox(height: 16),
-                        Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                                color: p.accentColor.withValues(alpha: 0.08),
-                                border: Border.all(
-                                    color:
-                                        p.accentColor.withValues(alpha: 0.2)),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Row(children: [
-                              Icon(Icons.trending_up_rounded,
-                                  size: 14, color: p.accentColor),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                  child: Text(p.result,
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          color: p.accentColor,
-                                          fontWeight: FontWeight.w600)))
-                            ]))
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -347,7 +314,36 @@ class _ProjectCardState extends State<ProjectCard> {
   }
 }
 
-class _InfoRow extends StatelessWidget {
+class _SmallBadge extends StatelessWidget {
+  final String text;
+  final IconData? icon;
+  const _SmallBadge({required this.text, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 12, color: Colors.white70),
+            const SizedBox(width: 4),
+          ],
+          Text(text, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+
+  }
+}
+
+class _InfoRow extends StatefulWidget {
   final String label, value;
   final Color? color;
 
@@ -355,16 +351,21 @@ class _InfoRow extends StatelessWidget {
       {required this.label, required this.value, required this.color});
 
   @override
+  State<_InfoRow> createState() => _InfoRowState();
+}
+
+class _InfoRowState extends State<_InfoRow> {
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('$label: ',
+      Text('${widget.label}: ',
           style: theme.textTheme.bodySmall
               ?.copyWith(fontSize: 12, fontWeight: FontWeight.w600)),
       Flexible(
-          child: Text(value,
+          child: Text(widget.value,
               style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontSize: 13, color: color, height: 1.5))),
+                  ?.copyWith(fontSize: 13, color: widget.color, height: 1.5))),
     ]);
   }
 }
