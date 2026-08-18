@@ -162,6 +162,16 @@ class AppProvider extends InheritedWidget {
     'cta.title': 'Ready to Transform Your Business?',
     'cta.sub': 'Join businesses across UAE, Saudi Arabia, and Syria who trust VIVUM.',
 
+    // Testimonials System
+    't.title': 'Success Stories',
+    't.write': 'Share Your Experience',
+    't.name': 'Your Name',
+    't.text': 'Your Review',
+    't.rating': 'Rating',
+    't.submit': 'Submit Review',
+    't.success': 'Thank you! Your review has been submitted for approval.',
+    't.empty': 'Be the first to share your experience with VIVUM!',
+
     // Testimonials
     't.1': 'VIVUM transformed our digital presence. Their AI automation saved us 20 hours a week!',
     't.1.author': 'Sarah J., CEO',
@@ -324,6 +334,16 @@ class AppProvider extends InheritedWidget {
     'portfolio.view_all': 'شاهد أعمالنا',
     'cta.title': 'جاهز لتحويل عملك؟',
     'cta.sub': 'انضم إلى الشركات في الإمارات والسعودية وسوريا التي تثق بـ فيفوم.',
+
+    // Testimonials System
+    't.title': 'قصص نجاح شركائنا',
+    't.write': 'شاركنا تجربتك',
+    't.name': 'الاسم الكريم',
+    't.text': 'رأيك يهمنا..',
+    't.rating': 'التقييم',
+    't.submit': 'إرسال المراجعة',
+    't.success': 'شكراً لك! تم إرسال مراجعتك وهي بانتظار المراجعة من قِبل الإدارة.',
+    't.empty': 'كن أول من يشارك تجربته مع فيفوم!',
 
     // Testimonials
     't.1': 'فيفوم حولت حضورنا الرقمي بالكامل. أتمتة الذكاء الاصطناعي وفرت علينا 20 ساعة عمل أسبوعياً!',

@@ -55,4 +55,32 @@ class DatabaseService {
       rethrow;
     }
   }
+
+  // --- TESTIMONIALS SYSTEM ---
+
+  // Submit a new review (pending by default)
+  static Future<void> submitReview(Map<String, dynamic> data) async {
+    try {
+      final id = DateTime.now().millisecondsSinceEpoch.toString();
+      await _db.collection('testimonials').doc(id).set({
+        ...data,
+        'id': id,
+        'status': 'pending', // Important: must be approved by admin
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint('Error submitting review: $e');
+      rethrow;
+    }
+  }
+
+  // Stream of ONLY approved testimonials for the public site
+  static Stream<List<Map<String, dynamic>>> getApprovedTestimonials() {
+    return _db
+        .collection('testimonials')
+        .where('status', isEqualTo: 'approved')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => doc.data()).toList());
+  }
 }

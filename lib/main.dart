@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'theme/app_theme.dart';
 import 'l10n/translations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -22,14 +23,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Efficient Memory Management
-  // Limit image cache to 50MB (Balanced for performance and memory)
   PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
-  // Limit to 15 images to prevent high-res accumulation
   PaintingBinding.instance.imageCache.maximumSize = 15;
 
   // Initialize Firebase
-  // If you are using web, you might need to pass options:
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Firebase.initializeApp(
       options: FirebaseOptions(
           apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
@@ -39,6 +36,13 @@ void main() async {
           messagingSenderId: "899371078453",
           appId: "1:899371078453:web:f96fb357e3603473f1727c",
           measurementId: "G-E7C1ZV11L7")
+  );
+
+  // Activate Firebase App Check
+  await FirebaseAppCheck.instance.activate(
+    providerWeb: ReCaptchaEnterpriseProvider('6Ld_PLACEHOLDER_SITE_KEY_FROM_FIREBASE'),
+    providerAndroid: AndroidDebugProvider(),
+    providerApple: AppleDebugProvider(),
   );
 
   await Supabase.initialize(

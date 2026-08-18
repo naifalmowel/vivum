@@ -224,8 +224,20 @@ class _SocialIconState extends State<_SocialIcon> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = true);
+          });
+        }
+      },
+      onExit: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = false);
+          });
+        }
+      },
       child: GestureDetector(
         onTap: _launch,
         child: AnimatedContainer(

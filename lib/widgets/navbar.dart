@@ -173,8 +173,20 @@ class _NavItemState extends State<_NavItem> {
     final inactiveColor = theme.textTheme.bodyMedium?.color;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = true);
+          });
+        }
+      },
+      onExit: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = false);
+          });
+        }
+      },
       child: InkWell(
         onTap: () => context.go(widget.path),
         borderRadius: BorderRadius.circular(8),

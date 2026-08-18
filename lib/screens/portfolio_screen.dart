@@ -17,7 +17,6 @@ class PortfolioScreen extends StatefulWidget {
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
   String _activeCategory = 'All';
-  String _activeYear = 'All';
   String _activeLocation = 'All';
   String _activeSkill = 'All';
 
@@ -49,23 +48,32 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         stream: DatabaseService.getProjectsStream(),
         builder: (context, snapshot) {
           final data = snapshot.data;
-          final firebaseProjects = (data != null && data.isNotEmpty)
-              ? data.map((m) => Project.fromMap(m)).toList()
-              : _fallbackProjects;
+          final List<Project> firebaseProjects = [];
+          
+          if (data != null && data.isNotEmpty) {
+            for (var m in data) {
+              try {
+                firebaseProjects.add(Project.fromMap(m));
+              } catch (e) {
+                debugPrint('Vivum: Error parsing project data: $e for map: $m');
+              }
+            }
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            // Handled inside CustomScrollView
+          } else {
+            firebaseProjects.addAll(_fallbackProjects);
+          }
 
-          // Extract unique values for filters
-          final categories = ['All', ...firebaseProjects.map((p) => p.category).toSet()];
-          final years = ['All', ...firebaseProjects.map((p) => p.year).toSet().toList()..sort((a, b) => b.compareTo(a))];
-          final locations = ['All', ...firebaseProjects.map((p) => p.location).toSet()];
-          final allSkills = firebaseProjects.expand((p) => p.tech).toSet();
+          final categories = ['All', ...firebaseProjects.map((p) => p.category.trim()).toSet()];
+          final locations = ['All', ...firebaseProjects.map((p) => p.location.trim()).toSet()];
+          final allSkills = firebaseProjects.expand((p) => p.tech.map((t) => t.trim())).toSet();
           final skills = ['All', ...allSkills];
 
           final filtered = firebaseProjects.where((p) {
-            final catMatch = _activeCategory == 'All' || p.category == _activeCategory;
-            final yearMatch = _activeYear == 'All' || p.year == _activeYear;
-            final locMatch = _activeLocation == 'All' || p.location == _activeLocation;
-            final skillMatch = _activeSkill == 'All' || p.tech.contains(_activeSkill);
-            return catMatch && yearMatch && locMatch && skillMatch;
+            final catMatch = _activeCategory == 'All' || p.category.trim().toLowerCase() == _activeCategory.trim().toLowerCase();
+            final locMatch = _activeLocation == 'All' || p.location.trim().toLowerCase() == _activeLocation.trim().toLowerCase();
+            final skillMatch = _activeSkill == 'All' || p.tech.any((t) => t.trim().toLowerCase() == _activeSkill.trim().toLowerCase());
+            return catMatch && locMatch && skillMatch;
           }).toList();
 
           return CustomScrollView(
@@ -116,6 +124,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             _FilterGroup(
                               title: lp.t('portfolio.filter.cat'),
@@ -123,26 +132,45 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               activeItem: _activeCategory,
                               onChanged: (v) => setState(() => _activeCategory = v),
                             ),
-                            const SizedBox(width: 40),
-                            _FilterGroup(
-                              title: lp.t('portfolio.filter.year'),
-                              items: years,
-                              activeItem: _activeYear,
-                              onChanged: (v) => setState(() => _activeYear = v),
-                            ),
-                            const SizedBox(width: 40),
+                            const SizedBox(width: 32),
                             _FilterGroup(
                               title: lp.t('portfolio.filter.loc'),
                               items: locations,
                               activeItem: _activeLocation,
                               onChanged: (v) => setState(() => _activeLocation = v),
                             ),
-                            const SizedBox(width: 40),
-                            _FilterGroup(
-                              title: lp.t('portfolio.filter.skill'),
-                              items: skills,
-                              activeItem: _activeSkill,
-                              onChanged: (v) => setState(() => _activeSkill = v),
+                            const SizedBox(width: 32),
+                            // Skills Dropdown
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(lp.t('portfolio.filter.skill').toUpperCase(), 
+                                  style: theme.textTheme.labelSmall?.copyWith(letterSpacing: 2, color: VivumColors.teal, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 12),
+                                Container(
+                                  height: 40,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: theme.dividerColor),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: _activeSkill,
+                                      icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
+                                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 13, fontWeight: FontWeight.w500),
+                                      dropdownColor: theme.colorScheme.surface,
+                                      borderRadius: BorderRadius.circular(16),
+                                      items: skills.map((s) => DropdownMenuItem(
+                                        value: s,
+                                        child: Text(s),
+                                      )).toList(),
+                                      onChanged: (v) => setState(() => _activeSkill = v!),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -152,8 +180,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 ),
               ),
 
-              // Project Grid/List
-              if (filtered.isEmpty)
+              if (snapshot.connectionState == ConnectionState.waiting)
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 40),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: isWide ? 3 : 1, 
+                      mainAxisSpacing: 32, 
+                      crossAxisSpacing: 32, 
+                      mainAxisExtent: 400,
+                    ),
+                    delegate: SliverChildBuilderDelegate((c, i) => const ShimmerProjectCard(), childCount: 3),
+                  ),
+                )
+              else if (filtered.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
@@ -170,44 +210,33 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     ),
                   ),
                 )
-              else if (isWide)
-                SliverPadding(
-                  key: const ValueKey('grid_padding'),
-                  padding: const EdgeInsets.symmetric(horizontal: 80),
-                  sliver: SliverGrid(
-                    key: const ValueKey('portfolio_grid'),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 32,
-                      crossAxisSpacing: 32,
-                      childAspectRatio: 0.85,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => SectionReveal(
-                        key: ValueKey('grid_${filtered[index].id}'),
-                        delay: Duration(milliseconds: index % 2 * 100),
-                        child: ProjectCard(project: filtered[index]),
-                      ),
-                      childCount: filtered.length,
-                    ),
-                  ),
-                )
               else
                 SliverPadding(
-                  key: const ValueKey('list_padding'),
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  sliver: SliverList(
-                    key: const ValueKey('portfolio_list'),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => Padding(
-                        padding: const EdgeInsets.only(bottom: 24),
-                        child: SectionReveal(
-                          key: ValueKey('list_${filtered[index].id}'),
-                          child: ProjectCard(project: filtered[index]),
+                  padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                  sliver: SliverLayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = constraints.crossAxisExtent;
+                      int crossAxisCount = width > 1200 ? 3 : (width > 700 ? 2 : 1);
+                      double mainAxisExtent = width > 1200 ? 540 : 500;
+
+                      return SliverGrid(
+                        key: ValueKey('portfolio_grid_$crossAxisCount'),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisSpacing: 32,
+                          crossAxisSpacing: 32,
+                          mainAxisExtent: mainAxisExtent,
                         ),
-                      ),
-                      childCount: filtered.length,
-                    ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => SectionReveal(
+                            key: ValueKey('grid_${filtered[index].id}'),
+                            delay: Duration(milliseconds: index % crossAxisCount * 100),
+                            child: ProjectCard(project: filtered[index]),
+                          ),
+                          childCount: filtered.length,
+                        ),
+                      );
+                    },
                   ),
                 ),
 
@@ -468,10 +497,17 @@ class _FilterChipState extends State<_FilterChip> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) {
+        if (mounted) setState(() => _hovered = true);
+      },
+      onExit: (_) {
+        if (mounted) setState(() => _hovered = false);
+      },
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: () {
+          // Defer selection to avoid MouseTracker conflict during state update
+          WidgetsBinding.instance.addPostFrameCallback((_) => widget.onTap());
+        },
         child: AnimatedContainer(
           duration: 200.ms, padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           decoration: BoxDecoration(color: widget.isActive ? VivumColors.teal : (_hovered ? theme.dividerColor : Colors.transparent), border: Border.all(color: widget.isActive ? VivumColors.teal : theme.dividerColor), borderRadius: BorderRadius.circular(24)),

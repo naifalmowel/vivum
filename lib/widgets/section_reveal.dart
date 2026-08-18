@@ -45,10 +45,11 @@ class _SectionRevealState extends State<SectionReveal> {
     }
 
     return VisibilityDetector(
-      key: widget.key ?? ValueKey(widget.child.hashCode), // Use a stable key instead of UniqueKey
+      key: widget.key ?? ValueKey(widget.child.hashCode),
       onVisibilityChanged: (info) {
         if (!mounted) return;
         if (info.visibleFraction > 0.1 && !_visible) {
+          // Use addPostFrameCallback to avoid MouseTracker/Layout assertion errors
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) setState(() => _visible = true);
           });

@@ -55,22 +55,43 @@ class Project {
   }
 
   factory Project.fromMap(Map<String, dynamic> map) {
+    // Ultra-safe color parsing
+    Color parseColor(dynamic v, Color fallback) {
+      try {
+        if (v is int) return Color(v);
+        if (v is String) {
+          String hex = v.replaceAll('#', '').replaceAll('0x', '');
+          if (hex.length == 6) hex = 'FF$hex';
+          if (hex.length == 8) return Color(int.parse(hex, radix: 16));
+        }
+      } catch (e) {
+        debugPrint('Vivum: Color parse error: $e');
+      }
+      return fallback;
+    }
+
     return Project(
-      id: map['id'] ?? '',
-      title: map['title'] ?? '',
-      industry: map['industry'] ?? '',
-      location: map['location'] ?? '',
+      id: (map['id'] ?? map['title']?.toString().toLowerCase().replaceAll(' ', '_') ?? '').toString(),
+      title: (map['title'] ?? 'Untitled Project').toString(),
+      industry: (map['industry'] ?? '').toString(),
+      location: (map['location'] ?? '').toString(),
       year: (map['year'] ?? '').toString(),
-      category: map['category'] ?? '',
-      challenge: map['challenge'] ?? '',
-      solution: map['solution'] ?? '',
-      result: map['result'] ?? '',
-      imageUrls: List<String>.from(map['imageUrls'] ?? []),
-      tech: List<String>.from(map['tech'] ?? []),
-      accentColor:
-          Color(map['accentColor'] as int? ?? VivumColors.teal.toARGB32()),
-      colors:
-          (map['colors'] as List? ?? []).map((v) => Color(v as int)).toList(),
+      category: (map['category'] ?? 'General').toString(),
+      challenge: (map['challenge'] ?? '').toString(),
+      solution: (map['solution'] ?? '').toString(),
+      result: (map['result'] ?? '').toString(),
+      imageUrls: (map['imageUrls'] as List? ?? [])
+          .map((e) => e.toString())
+          .where((e) => e.startsWith('http'))
+          .toList(),
+      tech: (map['tech'] as List? ?? [])
+          .map((e) => e.toString())
+          .where((e) => e.isNotEmpty)
+          .toList(),
+      accentColor: parseColor(map['accentColor'], VivumColors.teal),
+      colors: (map['colors'] as List? ?? [])
+          .map((v) => parseColor(v, VivumColors.teal))
+          .toList(),
     );
   }
 }
@@ -107,10 +128,18 @@ class _ProjectCardState extends State<ProjectCard> {
 
     return MouseRegion(
       onEnter: (_) {
-        if (mounted) setState(() => _hovered = true);
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = true);
+          });
+        }
       },
       onExit: (_) {
-        if (mounted) setState(() => _hovered = false);
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = false);
+          });
+        }
       },
       child: GestureDetector(
         onTap: () {
@@ -142,170 +171,189 @@ class _ProjectCardState extends State<ProjectCard> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Top Visual Part with Glass Effect - Use AspectRatio for fixed bounds
-                AspectRatio(
-                  aspectRatio: 1.4,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: p.imageUrls.isEmpty
-                            ? Container(
+            child: LayoutBuilder(
+              builder: (context, cardConstraints) {
+                final isSmall = cardConstraints.maxWidth < 400;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Top Visual Part
+                    AspectRatio(
+                      aspectRatio: isSmall ? 1.5 : 1.4,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: p.imageUrls.isEmpty
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: p.colors.length >= 2 ? p.colors : [VivumColors.teal, VivumColors.amber],
+                                      ),
+                                    ),
+                                  )
+                                : PageView.builder(
+                                    controller: _pageController,
+                                    itemCount: p.imageUrls.length,
+                                    onPageChanged: (idx) => setState(() => _currentImageIndex = idx),
+                                    itemBuilder: (context, idx) => Image.network(
+                                      p.imageUrls[idx],
+                                      fit: BoxFit.cover,
+                                      cacheWidth: 800,
+                                      errorBuilder: (c, e, s) => Container(
+                                        color: p.accentColor.withValues(alpha: 0.1),
+                                        child: const Icon(Icons.broken_image_outlined, color: Colors.white24),
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          // Dynamic Glass Overlay
+                          Positioned.fill(
+                            child: AnimatedOpacity(
+                              duration: 400.ms,
+                              opacity: _hovered ? 0.3 : 0.6,
+                              child: Container(
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: p.colors.length >= 2 ? p.colors : [VivumColors.teal, VivumColors.amber],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withValues(alpha: 0.8),
+                                    ],
                                   ),
                                 ),
-                              )
-                            : PageView.builder(
-                                controller: _pageController,
-                                itemCount: p.imageUrls.length,
-                                onPageChanged: (idx) => setState(() => _currentImageIndex = idx),
-                                itemBuilder: (context, idx) => Image.network(
-                                  p.imageUrls[idx],
-                                  fit: BoxFit.cover,
-                                  cacheWidth: 800,
-                                ),
-                              ),
-                      ),
-                      // Dynamic Glass Overlay
-                      Positioned.fill(
-                        child: AnimatedOpacity(
-                          duration: 400.ms,
-                          opacity: _hovered ? 0.3 : 0.6,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black.withValues(alpha: 0.8),
-                                ],
                               ),
                             ),
                           ),
-                        ),
+                          // Badges
+                          Positioned(
+                            top: isSmall ? 12 : 20, 
+                            left: isSmall ? 12 : 20,
+                            child: Row(
+                              children: [
+                                _SmallBadge(text: p.year),
+                                const SizedBox(width: 6),
+                                _SmallBadge(text: p.location, icon: Icons.location_on_outlined),
+                              ],
+                            ),
+                          ),
+                          //Content
+                          Positioned(
+                            bottom: isSmall ? 16 : 24, 
+                            left: isSmall ? 16 : 24, 
+                            right: isSmall ? 16 : 24,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(p.category.toUpperCase(), 
+                                  style: TextStyle(color: p.accentColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                                const SizedBox(height: 4),
+                                Text(p.title, 
+                                  style: TextStyle(color: Colors.white, fontSize: isSmall ? 22 : 26, fontWeight: FontWeight.w900, height: 1.1)),
+                              ],
+                            ),
+                          ),
+                          // Hover View Button
+                          if (_hovered)
+                            Positioned.fill(
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(lp.t('portfolio.view'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
+                                      const SizedBox(width: 8),
+                                      const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 16),
+                                    ],
+                                  ),
+                                ).animate().scale(duration: 300.ms, curve: Curves.bounceIn),
+                              ),
+                            ),
+                          // Dots
+                          if (p.imageUrls.length > 1)
+                            Positioned(
+                              bottom: isSmall ? 16 : 24, 
+                              right: isSmall ? 16 : 24,
+                              child: Row(
+                                children: List.generate(p.imageUrls.length, (i) => AnimatedContainer(
+                                  duration: 300.ms,
+                                  width: _currentImageIndex == i ? 16 : 6,
+                                  height: 6,
+                                  margin: const EdgeInsets.only(left: 4),
+                                  decoration: BoxDecoration(
+                                    color: _currentImageIndex == i ? p.accentColor : Colors.white54,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                )),
+                              ),
+                            ),
+                        ],
                       ),
-                      // Badges
-                      Positioned(
-                        top: 20, left: 20,
-                        child: Row(
-                          children: [
-                            _SmallBadge(text: p.year),
-                            const SizedBox(width: 8),
-                            _SmallBadge(text: p.location, icon: Icons.location_on_outlined),
-                          ],
-                        ),
-                      ),
-                      //Content
-                      Positioned(
-                        bottom: 24, left: 24, right: 24,
+                    ),
+                    // Bottom Info Part
+                    Expanded( // Use Expanded to take all remaining space and prevent overflow
+                      child: Padding(
+                        padding: EdgeInsets.all(isSmall ? 16 : 24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(p.category.toUpperCase(), 
-                              style: TextStyle(color: p.accentColor, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2)),
-                            const SizedBox(height: 6),
-                            Text(p.title, 
-                              style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, height: 1.1)),
+                            Expanded( // Internal expanded for text description
+                              child: Text(
+                                p.challenge, 
+                                maxLines: isSmall ? 2 : 3, 
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12, height: 1.5),
+                              ),
+                            ),
+                            SizedBox(height: isSmall ? 12 : 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: p.tech.take(isSmall ? 2 : 3).map((t) => Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: p.accentColor.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: p.accentColor.withValues(alpha: 0.15)),
+                                      ),
+                                      child: Text('#$t', 
+                                        style: TextStyle(color: p.accentColor, fontSize: 8, fontWeight: FontWeight.w800)),
+                                    )).toList(),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                AnimatedContainer(
+                                  duration: 300.ms,
+                                  width: 28, height: 28,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _hovered ? p.accentColor : theme.dividerColor.withValues(alpha: 0.3),
+                                  ),
+                                  child: Icon(Icons.arrow_forward_rounded, 
+                                    size: 14, 
+                                    color: _hovered ? Colors.white : theme.dividerColor),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
-                      // Hover View Button
-                      if (_hovered)
-                        Positioned.fill(
-                          child: Center(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(lp.t('portfolio.view'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 16),
-                                ],
-                              ),
-                            ).animate().scale(duration: 300.ms, curve: Curves.bounceOut),
-                          ),
-                        ),
-                      // Dots
-                      if (p.imageUrls.length > 1)
-                        Positioned(
-                          bottom: 24, right: 24,
-                          child: Row(
-                            children: List.generate(p.imageUrls.length, (i) => AnimatedContainer(
-                              duration: 300.ms,
-                              width: _currentImageIndex == i ? 16 : 6,
-                              height: 6,
-                              margin: const EdgeInsets.only(left: 4),
-                              decoration: BoxDecoration(
-                                color: _currentImageIndex == i ? p.accentColor : Colors.white54,
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            )),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                // Bottom Info with Tags
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(p.challenge, 
-                        maxLines: 2, 
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13, height: 1.6)),
-                      const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: p.tech.take(3).map((t) => Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: p.accentColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: p.accentColor.withValues(alpha: 0.2)),
-                                ),
-                                child: Text('#$t', 
-                                  style: TextStyle(color: p.accentColor, fontSize: 9, fontWeight: FontWeight.w800)),
-                              )).toList(),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          AnimatedContainer(
-                            duration: 300.ms,
-                            width: 32, height: 32,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _hovered ? p.accentColor : theme.dividerColor.withValues(alpha: 0.3),
-                            ),
-                            child: Icon(Icons.arrow_forward_rounded, 
-                              size: 16, 
-                              color: _hovered ? Colors.white : theme.dividerColor),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),

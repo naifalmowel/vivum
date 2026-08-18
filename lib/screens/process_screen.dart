@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
+import '../services/database_service.dart';
 import '../widgets/particle_painter.dart';
 import '../widgets/section_reveal.dart';
-
+import '../widgets/glow_button.dart';
 import '../widgets/footer.dart';
 
 class ProcessScreen extends StatelessWidget {
@@ -29,7 +30,6 @@ class ProcessScreen extends StatelessWidget {
       slivers: [
         SliverToBoxAdapter(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               // Page Hero
               Container(
@@ -37,11 +37,7 @@ class ProcessScreen extends StatelessWidget {
                 constraints: BoxConstraints(minHeight: isWide ? 400 : 300),
                 child: Stack(
                   children: [
-                    Positioned.fill(
-                      child: InternalPageHeaderBg(
-                        glowColor: VivumColors.teal,
-                      ),
-                    ),
+                    Positioned.fill(child: InternalPageHeaderBg(glowColor: VivumColors.teal)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
                       child: Column(
@@ -51,11 +47,9 @@ class ProcessScreen extends StatelessWidget {
                           const SizedBox(height: 60),
                           _Label(lp.t('process.label')),
                           const SizedBox(height: 20),
-                          Text(lp.t('process.title'),
-                              style: theme.textTheme.displayMedium),
+                          Text(lp.t('process.title'), style: theme.textTheme.displayMedium),
                           const SizedBox(height: 16),
-                          Text(lp.t('process.sub'),
-                              style: theme.textTheme.bodyLarge),
+                          Text(lp.t('process.sub'), style: theme.textTheme.bodyLarge),
                           const SizedBox(height: 60),
                         ],
                       ),
@@ -66,31 +60,35 @@ class ProcessScreen extends StatelessWidget {
 
               // Timeline
               Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: isWide ? 80 : 24, vertical: 80),
-                child: isWide
-                    ? _WideTimeline(steps: steps, lp: lp)
-                    : _NarrowTimeline(steps: steps, lp: lp),
+                padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24, vertical: 80),
+                child: isWide ? _WideTimeline(steps: steps, lp: lp) : _NarrowTimeline(steps: steps, lp: lp),
               ),
 
-              // Testimonials with Ticker
+              // Testimonials Section
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 100),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withValues(alpha: 0.5),
-                ),
+                decoration: BoxDecoration(color: theme.colorScheme.surface.withValues(alpha: 0.5)),
                 child: Column(
                   children: [
                     SectionReveal(
-                        child: Column(children: [
-                      _Label(lp.isAr ? 'ماذا يقولون عنا' : 'WHAT THEY SAY'), 
-                      const SizedBox(height: 12),
-                      Text(lp.isAr ? 'قصص نجاح شركائنا' : 'Client Success Stories',
-                          style: theme.textTheme.displaySmall),
-                    ])),
+                      child: Column(children: [
+                        _Label(lp.isAr ? 'آراء العملاء' : 'TESTIMONIALS'),
+                        const SizedBox(height: 12),
+                        Text(lp.t('t.title'), style: theme.textTheme.displaySmall),
+                      ]),
+                    ),
+                    const SizedBox(height: 60),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                      child: _TestimonialStaticList(lp: lp),
+                    ),
                     const SizedBox(height: 80),
-                    _TestimonialTicker(lp: lp),
+                    // Review Form
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: isWide ? 80 : 24),
+                      child: const _ReviewSubmissionForm(),
+                    ),
                   ],
                 ),
               ),
@@ -103,171 +101,255 @@ class ProcessScreen extends StatelessWidget {
   }
 }
 
-class _TestimonialTicker extends StatefulWidget {
+class _TestimonialStaticList extends StatefulWidget {
   final AppProvider lp;
-  const _TestimonialTicker({required this.lp});
+  const _TestimonialStaticList({required this.lp});
 
   @override
-  State<_TestimonialTicker> createState() => _TestimonialTickerState();
+  State<_TestimonialStaticList> createState() => _TestimonialStaticListState();
 }
 
-class _TestimonialTickerState extends State<_TestimonialTicker> {
-  late final ScrollController _scrollController;
-  bool _isPaused = false;
+class _TestimonialStaticListState extends State<_TestimonialStaticList> {
+  int _displayLimit = 3;
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _startScrolling());
+  Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 900;
+    
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: DatabaseService.getApprovedTestimonials(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text(widget.lp.t('t.empty'), style: const TextStyle(color: Colors.grey)));
+        }
+
+        final data = snapshot.data!;
+        final displayItems = data.take(_displayLimit).toList();
+
+        return Column(
+          children: [
+            if (isWide) 
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 24,
+                  mainAxisExtent: 240, // Reduced height for a more compact and elegant look
+                ),
+                itemCount: displayItems.length,
+                itemBuilder: (context, index) => _TestimonialCard(t: displayItems[index]),
+              )
+            else
+              Column(
+                children: displayItems.map((t) => Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: _TestimonialCard(t: t),
+                )).toList(),
+              ),
+            
+            if (data.length > _displayLimit) ...[
+              const SizedBox(height: 48),
+              Center(
+                child: VivumButton(
+                  label: widget.lp.isAr ? 'مشاهدة المزيد' : 'View More',
+                  onTap: () {
+                    // Safe state update
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) setState(() => _displayLimit += 3);
+                    });
+                  },
+                  variant: ButtonVariant.amber,
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
   }
+}
 
-  void _startScrolling() {
-    if (!_scrollController.hasClients || _isPaused) return;
-    
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.offset;
-    
-    if (currentScroll >= maxScroll - 1) {
-      _scrollController.jumpTo(0);
-      _startScrolling();
-      return;
-    }
-    
-    final remainingDistance = maxScroll - currentScroll;
-    final duration = Duration(milliseconds: (remainingDistance * 50).toInt());
+class _TestimonialCard extends StatelessWidget {
+  final Map<String, dynamic> t;
+  const _TestimonialCard({required this.t});
 
-    _scrollController.animateTo(
-      maxScroll,
-      duration: duration,
-      curve: Curves.linear,
-    ).then((_) {
-      if (mounted && !_isPaused) {
-        _scrollController.jumpTo(0);
-        _startScrolling();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+  void _showFullReview(BuildContext context) {
+    final theme = Theme.of(context);
+    final rating = (t['rating'] ?? 5).toInt();
+    
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 550),
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: theme.dividerColor),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: List.generate(5, (i) => Icon(Icons.star_rounded, 
+                color: i < rating ? VivumColors.amber : theme.dividerColor, size: 24))),
+              const SizedBox(height: 32),
+              Text(
+                t['text'] ?? '',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontStyle: FontStyle.italic, 
+                  height: 1.8, 
+                  fontSize: 18,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 40),
+              Row(
+                children: [
+                  Container(width: 40, height: 2, color: VivumColors.teal),
+                  const SizedBox(width: 16),
+                  Text(t['name'] ?? '', style: theme.textTheme.titleLarge?.copyWith(
+                    color: VivumColors.teal, fontWeight: FontWeight.w900)),
+                ],
+              ),
+              const SizedBox(height: 32),
+              Center(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppProvider.of(context).isAr ? 'إغلاق' : 'Close', 
+                    style: const TextStyle(color: VivumColors.amber, fontWeight: FontWeight.bold)),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final testimonials = [
-      ('t.1', 't.1.author'), ('t.2', 't.2.author'), ('t.3', 't.3.author'), 
-      ('t.4', 't.4.author'), ('t.5', 't.5.author'), ('t.6', 't.6.author')
-    ];
-
-    final displayList = [...testimonials, ...testimonials, ...testimonials, ...testimonials];
-
+    final theme = Theme.of(context);
+    final rating = (t['rating'] ?? 5).toInt();
     return MouseRegion(
-      onEnter: (_) {
-        setState(() => _isPaused = true);
-        _scrollController.jumpTo(_scrollController.offset); 
-      },
-      onExit: (_) {
-        setState(() => _isPaused = false);
-        _startScrolling();
-      },
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onLongPressStart: (_) {
-          setState(() => _isPaused = true);
-          _scrollController.jumpTo(_scrollController.offset);
-        },
-        onLongPressEnd: (_) {
-          setState(() => _isPaused = false);
-          _startScrolling();
-        },
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (notification) {
-            if (notification is ScrollStartNotification && notification.dragDetails != null) {
-              setState(() => _isPaused = true);
-            } else if (notification is ScrollEndNotification) {
-              if (_isPaused) {
-                setState(() => _isPaused = false);
-                Future.delayed(const Duration(seconds: 1), () {
-                  if (mounted && !_isPaused) _startScrolling();
-                });
-              }
-            }
-            return false;
-          },
-          child: SizedBox(
-            height: 250,
-            child: ListView.builder(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              itemCount: displayList.length,
-              itemBuilder: (context, index) {
-              final t = displayList[index];
-              return Container(
-                width: 380,
-                margin: const EdgeInsets.only(right: 24),
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(32),
-                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.5)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 30,
-                      offset: const Offset(0, 15),
-                    )
-                  ],
+        onTap: () => _showFullReview(context),
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 30, offset: const Offset(0, 15))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: List.generate(5, (i) => Icon(Icons.star_rounded, 
+                color: i < rating ? VivumColors.amber : Colors.grey.withValues(alpha: 0.3), size: 18))),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Text(
+                  t['text'] ?? '', 
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontStyle: FontStyle.italic, height: 1.6, fontSize: 14), 
+                  maxLines: 4, 
+                  overflow: TextOverflow.ellipsis
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: List.generate(5, (_) => 
-                      const Icon(Icons.star_rounded, color: VivumColors.amber, size: 18))),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: Text(
-                        widget.lp.t(t.$1),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          height: 1.6,
-                          fontSize: 15,
-                        ),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Container(
-                          width: 32, height: 2,
-                          color: VivumColors.teal.withValues(alpha: 0.4),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            widget.lp.t(t.$2),
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: VivumColors.teal,
-                              fontSize: 13,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(width: 32, height: 2, color: VivumColors.teal.withValues(alpha: 0.4)),
+                  const SizedBox(width: 12),
+                  Flexible(child: Text(t['name'] ?? '', style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800, color: VivumColors.teal, fontSize: 13, letterSpacing: 0.5))),
+                ],
+              ),
+            ],
           ),
         ),
       ),
-    ));
+    );
+  }
+}
+
+class _ReviewSubmissionForm extends StatefulWidget {
+  const _ReviewSubmissionForm();
+  @override
+  State<_ReviewSubmissionForm> createState() => _ReviewSubmissionFormState();
+}
+
+class _ReviewSubmissionFormState extends State<_ReviewSubmissionForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
+  final _textCtrl = TextEditingController();
+  int _rating = 5;
+  bool _loading = false;
+  bool _success = false;
+
+  void _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _loading = true);
+    try {
+      await DatabaseService.submitReview({'name': _nameCtrl.text, 'text': _textCtrl.text, 'rating': _rating});
+      setState(() { _loading = false; _success = true; });
+    } catch (e) {
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lp = AppProvider.of(context);
+    final theme = Theme.of(context);
+    if (_success) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(color: VivumColors.teal.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(24), border: Border.all(color: VivumColors.teal.withValues(alpha: 0.2))),
+          child: Column(children: [
+            const Icon(Icons.check_circle_outline_rounded, color: VivumColors.teal, size: 48),
+            const SizedBox(height: 16),
+            Text(lp.t('t.success'), textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
+          ]),
+        ),
+      );
+    }
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 600),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(color: theme.colorScheme.surface, borderRadius: BorderRadius.circular(32), border: Border.all(color: theme.dividerColor)),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(lp.t('t.write'), style: theme.textTheme.titleLarge),
+              const SizedBox(height: 24),
+              TextFormField(controller: _nameCtrl, decoration: InputDecoration(labelText: lp.t('t.name'), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), validator: (v) => v!.isEmpty ? '?' : null),
+              const SizedBox(height: 16),
+              TextFormField(controller: _textCtrl, maxLines: 3, decoration: InputDecoration(labelText: lp.t('t.text'), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), validator: (v) => v!.isEmpty ? '?' : null),
+              const SizedBox(height: 16),
+              Row(children: [
+                Text(lp.t('t.rating'), style: theme.textTheme.bodyMedium),
+                const SizedBox(width: 16),
+                Row(children: List.generate(5, (i) => IconButton(onPressed: () => setState(() => _rating = i + 1), icon: Icon(i < _rating ? Icons.star_rounded : Icons.star_outline_rounded, color: VivumColors.amber)))),
+              ]),
+              const SizedBox(height: 24),
+              SizedBox(width: double.infinity, child: _loading ? const Center(child: CircularProgressIndicator()) : VivumButton(label: lp.t('t.submit'), onTap: _submit, variant: ButtonVariant.teal)),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -295,14 +377,9 @@ class _WideTimeline extends StatelessWidget {
           child: IntrinsicHeight(
             child: Row(
               children: [
-                Expanded(child: isLeft
-                    ? _StepCard(step: step, lp: lp)
-                    : const SizedBox()),
-                // Center connector
+                Expanded(child: isLeft ? _StepCard(step: step, lp: lp) : const SizedBox()),
                 _TimelineCenter(step: step, isLast: e.key == steps.length - 1),
-                Expanded(child: !isLeft
-                    ? _StepCard(step: step, lp: lp)
-                    : const SizedBox()),
+                Expanded(child: !isLeft ? _StepCard(step: step, lp: lp) : const SizedBox()),
               ],
             ),
           ),

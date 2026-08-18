@@ -38,8 +38,20 @@ class _VivumButtonState extends State<VivumButton> {
     final shadowColor = isAmber ? VivumColors.amber : isTeal ? VivumColors.teal : theme.colorScheme.onSurface;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = true);
+          });
+        }
+      },
+      onExit: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = false);
+          });
+        }
+      },
       child: GestureDetector(
         onTapDown: (_) => setState(() => _pressed = true),
         onTapUp: (_) { setState(() => _pressed = false); widget.onTap(); },
