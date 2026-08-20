@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
@@ -38,10 +39,34 @@ class _ScaffoldShellState extends State<ScaffoldShell> {
     super.dispose();
   }
 
+  void _updatePageTitle(String path, bool isAr) {
+    String title = 'VIVUM Digital Agency';
+    if (path == '/about') title = isAr ? 'من نحن | VIVUM' : 'About Us | VIVUM';
+    if (path == '/services') title = isAr ? 'خدماتنا | VIVUM' : 'Services | VIVUM';
+    if (path == '/portfolio') title = isAr ? 'أعمالنا | VIVUM' : 'Portfolio | VIVUM';
+    if (path.startsWith('/project/')) title = isAr ? 'تفاصيل المشروع | VIVUM' : 'Project Details | VIVUM';
+    if (path == '/process') title = isAr ? 'منهجيتنا | VIVUM' : 'Process | VIVUM';
+    if (path == '/contact') title = isAr ? 'تواصل معنا | VIVUM' : 'Contact | VIVUM';
+
+    // Update Browser Tab Title
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemChrome.setApplicationSwitcherDescription(
+        ApplicationSwitcherDescription(
+          label: title,
+          primaryColor: 0xFF00B5CC,
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final lp = AppProvider.of(context);
+    final loc = GoRouterState.of(context).uri.path;
+    
+    // Dynamic Page Title for Browser Tabs
+    _updatePageTitle(loc, lp.isAr);
     
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

@@ -179,56 +179,60 @@ class _TestimonialCard extends StatelessWidget {
     final theme = Theme.of(context);
     final rating = (t['rating'] ?? 5).toInt();
     
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 550),
-          padding: const EdgeInsets.all(40),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: theme.dividerColor),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: List.generate(5, (i) => Icon(Icons.star_rounded, 
-                color: i < rating ? VivumColors.amber : theme.dividerColor, size: 24))),
-              const SizedBox(height: 32),
-              Text(
-                t['text'] ?? '',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontStyle: FontStyle.italic, 
-                  height: 1.8, 
-                  fontSize: 18,
-                  color: theme.colorScheme.onSurface,
+    // Use addPostFrameCallback to avoid MouseTracker/Scheduler conflicts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 550),
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: List.generate(5, (i) => Icon(Icons.star_rounded, 
+                  color: i < rating ? VivumColors.amber : theme.dividerColor, size: 24))),
+                const SizedBox(height: 32),
+                Text(
+                  t['text'] ?? '',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontStyle: FontStyle.italic, 
+                    height: 1.8, 
+                    fontSize: 18,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              Row(
-                children: [
-                  Container(width: 40, height: 2, color: VivumColors.teal),
-                  const SizedBox(width: 16),
-                  Text(t['name'] ?? '', style: theme.textTheme.titleLarge?.copyWith(
-                    color: VivumColors.teal, fontWeight: FontWeight.w900)),
-                ],
-              ),
-              const SizedBox(height: 32),
-              Center(
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(AppProvider.of(context).isAr ? 'إغلاق' : 'Close', 
-                    style: const TextStyle(color: VivumColors.amber, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 40),
+                Row(
+                  children: [
+                    Container(width: 40, height: 2, color: VivumColors.teal),
+                    const SizedBox(width: 16),
+                    Text(t['name'] ?? '', style: theme.textTheme.titleLarge?.copyWith(
+                      color: VivumColors.teal, fontWeight: FontWeight.w900)),
+                  ],
                 ),
-              )
-            ],
+                const SizedBox(height: 32),
+                Center(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppProvider.of(context).isAr ? 'إغلاق' : 'Close', 
+                      style: const TextStyle(color: VivumColors.amber, fontWeight: FontWeight.bold)),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   @override
@@ -249,20 +253,20 @@ class _TestimonialCard extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(children: List.generate(5, (i) => Icon(Icons.star_rounded, 
                 color: i < rating ? VivumColors.amber : Colors.grey.withValues(alpha: 0.3), size: 18))),
               const SizedBox(height: 20),
-              Expanded(
-                child: Text(
-                  t['text'] ?? '', 
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontStyle: FontStyle.italic, height: 1.6, fontSize: 14), 
-                  maxLines: 4, 
-                  overflow: TextOverflow.ellipsis
-                ),
+              Text(
+                t['text'] ?? '', 
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontStyle: FontStyle.italic, height: 1.6, fontSize: 14), 
+                maxLines: 4, 
+                overflow: TextOverflow.ellipsis
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+              // No Expanded or Spacer here to prevent "RenderBox was not laid out" on mobile
               Row(
                 children: [
                   Container(width: 32, height: 2, color: VivumColors.teal.withValues(alpha: 0.4)),
@@ -341,7 +345,13 @@ class _ReviewSubmissionFormState extends State<_ReviewSubmissionForm> {
               Row(children: [
                 Text(lp.t('t.rating'), style: theme.textTheme.bodyMedium),
                 const SizedBox(width: 16),
-                Row(children: List.generate(5, (i) => IconButton(onPressed: () => setState(() => _rating = i + 1), icon: Icon(i < _rating ? Icons.star_rounded : Icons.star_outline_rounded, color: VivumColors.amber)))),
+                Row(children: List.generate(5, (i) => IconButton(
+                onPressed: () {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) setState(() => _rating = i + 1);
+                  });
+                }, 
+                icon: Icon(i < _rating ? Icons.star_rounded : Icons.star_outline_rounded, color: VivumColors.amber)))),
               ]),
               const SizedBox(height: 24),
               SizedBox(width: double.infinity, child: _loading ? const Center(child: CircularProgressIndicator()) : VivumButton(label: lp.t('t.submit'), onTap: _submit, variant: ButtonVariant.teal)),
@@ -446,8 +456,20 @@ class _StepCardState extends State<_StepCard> {
     final isDark = theme.brightness == Brightness.dark;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = true);
+          });
+        }
+      },
+      onExit: (_) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = false);
+          });
+        }
+      },
       child: AnimatedContainer(
         duration: 250.ms,
         margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),

@@ -53,9 +53,24 @@ class _VivumButtonState extends State<VivumButton> {
         }
       },
       child: GestureDetector(
-        onTapDown: (_) => setState(() => _pressed = true),
-        onTapUp: (_) { setState(() => _pressed = false); widget.onTap(); },
-        onTapCancel: () => setState(() => _pressed = false),
+        onTapDown: (_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _pressed = true);
+          });
+        },
+        onTapUp: (_) { 
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() => _pressed = false);
+              widget.onTap();
+            }
+          });
+        },
+        onTapCancel: () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _pressed = false);
+          });
+        },
         child: AnimatedScale(
           scale: _pressed ? 0.97 : 1.0,
           duration: 100.ms,

@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:vivum/widgets/glow_button.dart';
 import 'theme/app_theme.dart';
 import 'l10n/translations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -73,7 +74,31 @@ final _router = GoRouter(
       ],
     ),
   ],
+  errorBuilder: (context, state) => const _NotFoundScreen(),
 );
+
+class _NotFoundScreen extends StatelessWidget {
+  const _NotFoundScreen();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.rocket_rounded, size: 80, color: VivumColors.teal),
+            const SizedBox(height: 24),
+            Text('404', style: Theme.of(context).textTheme.displayLarge),
+            const SizedBox(height: 12),
+            const Text('Page lost in space...', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 40),
+            VivumButton(label: 'Back Home', onTap: () => context.go('/'), variant: ButtonVariant.teal),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class VivumApp extends StatefulWidget {
   const VivumApp({super.key});

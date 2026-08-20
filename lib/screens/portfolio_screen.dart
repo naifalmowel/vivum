@@ -498,10 +498,18 @@ class _FilterChipState extends State<_FilterChip> {
     final theme = Theme.of(context);
     return MouseRegion(
       onEnter: (_) {
-        if (mounted) setState(() => _hovered = true);
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = true);
+          });
+        }
       },
       onExit: (_) {
-        if (mounted) setState(() => _hovered = false);
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _hovered = false);
+          });
+        }
       },
       child: GestureDetector(
         onTap: () {
