@@ -290,27 +290,7 @@ class _ContactForm extends StatelessWidget {
   InputDecoration _inputDecoration(IconData? icon, ThemeData theme, String? hint) {
     return InputDecoration(
       prefixIcon: icon != null ? Icon(icon, size: 20, color: VivumColors.teal.withValues(alpha: 0.7)) : null,
-      filled: true,
       hintText: hint,
-      hintStyle: theme.textTheme.bodyMedium?.copyWith(
-        color: theme.colorScheme.onSurface.withValues(alpha: 0.3), // Semi-transparent hint
-        fontSize: 14,
-      ),
-      // Use the scaffold background color to create a "recessed" look inside the card
-      fillColor: theme.scaffoldBackgroundColor,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16), 
-        borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.5)), // Visible border
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16), 
-        borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.5)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16), 
-        borderSide: const BorderSide(color: VivumColors.teal, width: 1.5),
-      ),
-      hoverColor: VivumColors.teal.withValues(alpha: 0.02),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
     );
   }
