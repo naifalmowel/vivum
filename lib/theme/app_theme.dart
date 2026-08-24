@@ -150,41 +150,6 @@ class AppTheme {
           side: BorderSide(color: colorScheme.outline, width: 1),
         ),
       ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: isDark ? VivumColors.darkBG : VivumColors.lightBG,
-        hoverColor: WidgetStateColor.resolveWith((states) {
-          if (states.contains(WidgetState.error)) return Colors.transparent;
-          return VivumColors.teal.withValues(alpha: 0.02);
-        }),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: VivumColors.teal, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
-        ),
-        errorStyle: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
-        hintStyle: TextStyle(
-          color: isDark 
-            ? VivumColors.darkWhite.withValues(alpha: 0.4) 
-            : VivumColors.lightText.withValues(alpha: 0.4),
-          fontSize: 14,
-        ),
-      ),
       scrollbarTheme: ScrollbarThemeData(
         thickness: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.hovered) || states.contains(WidgetState.dragged)) {

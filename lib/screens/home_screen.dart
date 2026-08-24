@@ -477,26 +477,15 @@ class _CtaBanner extends StatelessWidget {
   const _CtaBanner({required this.lp});
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isMobile = width < 768;
-
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80, vertical: 60),
+      padding: const EdgeInsets.all(80),
       child: Container(
-        padding: EdgeInsets.all(isMobile ? 32 : 60),
+        padding: const EdgeInsets.all(60),
         decoration: BoxDecoration(gradient: VivumColors.tealGradient, borderRadius: BorderRadius.circular(32)),
         child: Column(children: [
-          Text(
-            lp.t('cta.title'), 
-            style: TextStyle(
-              fontSize: isMobile ? 28 : 42, 
-              color: Colors.white, 
-              fontWeight: FontWeight.w900
-            ), 
-            textAlign: TextAlign.center
-          ),
-          SizedBox(height: isMobile ? 24 : 36),
+          Text(lp.t('cta.title'), style: const TextStyle(fontSize: 42, color: Colors.white, fontWeight: FontWeight.w900), textAlign: TextAlign.center),
+          const SizedBox(height: 36),
           VivumButton(label: lp.t('hero.cta2'), onTap: () => context.go('/contact'), variant: ButtonVariant.amber),
         ]),
       ),
