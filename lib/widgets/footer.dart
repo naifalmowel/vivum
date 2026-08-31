@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
-import '../theme/personal_info.dart';
 import '../l10n/translations.dart';
 
 class VivumFooter extends StatelessWidget {
@@ -173,26 +172,31 @@ class _BrandColumn extends StatelessWidget {
           spacing: 12,
           runSpacing: 12,
           children: [
-            _SocialIcon(
-              icon: const FaIcon(FontAwesomeIcons.linkedinIn, size: 18),
-              url: PersonalInfo.linkedin,
-            ),
-            _SocialIcon(
-              icon: const FaIcon(FontAwesomeIcons.instagram, size: 18),
-              url: PersonalInfo.instagram,
-            ),
-            _SocialIcon(
-              icon: const FaIcon(FontAwesomeIcons.facebookF, size: 18),
-              url: PersonalInfo.facebook,
-            ),
-            _SocialIcon(
-              icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
-              url: PersonalInfo.whatsapp,
-            ),
-            _SocialIcon(
-              icon: const FaIcon(FontAwesomeIcons.behance, size: 18),
-              url: PersonalInfo.behance,
-            ),
+            if (lp.settings['linkedin']?.toString().isNotEmpty ?? false)
+              _SocialIcon(
+                icon: const FaIcon(FontAwesomeIcons.linkedinIn, size: 18),
+                url: lp.settings['linkedin'],
+              ),
+            if (lp.settings['instagram']?.toString().isNotEmpty ?? false)
+              _SocialIcon(
+                icon: const FaIcon(FontAwesomeIcons.instagram, size: 18),
+                url: lp.settings['instagram'],
+              ),
+            if (lp.settings['facebook']?.toString().isNotEmpty ?? false)
+              _SocialIcon(
+                icon: const FaIcon(FontAwesomeIcons.facebookF, size: 18),
+                url: lp.settings['facebook'],
+              ),
+            if (lp.settings['whatsapp']?.toString().isNotEmpty ?? false)
+              _SocialIcon(
+                icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
+                url: lp.settings['whatsapp'],
+              ),
+            if (lp.settings['behance']?.toString().isNotEmpty ?? false)
+              _SocialIcon(
+                icon: const FaIcon(FontAwesomeIcons.behance, size: 18),
+                url: lp.settings['behance'],
+              ),
           ],
         ),
       ],
@@ -337,22 +341,27 @@ class _ContactColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final email = lp.settings['email']?.toString() ?? '';
+    final phone = lp.settings['phone']?.toString() ?? '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(lp.t('nav.contact'), style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700)),
         const SizedBox(height: 24),
-        InkWell(
-          onTap: () => launchUrl(Uri.parse('mailto:${PersonalInfo.email}')),
-          child: Text(PersonalInfo.email, style: theme.textTheme.bodyMedium),
-        ),
-        const SizedBox(height: 12),
-        InkWell(
-          onTap: () => launchUrl(Uri.parse('tel:${PersonalInfo.phoneNumber}')),
-          child: Text(
-              PersonalInfo.phoneNumber, style: theme.textTheme.bodyMedium),
-        ),
+        if (email.isNotEmpty)
+          InkWell(
+            onTap: () => launchUrl(Uri.parse('mailto:$email')),
+            child: Text(email, style: theme.textTheme.bodyMedium),
+          ),
+        if (email.isNotEmpty && phone.isNotEmpty)
+          const SizedBox(height: 12),
+        if (phone.isNotEmpty)
+          InkWell(
+            onTap: () => launchUrl(Uri.parse('tel:$phone')),
+            child: Text(phone, style: theme.textTheme.bodyMedium),
+          ),
       ],
     );
   }

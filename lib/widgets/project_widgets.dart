@@ -162,7 +162,7 @@ class _ProjectCardState extends State<ProjectCard> {
             boxShadow: [
               BoxShadow(
                 color: _hovered 
-                  ? p.accentColor.withValues(alpha: 0.2) 
+                  ? p.accentColor.withValues(alpha: 0.2)
                   : Colors.black.withValues(alpha: 0.04),
                 blurRadius: _hovered ? 50 : 20,
                 offset: Offset(0, _hovered ? 25 : 10),
@@ -230,7 +230,7 @@ class _ProjectCardState extends State<ProjectCard> {
                           ),
                           // Badges
                           Positioned(
-                            top: isSmall ? 12 : 20, 
+                            top: isSmall ? 12 : 20,
                             left: isSmall ? 12 : 20,
                             child: Row(
                               children: [
@@ -242,16 +242,16 @@ class _ProjectCardState extends State<ProjectCard> {
                           ),
                           //Content
                           Positioned(
-                            bottom: isSmall ? 16 : 24, 
-                            left: isSmall ? 16 : 24, 
+                            bottom: isSmall ? 16 : 24,
+                            left: isSmall ? 16 : 24,
                             right: isSmall ? 16 : 24,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(p.category.toUpperCase(), 
+                                Text(p.category.toUpperCase(),
                                   style: TextStyle(color: p.accentColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                                 const SizedBox(height: 4),
-                                Text(p.title, 
+                                Text(p.title,
                                   style: TextStyle(color: Colors.white, fontSize: isSmall ? 22 : 26, fontWeight: FontWeight.w900, height: 1.1)),
                               ],
                             ),
@@ -281,7 +281,7 @@ class _ProjectCardState extends State<ProjectCard> {
                           // Dots
                           if (p.imageUrls.length > 1)
                             Positioned(
-                              bottom: isSmall ? 16 : 24, 
+                              bottom: isSmall ? 16 : 24,
                               right: isSmall ? 16 : 24,
                               child: Row(
                                 children: List.generate(p.imageUrls.length, (i) => AnimatedContainer(
@@ -308,8 +308,8 @@ class _ProjectCardState extends State<ProjectCard> {
                           children: [
                             Expanded( // Internal expanded for text description
                               child: Text(
-                                p.challenge, 
-                                maxLines: isSmall ? 2 : 3, 
+                                p.challenge,
+                                maxLines: isSmall ? 2 : 3,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12, height: 1.5),
                               ),
@@ -328,7 +328,7 @@ class _ProjectCardState extends State<ProjectCard> {
                                         borderRadius: BorderRadius.circular(6),
                                         border: Border.all(color: p.accentColor.withValues(alpha: 0.15)),
                                       ),
-                                      child: Text('#$t', 
+                                      child: Text('#$t',
                                         style: TextStyle(color: p.accentColor, fontSize: 8, fontWeight: FontWeight.w800)),
                                     )).toList(),
                                   ),
@@ -341,8 +341,8 @@ class _ProjectCardState extends State<ProjectCard> {
                                     shape: BoxShape.circle,
                                     color: _hovered ? p.accentColor : theme.dividerColor.withValues(alpha: 0.3),
                                   ),
-                                  child: Icon(Icons.arrow_forward_rounded, 
-                                    size: 14, 
+                                  child: Icon(Icons.arrow_forward_rounded,
+                                    size: 14,
                                     color: _hovered ? Colors.white : theme.dividerColor),
                                 ),
                               ],

@@ -144,7 +144,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(lp.t('portfolio.filter.skill').toUpperCase(), 
+                                Text(lp.t('portfolio.filter.skill').toUpperCase(),
                                   style: theme.textTheme.labelSmall?.copyWith(letterSpacing: 2, color: VivumColors.teal, fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 12),
                                 Container(
@@ -267,7 +267,7 @@ class _FilterGroup extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title.toUpperCase(), 
+        Text(title.toUpperCase(),
           style: theme.textTheme.labelSmall?.copyWith(letterSpacing: 2, color: VivumColors.teal, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         Row(

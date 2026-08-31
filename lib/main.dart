@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:vivum/services/database_service.dart';
 import 'package:vivum/widgets/glow_button.dart';
 import 'theme/app_theme.dart';
 import 'l10n/translations.dart';
@@ -120,38 +121,45 @@ class _VivumAppState extends State<VivumApp> {
 
   @override
   Widget build(BuildContext context) {
-    return AppProvider(
-      lang: _lang,
-      themeMode: _themeMode,
-      onToggleLang: _toggleLang,
-      onToggleTheme: _toggleTheme,
-      child: Builder(
-        builder: (context) {
-          final appProvider = AppProvider.of(context);
-          return MaterialApp.router(
-            title: 'VIVUM Digital Agency',
-            debugShowCheckedModeBanner: false,
-            scrollBehavior: const MaterialScrollBehavior().copyWith(
-              dragDevices: {
-                PointerDeviceKind.mouse,
-                PointerDeviceKind.touch,
-                PointerDeviceKind.trackpad
-              },
-            ),
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: appProvider.themeMode,
-            routerConfig: _router,
-            builder: (context, child) {
-              return Directionality(
-                // Force LTR for all languages as per user request to keep UI consistent
-                textDirection: TextDirection.ltr,
-                child: child!,
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: DatabaseService.getSettingsStream(),
+      builder: (context, snapshot) {
+        final settings = snapshot.data ?? {};
+        return AppProvider(
+          lang: _lang,
+          themeMode: _themeMode,
+          settings: settings,
+          onToggleLang: _toggleLang,
+          onToggleTheme: _toggleTheme,
+          child: Builder(
+            builder: (context) {
+              final appProvider = AppProvider.of(context);
+              return MaterialApp.router(
+                title: 'VIVUM Digital Agency',
+                debugShowCheckedModeBanner: false,
+                scrollBehavior: const MaterialScrollBehavior().copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.mouse,
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.trackpad
+                  },
+                ),
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: appProvider.themeMode,
+                routerConfig: _router,
+                builder: (context, child) {
+                  return Directionality(
+                    // Force LTR for all languages as per user request to keep UI consistent
+                    textDirection: TextDirection.ltr,
+                    child: child!,
+                  );
+                },
               );
             },
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

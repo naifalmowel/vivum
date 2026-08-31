@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/database_service.dart';
 import '../theme/app_theme.dart';
-import '../theme/personal_info.dart';
 import '../l10n/translations.dart';
 import '../widgets/footer.dart';
 import '../widgets/particle_painter.dart';
@@ -323,33 +322,44 @@ class _SidebarInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final phone = lp.settings['phone']?.toString() ?? '';
+    final email = lp.settings['email']?.toString() ?? '';
+    final whatsapp = lp.settings['whatsapp']?.toString() ?? '';
+    final instagram = lp.settings['instagram']?.toString() ?? '';
+    final linkedin = lp.settings['linkedin']?.toString() ?? '';
+    final behance = lp.settings['behance']?.toString() ?? '';
+    final facebook = lp.settings['facebook']?.toString() ?? '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Premium Contact Cards
-        _PremiumInfoCard(
-          icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 24),
-          title: lp.t('contact.whatsapp'),
-          value: PersonalInfo.phoneNumber,
-          color: const Color(0xFF25D366),
-          onTap: () => launchUrl(Uri.parse(PersonalInfo.whatsapp)),
-        ),
-        const SizedBox(height: 20),
-        _PremiumInfoCard(
-          icon: const Icon(Icons.email_rounded, size: 24),
-          title: 'Email Address',
-          value: PersonalInfo.email,
-          color: VivumColors.teal,
-          onTap: () => launchUrl(Uri.parse('mailto:${PersonalInfo.email}')),
-        ),
-        const SizedBox(height: 20),
-        _PremiumInfoCard(
-          icon: const Icon(Icons.phone_rounded, size: 24),
-          title: 'Direct Call',
-          value: PersonalInfo.phoneNumber,
-          color: VivumColors.amber,
-          onTap: () => launchUrl(Uri.parse('tel:${PersonalInfo.phoneNumber}')),
-        ),
+        if (whatsapp.isNotEmpty)
+          _PremiumInfoCard(
+            icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 24),
+            title: lp.t('contact.whatsapp'),
+            value: phone,
+            color: const Color(0xFF25D366),
+            onTap: () => launchUrl(Uri.parse(whatsapp)),
+          ),
+        if (whatsapp.isNotEmpty && email.isNotEmpty) const SizedBox(height: 20),
+        if (email.isNotEmpty)
+          _PremiumInfoCard(
+            icon: const Icon(Icons.email_rounded, size: 24),
+            title: 'Email Address',
+            value: email,
+            color: VivumColors.teal,
+            onTap: () => launchUrl(Uri.parse('mailto:$email')),
+          ),
+        if (email.isNotEmpty && phone.isNotEmpty) const SizedBox(height: 20),
+        if (phone.isNotEmpty)
+          _PremiumInfoCard(
+            icon: const Icon(Icons.phone_rounded, size: 24),
+            title: 'Direct Call',
+            value: phone,
+            color: VivumColors.amber,
+            onTap: () => launchUrl(Uri.parse('tel:$phone')),
+          ),
         
         const SizedBox(height: 48),
         Text(lp.t('footer.follow'), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
@@ -362,10 +372,10 @@ class _SidebarInfo extends StatelessWidget {
           crossAxisSpacing: 16,
           childAspectRatio: 2.2,
           children: [
-            _SocialTile(icon: const FaIcon(FontAwesomeIcons.instagram, size: 18), label: 'Instagram', url: PersonalInfo.instagram, color: const Color(0xFFE1306C)),
-            _SocialTile(icon: const FaIcon(FontAwesomeIcons.linkedinIn, size: 18), label: 'LinkedIn', url: PersonalInfo.linkedin, color: const Color(0xFF0A66C2)),
-            _SocialTile(icon: const FaIcon(FontAwesomeIcons.behance, size: 18), label: 'Behance', url: PersonalInfo.behance, color: const Color(0xFF1769FF)),
-            _SocialTile(icon: const FaIcon(FontAwesomeIcons.facebookF, size: 18), label: 'Facebook', url: PersonalInfo.facebook, color: const Color(0xFF1877F2)),
+            if (instagram.isNotEmpty) _SocialTile(icon: const FaIcon(FontAwesomeIcons.instagram, size: 18), label: 'Instagram', url: instagram, color: const Color(0xFFE1306C)),
+            if (linkedin.isNotEmpty) _SocialTile(icon: const FaIcon(FontAwesomeIcons.linkedinIn, size: 18), label: 'LinkedIn', url: linkedin, color: const Color(0xFF0A66C2)),
+            if (behance.isNotEmpty) _SocialTile(icon: const FaIcon(FontAwesomeIcons.behance, size: 18), label: 'Behance', url: behance, color: const Color(0xFF1769FF)),
+            if (facebook.isNotEmpty) _SocialTile(icon: const FaIcon(FontAwesomeIcons.facebookF, size: 18), label: 'Facebook', url: facebook, color: const Color(0xFF1877F2)),
           ],
         ),
 

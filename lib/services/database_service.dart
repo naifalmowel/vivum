@@ -83,4 +83,14 @@ class DatabaseService {
         .snapshots()
         .map((snap) => snap.docs.map((doc) => doc.data()).toList());
   }
+
+  // --- SETTINGS SYSTEM ---
+
+  // Get contact & social settings
+  static Stream<Map<String, dynamic>> getSettingsStream() {
+    return _db.collection('settings').doc('contact_info').snapshots().map((doc) {
+      if (doc.exists) return doc.data()!;
+      return {};
+    });
+  }
 }

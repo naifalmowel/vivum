@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppProvider extends InheritedWidget {
   final String lang;
   final ThemeMode themeMode;
+  final Map<String, dynamic> settings;
   final VoidCallback onToggleLang;
   final VoidCallback onToggleTheme;
 
@@ -10,6 +11,7 @@ class AppProvider extends InheritedWidget {
     super.key,
     required this.lang,
     required this.themeMode,
+    required this.settings,
     required this.onToggleLang,
     required this.onToggleTheme,
     required super.child,
@@ -35,7 +37,7 @@ class AppProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AppProvider old) => 
-      old.lang != lang || old.themeMode != themeMode;
+      old.lang != lang || old.themeMode != themeMode || old.settings != settings;
 
   static const _en = {
     // Nav
