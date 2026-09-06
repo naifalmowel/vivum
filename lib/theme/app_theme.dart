@@ -102,43 +102,43 @@ class AppTheme {
       shadowColor: colorScheme.shadow,
       textTheme: TextTheme(
         displayLarge: TextStyle(
-          fontSize: 72, fontWeight: FontWeight.w800,
+          fontSize: 72, fontWeight: FontWeight.bold,
           color: textColor, height: 1.0, letterSpacing: -1,
         ),
         displayMedium: TextStyle(
-          fontSize: 56, fontWeight: FontWeight.w800,
+          fontSize: 56, fontWeight: FontWeight.bold,
           color: textColor, height: 1.1, letterSpacing: -0.5,
         ),
         displaySmall: TextStyle(
-          fontSize: 42, fontWeight: FontWeight.w700,
+          fontSize: 42, fontWeight: FontWeight.bold,
           color: textColor, height: 1.2,
         ),
         headlineLarge: TextStyle(
-          fontSize: 36, fontWeight: FontWeight.w700,
+          fontSize: 36, fontWeight: FontWeight.bold,
           color: textColor,
         ),
         headlineMedium: TextStyle(
-          fontSize: 28, fontWeight: FontWeight.w700,
+          fontSize: 28, fontWeight: FontWeight.bold,
           color: textColor,
         ),
         headlineSmall: TextStyle(
-          fontSize: 22, fontWeight: FontWeight.w600,
+          fontSize: 22, fontWeight: FontWeight.bold,
           color: textColor,
         ),
         titleLarge: TextStyle(
-          fontSize: 20, fontWeight: FontWeight.w700,
+          fontSize: 20, fontWeight: FontWeight.bold,
           color: textColor,
         ),
         bodyLarge: TextStyle(
-          fontSize: 16, fontWeight: FontWeight.w400,
+          fontSize: 16, fontWeight: FontWeight.normal,
           color: mutedColor, height: 1.7,
         ),
         bodyMedium: TextStyle(
-          fontSize: 14, fontWeight: FontWeight.w400,
+          fontSize: 14, fontWeight: FontWeight.normal,
           color: mutedColor, height: 1.6,
         ),
         labelLarge: TextStyle(
-          fontSize: 14, fontWeight: FontWeight.w600,
+          fontSize: 14, fontWeight: FontWeight.bold,
           color: textColor, letterSpacing: 0.5,
         ),
       ),
