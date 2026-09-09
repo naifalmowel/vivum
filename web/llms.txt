@@ -1,5 +1,31 @@
 # VIVUM Digital Agency
-Building Digital Experiences That Help Businesses Grow.
 
-## Links
-- [Home](https://web.app)
+A premium regional digital agency providing creative design, technology, and AI solutions across the UAE, Saudi Arabia, and Syria. This project is a high-performance Flutter Web application designed to showcase work and facilitate client growth.
+
+## Core Features
+- **Minimalist Portfolio:** A visual-first gallery organized by dynamic categories (Web, Branding, AI).
+- **Dynamic Content Management:** Contact details, social media links, and global settings are synchronized in real-time with a Firestore-based dashboard.
+- **Bilingual Experience:** Seamless switching between Arabic and English with localized UI and the Cairo typography.
+- **Automated Workflows:** Integrated testimonial submission system with admin moderation and secure contact forms.
+
+## Technical Architecture
+- **Framework:** Flutter Web (optimised for SEO and performance).
+- **Navigation:** GoRouter with path-based URL strategy.
+- **Backend Services:**
+  - **Firebase Firestore:** Powers real-time settings, projects database, and testimonials.
+  - **Firebase Hosting:** Global CDN deployment.
+  - **Firebase App Check:** Enterprise-grade security for API protection.
+  - **Supabase:** Managed storage for high-resolution project images and assets.
+- **Design System:** Custom Material 3 implementation (`AppTheme`) with a focus on dark/light mode balance and smooth micro-animations using `flutter_animate`.
+
+## Directory Structure
+- `lib/screens/`: High-level page components and layouts.
+- `lib/widgets/`: Modular, reusable UI elements (Custom buttons, project cards, shell navigation).
+- `lib/services/`: Abstraction layer for database and storage interactions.
+- `lib/theme/`: Centralized colors, typography, and decoration styles.
+- `lib/l10n/`: Localisation provider and string translations.
+
+## Development & Operations
+- **Clean Architecture:** Separation of UI and business logic through the `AppProvider` (InheritedWidget).
+- **Performance Optimized:** Minimised font weights and non-blocking service initialisation.
+- **Base URL:** [https://vivum-d2907.web.app](https://vivum-d2907.web.app)

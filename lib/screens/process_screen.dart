@@ -342,17 +342,27 @@ class _ReviewSubmissionFormState extends State<_ReviewSubmissionForm> {
               const SizedBox(height: 16),
               TextFormField(controller: _textCtrl, maxLines: 3, decoration: InputDecoration(labelText: lp.t('t.text'), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), validator: (v) => v!.isEmpty ? '?' : null),
               const SizedBox(height: 16),
-              Row(children: [
-                Text(lp.t('t.rating'), style: theme.textTheme.bodyMedium),
-                const SizedBox(width: 16),
-                Row(children: List.generate(5, (i) => IconButton(
-                onPressed: () {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) setState(() => _rating = i + 1);
-                  });
-                },
-                icon: Icon(i < _rating ? Icons.star_rounded : Icons.star_outline_rounded, color: VivumColors.amber)))),
-              ]),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  Text(lp.t('t.rating'), style: theme.textTheme.bodyMedium),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(5, (i) => IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) setState(() => _rating = i + 1);
+                        });
+                      }, 
+                      icon: Icon(i < _rating ? Icons.star_rounded : Icons.star_outline_rounded, color: VivumColors.amber, size: 28)
+                    )),
+                  ),
+                ],
+              ),
               const SizedBox(height: 24),
               SizedBox(width: double.infinity, child: _loading ? const Center(child: CircularProgressIndicator()) : VivumButton(label: lp.t('t.submit'), onTap: _submit, variant: ButtonVariant.teal)),
             ],

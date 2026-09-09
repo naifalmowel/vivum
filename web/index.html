@@ -6,11 +6,28 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="فيفوم وكالة رقمية إقليمية تساعد الأعمال في الإمارات والسعودية وسوريا على تحويل أفكارها إلى تجارب رقمية قوية. VIVUM Digital Agency - Creative Design, Technology & AI.">
   <meta name="keywords" content="digital agency, UAE, Saudi Arabia, Syria, web design, AI automation, branding, دبي, الرياض, دمشق, وكالة رقمية, تصميم مواقع, ذكاء اصطناعي">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta property="og:title" content="VIVUM Digital Agency">
   <meta property="og:description" content="Building Digital Experiences That Help Businesses Grow">
   <title>VIVUM Digital Agency</title>
+  <link rel="icon" type="image/png" href="favicon.png"/>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Firebase SDKs (Using type="module" for Modern Modular SDK) -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/12.17.0/firebase-app-check.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore-pipelines.js"></script>
+
+  <!-- Patch for Intl.v8BreakIterator deprecation -->
+  <script>
+    if (!window.Intl || !window.Intl.v8BreakIterator) {
+      window.Intl = window.Intl || {};
+      window.Intl.v8BreakIterator = function() {
+        return { adoptText: function() {}, first: function() { return 0; }, next: function() { return -1; } };
+      };
+    }
+  </script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {

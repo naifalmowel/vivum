@@ -31,7 +31,7 @@ Future<void> _initCoreServices() async {
   await Firebase.initializeApp(
       options: const FirebaseOptions(
           apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
-          authDomain: "://firebaseapp.com",
+          authDomain: "vivum-d2907.firebaseapp.com",
           projectId: "vivum-d2907",
           storageBucket: "vivum-d2907.firebasestorage.app",
           messagingSenderId: "899371078453",
@@ -42,7 +42,7 @@ Future<void> _initCoreServices() async {
 
   // السوبابيس مسموح تحميله بالتوازي
   await Supabase.initialize(
-    url: 'https://supabase.co',
+    url: 'https://gosqrnkrebpdqvhazugw.supabase.co',
     publishableKey: 'sb_publishable_N0iUuNR5DD-yKtgCqcXglg_K2ySU9pj',
     debug: false,
   );
