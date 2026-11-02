@@ -49,7 +49,7 @@ class _VivumNavbarState extends State<VivumNavbar> {
                 InkWell(
                   onTap: () => context.go('/'),
                   borderRadius: BorderRadius.circular(8),
-                  child: const _VivumLogoText(),
+                  child: const VivumLogo(height: 20),
                 ),
                 const Spacer(),
                 if (!isMobile) ...[
@@ -130,24 +130,41 @@ class _VivumNavbarState extends State<VivumNavbar> {
   }
 }
 
-class _VivumLogoText extends StatelessWidget {
-  const _VivumLogoText();
+class VivumLogo extends StatelessWidget {
+  final double height;
+  const VivumLogo({super.key, this.height = 44});
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return RichText(
-      text: TextSpan(
-        style: TextStyle(
-          fontSize: 24, fontWeight: FontWeight.w900,
-          color: theme.colorScheme.onSurface,
-          fontFamily: 'Cairo',
-        ),
-        children: const [
-          TextSpan(text: 'vi'),
-          TextSpan(text: 'v', style: TextStyle(color: VivumColors.teal)),
-          TextSpan(text: 'um'),
-          TextSpan(text: '.', style: TextStyle(color: VivumColors.amber)),
-        ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryAsset = isDark ? 'assets/images/1.png' : 'assets/images/2.png';
+    return SizedBox(
+      height: height,
+      child: Image.asset(
+        primaryAsset,
+        height: height,
+        fit: BoxFit.contain, // Ensures the entire cropped logo is shown clearly without cropping
+        filterQuality: FilterQuality.high,
+        errorBuilder: (context, error, stackTrace) {
+          final theme = Theme.of(context);
+          return RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: height * 0.65,
+                fontWeight: FontWeight.w900,
+                color: theme.colorScheme.onSurface,
+                fontFamily: 'Cairo',
+              ),
+              children: const [
+                TextSpan(text: 'vi'),
+                TextSpan(text: 'v', style: TextStyle(color: VivumColors.teal)),
+                TextSpan(text: 'um'),
+                TextSpan(text: '.', style: TextStyle(color: VivumColors.amber)),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

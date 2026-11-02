@@ -9,8 +9,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta property="og:title" content="VIVUM Digital Agency">
   <meta property="og:description" content="Building Digital Experiences That Help Businesses Grow">
+  <meta property="og:image" content="1.png">
   <title>VIVUM Digital Agency</title>
+
+  <!-- Favicon & Icons -->
   <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+  <link rel="apple-touch-icon" href="1.png"/>
   <link rel="manifest" href="manifest.json">
 
   <!-- Firebase SDKs (Using type="module" for Modern Modular SDK) -->
@@ -47,6 +52,17 @@
       z-index: 9999;
       transition: opacity 0.6s ease;
     }
+    .loader-logo-img {
+      height: 64px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 12px rgba(0, 181, 204, 0.3));
+      animation: pulseLogo 2s ease-in-out infinite;
+    }
+    @keyframes pulseLogo {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
     .loader-logo {
       font-family: sans-serif;
       font-size: 2.5rem;
@@ -78,10 +94,19 @@
 </head>
 <body>
   <div id="loading">
-    <div class="loader-logo">vi<span class="teal">v</span>um<span class="amber">.</span></div>
+    <img id="splash-logo" src="1.png" alt="VIVUM Logo" class="loader-logo-img"/>
+    <div id="text-logo" class="loader-logo" style="display:none;">vi<span class="teal">v</span>um<span class="amber">.</span></div>
     <div class="loader-bar"><div class="loader-fill"></div></div>
   </div>
   <script>
+    var splashImg = document.getElementById('splash-logo');
+    if (splashImg) {
+      splashImg.addEventListener('error', function() {
+        splashImg.style.display = 'none';
+        var txt = document.getElementById('text-logo');
+        if (txt) txt.style.display = 'block';
+      });
+    }
     window.addEventListener('flutter-first-frame', function() {
       var loader = document.getElementById('loading');
       if (loader) {

@@ -217,7 +217,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     builder: (context, constraints) {
                       final width = constraints.crossAxisExtent;
                       int crossAxisCount = width > 1200 ? 3 : (width > 700 ? 2 : 1);
-                      double mainAxisExtent = width > 1200 ? 540 : 500;
+                      double mainAxisExtent = width > 1200 ? 440 : (width > 700 ? 430 : 410);
 
                       return SliverGrid(
                         key: ValueKey('portfolio_grid_$crossAxisCount'),

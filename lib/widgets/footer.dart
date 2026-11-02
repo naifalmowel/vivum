@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
+import 'navbar.dart';
 
 class VivumFooter extends StatelessWidget {
   const VivumFooter({super.key});
@@ -146,20 +147,10 @@ class _BrandColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            style: TextStyle(
-              fontSize: 28, fontWeight: FontWeight.w900,
-              color: theme.colorScheme.onSurface,
-              fontFamily: 'Cairo',
-            ),
-            children: const [
-              TextSpan(text: 'vi'),
-              TextSpan(text: 'v', style: TextStyle(color: VivumColors.teal)),
-              TextSpan(text: 'um'),
-              TextSpan(text: '.', style: TextStyle(color: VivumColors.amber)),
-            ],
-          ),
+        InkWell(
+          onTap: () => context.go('/'),
+          borderRadius: BorderRadius.circular(8),
+          child: const VivumLogo(height: 44),
         ),
         const SizedBox(height: 20),
         Text(

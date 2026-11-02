@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -50,15 +51,6 @@ class _HeroSection extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Positioned.fill(child: const ParticleBackground()),
-          if (!isWide)
-            Opacity(
-              opacity: lp.isDark ? 0.35 : 0.45,
-              child: SizedBox(
-                width: size.width * 0.85,
-                height: size.width * 0.85,
-                child: const RepaintBoundary(child: HeroOrbit()),
-              ),
-            ),
           Positioned(
             top: size.height * 0.05,
             right: isWide ? size.width * 0.05 : -size.width * 0.1,
@@ -90,7 +82,14 @@ class _HeroSection extends StatelessWidget {
                       const Expanded(flex: 5, child: HeroOrbit()),
                     ],
                   )
-                : _HeroText(lp: lp),
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _HeroText(lp: lp),
+                      const SizedBox(height: 36),
+                      HeroOrbit(size: math.min(size.width - 48, 420.0)),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -177,11 +176,13 @@ class _HeroText extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.topCenter,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 6),
-                    width: 3, height: 6,
-                    decoration: BoxDecoration(color: VivumColors.teal, borderRadius: BorderRadius.circular(2)),
-                  ).animate(onPlay: (c) => c.repeat()).moveY(begin: 0, end: 10, duration: 1500.ms, curve: Curves.easeInOut).fadeOut(duration: 1500.ms),
+                  RepaintBoundary(
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 6),
+                      width: 3, height: 6,
+                      decoration: BoxDecoration(color: VivumColors.teal, borderRadius: BorderRadius.circular(2)),
+                    ).animate(onPlay: (c) => c.repeat()).moveY(begin: 0, end: 10, duration: 1500.ms, curve: Curves.easeInOut).fadeOut(duration: 1500.ms),
+                  ),
                 ],
               ),
             ),
@@ -193,6 +194,8 @@ class _HeroText extends StatelessWidget {
     ).animate().fadeIn(duration: 800.ms);
   }
 }
+
+
 
 // ─── SERVICES PREVIEW ──────────────────────────────────────────────────────
 class _ServicesPreview extends StatelessWidget {
@@ -382,7 +385,7 @@ class _PortfolioTeaser extends StatelessWidget {
                   crossAxisCount: width > 1100 ? 3 : (width > 700 ? 2 : 1),
                   crossAxisSpacing: 24, 
                   mainAxisSpacing: 24, 
-                  mainAxisExtent: width > 1100 ? 540 : 500, // Matched with portfolio_screen
+                  mainAxisExtent: width > 1100 ? 440 : (width > 700 ? 430 : 410),
                 ),
                 itemCount: projects.length,
                 itemBuilder: (context, i) => ProjectCard(project: projects[i]),

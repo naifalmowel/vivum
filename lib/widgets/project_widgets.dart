@@ -1,8 +1,8 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import '../l10n/translations.dart';
 import '../theme/app_theme.dart';
 
 class Project {
@@ -111,7 +111,6 @@ class ProjectCard extends StatefulWidget {
 
 class _ProjectCardState extends State<ProjectCard> {
   bool _hovered = false;
-  int _currentImageIndex = 0;
   final PageController _pageController = PageController();
 
   @override
@@ -120,10 +119,16 @@ class _ProjectCardState extends State<ProjectCard> {
     super.dispose();
   }
 
+  double _getTopHeight(double width) {
+    if (width < 380) return 210;
+    if (width < 450) return 230;
+    if (width < 600) return 250;
+    return 280;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final lp = AppProvider.of(context);
     final p = widget.project;
 
     return MouseRegion(
@@ -145,32 +150,32 @@ class _ProjectCardState extends State<ProjectCard> {
         onTap: () {
           final cleanId = p.id.trim();
           if (cleanId.isNotEmpty) {
-            Future.microtask(() => context.go('/project/$cleanId'));
+            Future.microtask(() => context.push('/project/$cleanId'));
           }
         },
         child: AnimatedContainer(
-          duration: 500.ms,
-          curve: Curves.easeOutQuart,
-          transform: Matrix4.translationValues(0, _hovered ? -15.0 : 0, 0),
+          duration: 200.ms,
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.translationValues(0, _hovered ? -4.0 : 0, 0),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: _hovered ? p.accentColor.withValues(alpha: 0.5) : theme.dividerColor.withValues(alpha: 0.5),
-              width: _hovered ? 2 : 1,
+              color: _hovered ? p.accentColor.withValues(alpha: 0.35) : theme.dividerColor,
+              width: 1,
             ),
             boxShadow: [
               BoxShadow(
                 color: _hovered 
-                  ? p.accentColor.withValues(alpha: 0.2)
-                  : Colors.black.withValues(alpha: 0.04),
-                blurRadius: _hovered ? 50 : 20,
-                offset: Offset(0, _hovered ? 25 : 10),
+                  ? p.accentColor.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.03),
+                blurRadius: _hovered ? 16 : 8,
+                offset: Offset(0, _hovered ? 8 : 4),
               )
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(23),
             child: LayoutBuilder(
               builder: (context, cardConstraints) {
                 final isSmall = cardConstraints.maxWidth < 400;
@@ -178,9 +183,9 @@ class _ProjectCardState extends State<ProjectCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Top Visual Part
-                    AspectRatio(
-                      aspectRatio: isSmall ? 1.5 : 1.4,
+                    // Top Visual Part (Dynamic & Responsive Height)
+                    SizedBox(
+                      height: _getTopHeight(cardConstraints.maxWidth),
                       child: Stack(
                         children: [
                           Positioned.fill(
@@ -194,36 +199,27 @@ class _ProjectCardState extends State<ProjectCard> {
                                       ),
                                     ),
                                   )
-                                : PageView.builder(
-                                    controller: _pageController,
-                                    itemCount: p.imageUrls.length,
-                                    onPageChanged: (idx) => setState(() => _currentImageIndex = idx),
-                                    itemBuilder: (context, idx) => Image.network(
-                                      p.imageUrls[idx],
-                                      fit: BoxFit.cover,
-                                      cacheWidth: 800,
-                                      errorBuilder: (c, e, s) => Container(
-                                        color: p.accentColor.withValues(alpha: 0.1),
-                                        child: const Icon(Icons.broken_image_outlined, color: Colors.white24),
-                                      ),
+                                : Image.network(
+                                    p.imageUrls.first,
+                                    fit: BoxFit.cover,
+                                    cacheWidth: kIsWeb ? null : 800,
+                                    errorBuilder: (c, e, s) => Container(
+                                      color: p.accentColor.withValues(alpha: 0.1),
+                                      child: const Icon(Icons.broken_image_outlined, color: Colors.white24),
                                     ),
                                   ),
                           ),
                           // Dynamic Glass Overlay
                           Positioned.fill(
-                            child: AnimatedOpacity(
-                              duration: 400.ms,
-                              opacity: _hovered ? 0.3 : 0.6,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black.withValues(alpha: 0.8),
-                                    ],
-                                  ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withValues(alpha: 0.75),
+                                  ],
                                 ),
                               ),
                             ),
@@ -240,7 +236,7 @@ class _ProjectCardState extends State<ProjectCard> {
                               ],
                             ),
                           ),
-                          //Content
+                          // Content
                           Positioned(
                             bottom: isSmall ? 16 : 24,
                             left: isSmall ? 16 : 24,
@@ -249,106 +245,67 @@ class _ProjectCardState extends State<ProjectCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(p.category.toUpperCase(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(color: p.accentColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                                 const SizedBox(height: 4),
                                 Text(p.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(color: Colors.white, fontSize: isSmall ? 22 : 26, fontWeight: FontWeight.w900, height: 1.1)),
                               ],
                             ),
                           ),
-                          // Hover View Button
-                          if (_hovered)
-                            Positioned.fill(
-                              child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(lp.t('portfolio.view'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
-                                      const SizedBox(width: 8),
-                                      const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 16),
-                                    ],
-                                  ),
-                                ).animate().scale(duration: 300.ms, curve: Curves.bounceIn),
-                              ),
-                            ),
-                          // Dots
-                          if (p.imageUrls.length > 1)
-                            Positioned(
-                              bottom: isSmall ? 16 : 24,
-                              right: isSmall ? 16 : 24,
-                              child: Row(
-                                children: List.generate(p.imageUrls.length, (i) => AnimatedContainer(
-                                  duration: 300.ms,
-                                  width: _currentImageIndex == i ? 16 : 6,
-                                  height: 6,
-                                  margin: const EdgeInsets.only(left: 4),
-                                  decoration: BoxDecoration(
-                                    color: _currentImageIndex == i ? p.accentColor : Colors.white54,
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                )),
-                              ),
-                            ),
                         ],
                       ),
                     ),
                     // Bottom Info Part
-                    Expanded( // Use Expanded to take all remaining space and prevent overflow
-                      child: Padding(
-                        padding: EdgeInsets.all(isSmall ? 16 : 24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded( // Internal expanded for text description
-                              child: Text(
-                                p.challenge,
-                                maxLines: isSmall ? 2 : 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12, height: 1.5),
+                    Padding(
+                      padding: EdgeInsets.all(isSmall ? 16 : 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            p.challenge,
+                            maxLines: isSmall ? 2 : 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12, height: 1.5),
+                          ),
+                          SizedBox(height: isSmall ? 12 : 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: p.tech.take(isSmall ? 2 : 3).map((t) => Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: p.accentColor.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: p.accentColor.withValues(alpha: 0.15)),
+                                    ),
+                                    child: Text('#$t',
+                                      style: TextStyle(color: p.accentColor, fontSize: 8, fontWeight: FontWeight.w800)),
+                                  )).toList(),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: isSmall ? 12 : 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Wrap(
-                                    spacing: 6,
-                                    runSpacing: 6,
-                                    children: p.tech.take(isSmall ? 2 : 3).map((t) => Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: p.accentColor.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: p.accentColor.withValues(alpha: 0.15)),
-                                      ),
-                                      child: Text('#$t',
-                                        style: TextStyle(color: p.accentColor, fontSize: 8, fontWeight: FontWeight.w800)),
-                                    )).toList(),
-                                  ),
+                              const SizedBox(width: 8),
+                              AnimatedContainer(
+                                duration: 300.ms,
+                                width: 28, height: 28,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _hovered ? p.accentColor : theme.dividerColor.withValues(alpha: 0.3),
                                 ),
-                                const SizedBox(width: 8),
-                                AnimatedContainer(
-                                  duration: 300.ms,
-                                  width: 28, height: 28,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _hovered ? p.accentColor : theme.dividerColor.withValues(alpha: 0.3),
-                                  ),
-                                  child: Icon(Icons.arrow_forward_rounded,
-                                    size: 14,
-                                    color: _hovered ? Colors.white : theme.dividerColor),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                child: Icon(Icons.arrow_forward_rounded,
+                                  size: 14,
+                                  color: _hovered ? Colors.white : theme.dividerColor),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],
