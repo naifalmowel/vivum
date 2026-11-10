@@ -45,6 +45,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final theme = Theme.of(context);
 
     return StreamBuilder<List<Map<String, dynamic>>>(
+        initialData: DatabaseService.cachedProjects,
         stream: DatabaseService.getProjectsStream(),
         builder: (context, snapshot) {
           final data = snapshot.data;

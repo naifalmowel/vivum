@@ -4,6 +4,43 @@ import 'package:flutter/material.dart';
 class DatabaseService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  // In-memory cache for fast instant rendering without network hops
+  static List<Map<String, dynamic>>? _cachedProjects;
+  static Map<String, dynamic>? _cachedSettings;
+
+  static List<Map<String, dynamic>>? get cachedProjects => _cachedProjects;
+  static Map<String, dynamic>? get cachedSettings => _cachedSettings;
+
+  static Map<String, dynamic>? getCachedProject(String id) {
+    if (_cachedProjects == null) return null;
+    try {
+      final match = _cachedProjects!.firstWhere(
+        (m) => m['id'] == id,
+        orElse: () => {},
+      );
+      return match.isNotEmpty ? match : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Get single project (checks cache first, fallback to Firestore single doc)
+  static Future<Map<String, dynamic>?> getProjectById(String id) async {
+    final cached = getCachedProject(id);
+    if (cached != null && cached.isNotEmpty) {
+      return cached;
+    }
+    try {
+      final doc = await _db.collection('projects').doc(id).get();
+      if (doc.exists && doc.data() != null) {
+        return doc.data();
+      }
+    } catch (e) {
+      debugPrint('Error fetching project $id: $e');
+    }
+    return null;
+  }
+
   // Save or Update project
   static Future<void> saveProject(Map<String, dynamic> projectData) async {
     try {
@@ -18,6 +55,15 @@ class DatabaseService {
 
       projectData['id'] = id;
       await _db.collection('projects').doc(id).set(projectData, SetOptions(merge: true));
+
+      if (_cachedProjects != null) {
+        final index = _cachedProjects!.indexWhere((p) => p['id'] == id);
+        if (index != -1) {
+          _cachedProjects![index] = projectData;
+        } else {
+          _cachedProjects!.add(projectData);
+        }
+      }
     } catch (e) {
       debugPrint('Error saving project: $e');
       rethrow;
@@ -28,16 +74,19 @@ class DatabaseService {
   static Future<void> deleteProject(String id) async {
     try {
       await _db.collection('projects').doc(id).delete();
+      _cachedProjects?.removeWhere((p) => p['id'] == id);
     } catch (e) {
       debugPrint('Error deleting project: $e');
       rethrow;
     }
   }
 
-  // Stream of projects from Firestore
+  // Stream of projects from Firestore with cache update
   static Stream<List<Map<String, dynamic>>> getProjectsStream() {
     return _db.collection('projects').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => doc.data()).toList();
+      final list = snapshot.docs.map((doc) => doc.data()).toList();
+      _cachedProjects = list;
+      return list;
     });
   }
 
@@ -86,10 +135,13 @@ class DatabaseService {
 
   // --- SETTINGS SYSTEM ---
 
-  // Get contact & social settings
+  // Get contact & social settings with cache
   static Stream<Map<String, dynamic>> getSettingsStream() {
     return _db.collection('settings').doc('contact_info').snapshots().map((doc) {
-      if (doc.exists) return doc.data()!;
+      if (doc.exists) {
+        _cachedSettings = doc.data()!;
+        return _cachedSettings!;
+      }
       return {};
     });
   }

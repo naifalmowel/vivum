@@ -1,16 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="فيفوم وكالة رقمية إقليمية تساعد الأعمال في الإمارات والسعودية وسوريا على تحويل أفكارها إلى تجارب رقمية قوية. VIVUM Digital Agency - Creative Design, Technology & AI.">
-  <meta name="keywords" content="digital agency, UAE, Saudi Arabia, Syria, web design, AI automation, branding, دبي, الرياض, دمشق, وكالة رقمية, تصميم مواقع, ذكاء اصطناعي">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta property="og:title" content="VIVUM Digital Agency">
-  <meta property="og:description" content="Building Digital Experiences That Help Businesses Grow">
-  <meta property="og:image" content="1.png">
-  <title>VIVUM Digital Agency</title>
+
+  <!-- Primary SEO Meta Tags -->
+  <title>VIVUM Digital Agency | وكالة فيفوم الرقمية - تصميم المواقع، التطبيقات والذكاء الاصطناعي</title>
+  <meta name="description" content="فيفوم (VIVUM) وكالة رقمية إقليمية رائدة متخصصة في تصميم البرمجيات، تطوير المواقع والتطبيقات، والحلول البرمجية بالذكاء الاصطناعي في الإمارات (دبي)، السعودية (الرياض)، وسوريا (دمشق). VIVUM Digital Agency - Creative Design, Technology & AI.">
+  <meta name="keywords" content="VIVUM, VIVUM Digital Agency, فيفوم, وكالة فيفوم الرقمية, وكالة رقمية, دبي, الرياض, دمشق, الإمارات, السعودية, سوريا, تصميم مواقع, تطبيقات جوال, ذكاء اصطناعي, UI UX design, web development, mobile apps, AI automation, branding">
+  <meta name="author" content="VIVUM Digital Agency">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="https://vivum-d2907.web.app/">
+
+  <!-- Open Graph / Facebook / LinkedIn Meta Tags -->
+  <meta property="og:site_name" content="VIVUM Digital Agency">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vivum-d2907.web.app/">
+  <meta property="og:title" content="VIVUM Digital Agency | وكالة فيفوم الرقمية">
+  <meta property="og:description" content="نساعد الشركات والأعمال في الإمارات، السعودية، وسوريا على تحويل أفكارها إلى تجارب رقمية ممتازة وحلول برمجية متطورة.">
+  <meta property="og:image" content="https://vivum-d2907.web.app/1.png">
+  <meta property="og:locale" content="ar_AE">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://vivum-d2907.web.app/">
+  <meta name="twitter:title" content="VIVUM Digital Agency | Creative Design, Technology & AI">
+  <meta name="twitter:description" content="Building Digital Experiences That Help Businesses Grow across UAE, Saudi Arabia, and Syria.">
+  <meta name="twitter:image" content="https://vivum-d2907.web.app/1.png">
 
   <!-- Favicon & Icons -->
   <link rel="icon" type="image/png" href="favicon.png"/>
@@ -18,10 +37,74 @@
   <link rel="apple-touch-icon" href="1.png"/>
   <link rel="manifest" href="manifest.json">
 
-  <!-- Firebase SDKs (Using type="module" for Modern Modular SDK) -->
-  <script type="module" src="https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/12.17.0/firebase-app-check.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore-pipelines.js"></script>
+  <!-- Preload Critical Fonts for Fast Render -->
+  <link rel="preload" href="assets/fonts/Cairo-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/fonts/Cairo-Bold.ttf" as="font" type="font/ttf" crossorigin>
+
+  <!-- Google tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E7C1ZV11L7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-E7C1ZV11L7', { 'send_page_view': true });
+  </script>
+
+  <!-- Structured Data (JSON-LD) for Search Engines & LLMs -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "VIVUM Digital Agency",
+    "alternateName": "وكالة فيفوم الرقمية",
+    "url": "https://vivum-d2907.web.app/",
+    "logo": "https://vivum-d2907.web.app/1.png",
+    "image": "https://vivum-d2907.web.app/1.png",
+    "description": "وكالة رقمية إقليمية رائدة تقدم خدمات تصميم البرمجيات، وتطوير المواقع والتطبيقات، والحلول الذكية وحلول الذكاء الاصطناعي في الإمارات العربية المتحدة، المملكة العربية السعودية، وسوريا.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "AE",
+      "addressRegion": "Dubai"
+    },
+    "areaServed": [
+      "United Arab Emirates",
+      "Saudi Arabia",
+      "Syria"
+    ],
+    "knowsLanguage": ["Arabic", "English"],
+    "priceRange": "$$",
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "VIVUM Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Web & App Development",
+            "description": "تطوير مواقع وتطبيقات ويب وجوال فائقة السرعة والأداء."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "AI Automation & Chatbots",
+            "description": "بناء أنظمة الذكاء الاصطناعي، الأتمتة المتقدمة، وروبوتات المحادثة الذكية."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "UI/UX & Brand Identity",
+            "description": "تصميم هويات بصرية ممتازة وتجارب مستخدم مبتكرة وجذابة."
+          }
+        }
+      ]
+    }
+  }
+  </script>
 
   <!-- Patch for Intl.v8BreakIterator deprecation -->
   <script>
@@ -93,11 +176,38 @@
   </style>
 </head>
 <body>
+  <!-- Static Prerendered HTML Content for Search Engine Crawlers & LLMs -->
+  <div id="seo-fallback" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
+    <h1>VIVUM Digital Agency | وكالة فيفوم الرقمية</h1>
+    <p>فيفوم (VIVUM) وكالة رقمية إقليمية تساعد الشركات والأعمال في الإمارات العربية المتحدة (دبي)، المملكة العربية السعودية (الرياض)، وسوريا (دمشق) على تحويل أفكارها إلى تجارب رقمية قوية، برمجيات حديثة، وتطبيقات مدعومة بالذكاء الاصطناعي.</p>
+
+    <h2>خدماتنا الرئيسية | Our Core Services</h2>
+    <ul>
+      <li><strong>تطوير المواقع والتطبيقات (Web & Mobile Development):</strong> بناء برمجيات ومواقع وتطبيقات سريعة، آمنة ومصممة بأحدث التقنيات.</li>
+      <li><strong>حلول الذكاء الاصطناعي والأتمتة (AI Automation & Chatbots):</strong> تطوير مساعدين رقميين وروبوتات محادثة وأتمتة مسارات العمل بكفاءة عالية.</li>
+      <li><strong>تصميم تجربة المستخدم والهوية البصرية (UI/UX & Branding):</strong> ابتكار هويات رقمية متميزة وتصاميم عصرية جذابة.</li>
+      <li><strong>الاستشارات الرقمية والاستراتيجية (Digital Strategy):</strong> تقديم خطط تحول رقمي متكاملة تدعم نمو الأعمال إقليمياً.</li>
+    </ul>
+
+    <h2>تصفح الموقع | Site Navigation</h2>
+    <nav>
+      <ul>
+        <li><a href="/">الرئيسية | Home</a></li>
+        <li><a href="/about">من نحن | About Us</a></li>
+        <li><a href="/services">خدماتنا | Services</a></li>
+        <li><a href="/portfolio">معرض الأعمال | Portfolio</a></li>
+        <li><a href="/process">منهجية العمل | Process</a></li>
+        <li><a href="/contact">تواصل معنا | Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+
   <div id="loading">
     <img id="splash-logo" src="1.png" alt="VIVUM Logo" class="loader-logo-img"/>
     <div id="text-logo" class="loader-logo" style="display:none;">vi<span class="teal">v</span>um<span class="amber">.</span></div>
     <div class="loader-bar"><div class="loader-fill"></div></div>
   </div>
+
   <script>
     var splashImg = document.getElementById('splash-logo');
     if (splashImg) {
@@ -114,6 +224,26 @@
         setTimeout(function() { loader.remove(); }, 400);
       }
     });
+  </script>
+
+  <script>
+    // Ensure Chrome never holds onto stale service worker caches on new deployments
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (var r of registrations) {
+          r.unregister();
+        }
+      });
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (var name of names) {
+            if (name.includes('flutter')) {
+              caches.delete(name);
+            }
+          }
+        });
+      }
+    }
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>

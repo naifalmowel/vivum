@@ -17,8 +17,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lp = AppProvider.of(context);
+    final primaryScrollController = PrimaryScrollController.maybeOf(context);
     return CustomScrollView(
-      primary: true, 
+      controller: primaryScrollController,
+      primary: primaryScrollController == null, 
       slivers: [
         SliverToBoxAdapter(child: _HeroSection(lp: lp)),
         SliverToBoxAdapter(child: _ServicesPreview(lp: lp)),
@@ -267,8 +269,8 @@ class _ServiceCardState extends State<_ServiceCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return MouseRegion(
-      onEnter: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) setState(() => _hovered = true); }); },
-      onExit: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) setState(() => _hovered = false); }); },
+      onEnter: (_) { if (mounted) setState(() => _hovered = true); },
+      onExit: (_) { if (mounted) setState(() => _hovered = false); },
       child: InkWell(
         onTap: () => context.go('/services'),
         borderRadius: BorderRadius.circular(20),
@@ -368,6 +370,7 @@ class _PortfolioTeaser extends StatelessWidget {
           ),
           const SizedBox(height: 48),
           StreamBuilder<List<Map<String, dynamic>>>(
+            initialData: DatabaseService.cachedProjects,
             stream: DatabaseService.getProjectsStream(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
@@ -451,8 +454,8 @@ class _PillarCardContentState extends State<_PillarCardContent> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return MouseRegion(
-      onEnter: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) setState(() => _hovered = true); }); },
-      onExit: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) setState(() => _hovered = false); }); },
+      onEnter: (_) { if (mounted) setState(() => _hovered = true); },
+      onExit: (_) { if (mounted) setState(() => _hovered = false); },
       child: Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(

@@ -132,25 +132,18 @@ class _ProjectCardState extends State<ProjectCard> {
     final p = widget.project;
 
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) {
-        if (mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _hovered = true);
-          });
-        }
+        if (mounted) setState(() => _hovered = true);
       },
       onExit: (_) {
-        if (mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _hovered = false);
-          });
-        }
+        if (mounted) setState(() => _hovered = false);
       },
       child: GestureDetector(
         onTap: () {
           final cleanId = p.id.trim();
           if (cleanId.isNotEmpty) {
-            Future.microtask(() => context.push('/project/$cleanId'));
+            context.push('/project/$cleanId');
           }
         },
         child: AnimatedContainer(

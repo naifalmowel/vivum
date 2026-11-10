@@ -421,8 +421,8 @@ class _PremiumInfoCardState extends State<_PremiumInfoCard> {
     final theme = Theme.of(context);
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => _hovered = true)); },
-      onExit: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => _hovered = false)); },
+      onEnter: (_) { if (mounted) setState(() => _hovered = true); },
+      onExit: (_) { if (mounted) setState(() => _hovered = false); },
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
@@ -481,8 +481,8 @@ class _SocialTileState extends State<_SocialTile> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return MouseRegion(
-      onEnter: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => _hovered = true)); },
-      onExit: (_) { if (mounted) WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => _hovered = false)); },
+      onEnter: (_) { if (mounted) setState(() => _hovered = true); },
+      onExit: (_) { if (mounted) setState(() => _hovered = false); },
       child: InkWell(
         onTap: () => launchUrl(Uri.parse(widget.url)),
         borderRadius: BorderRadius.circular(16),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:vivum/services/database_service.dart';
 import 'package:vivum/widgets/glow_button.dart';
 import 'theme/app_theme.dart';
@@ -19,33 +20,37 @@ import 'screens/contact_screen.dart';
 import 'screens/project_details_screen.dart';
 import 'widgets/scaffold_shell.dart';
 
-void main() {
+void main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
+  await _initCoreServices();
   runApp(const VivumApp());
 }
 
-// دالة تهيئة الخدمات الأساسية التي يجب انتظارها
+// دالة تهيئة الخدمات الأساسية
 Future<void> _initCoreServices() async {
-  // تهيئة الفايربيس أولاً بشكل كامل لمنع خطأ الـ JavaScriptObject
-  await Firebase.initializeApp(
+  await Future.wait([
+    Firebase.initializeApp(
       options: const FirebaseOptions(
-          apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
-          authDomain: "vivum-d2907.firebaseapp.com",
-          projectId: "vivum-d2907",
-          storageBucket: "vivum-d2907.firebasestorage.app",
-          messagingSenderId: "899371078453",
-          appId: "1:899371078453:web:f96fb357e3603473f1727c",
-          measurementId: "G-E7C1ZV11L7"
-      )
-  );
+        apiKey: "AIzaSyBjFpqGTr1XPq9fEbMo7T1e6yWh640lsQ0",
+        authDomain: "vivum-d2907.firebaseapp.com",
+        projectId: "vivum-d2907",
+        storageBucket: "vivum-d2907.firebasestorage.app",
+        messagingSenderId: "899371078453",
+        appId: "1:899371078453:web:f96fb357e3603473f1727c",
+        measurementId: "G-E7C1ZV11L7"
+      ),
+    ),
+    Supabase.initialize(
+      url: 'https://gosqrnkrebpdqvhazugw.supabase.co',
+      publishableKey: 'sb_publishable_N0iUuNR5DD-yKtgCqcXglg_K2ySU9pj',
+      debug: false,
+    ),
+  ]);
 
-  // السوبابيس مسموح تحميله بالتوازي
-  await Supabase.initialize(
-    url: 'https://gosqrnkrebpdqvhazugw.supabase.co',
-    publishableKey: 'sb_publishable_N0iUuNR5DD-yKtgCqcXglg_K2ySU9pj',
-    debug: false,
-  );
+  try {
+    await FirebaseAnalytics.instance.logAppOpen();
+  } catch (_) {}
 
   assert(() {
     Animate.restartOnHotReload = true;
@@ -55,6 +60,9 @@ Future<void> _initCoreServices() async {
 
 final _router = GoRouter(
   initialLocation: '/',
+  observers: [
+    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+  ],
   routes: [
     ShellRoute(
       builder: (context, state, child) => ScaffoldShell(child: child),
@@ -106,13 +114,6 @@ class VivumApp extends StatefulWidget {
 class _VivumAppState extends State<VivumApp> {
   String _lang = 'en';
   ThemeMode _themeMode = ThemeMode.dark;
-  late final Future<void> _initializationFuture;
-
-  @override
-  void initState() { // تم تصحيح الخطأ الإملائي هنا في السطر 113
-    super.initState();
-    _initializationFuture = _initCoreServices();
-  }
 
   void _toggleLang() => setState(() => _lang = _lang == 'en' ? 'ar' : 'en');
 
@@ -123,55 +124,43 @@ class _VivumAppState extends State<VivumApp> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _initializationFuture,
-      builder: (context, authSnapshot) {
-        // تم تصحيح طريقة كتابة لون الهيكس هنا في السطر 135 ليكون كوداً برمجياً صحيحاً للون الخلفية الداكنة
-        if (authSnapshot.connectionState != ConnectionState.done) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Container(color: const Color(0xFF07091A)),
-          );
-        }
-
-        return StreamBuilder<Map<String, dynamic>>(
-          stream: DatabaseService.getSettingsStream(),
-          builder: (context, snapshot) {
-            final settings = snapshot.data ?? {};
-            return AppProvider(
-              lang: _lang,
-              themeMode: _themeMode,
-              settings: settings,
-              onToggleLang: _toggleLang,
-              onToggleTheme: _toggleTheme,
-              child: Builder(
-                builder: (context) {
-                  final appProvider = AppProvider.of(context);
-                  return MaterialApp.router(
-                    title: 'VIVUM Digital Agency',
-                    debugShowCheckedModeBanner: false,
-                    scrollBehavior: const MaterialScrollBehavior().copyWith(
-                      dragDevices: {
-                        PointerDeviceKind.mouse,
-                        PointerDeviceKind.touch,
-                        PointerDeviceKind.trackpad
-                      },
-                    ),
-                    theme: AppTheme.lightTheme,
-                    darkTheme: AppTheme.darkTheme,
-                    themeMode: appProvider.themeMode,
-                    routerConfig: _router,
-                    builder: (context, child) {
-                      return Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: child!,
-                      );
-                    },
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: DatabaseService.getSettingsStream(),
+      builder: (context, snapshot) {
+        final settings = snapshot.data ?? {};
+        return AppProvider(
+          lang: _lang,
+          themeMode: _themeMode,
+          settings: settings,
+          onToggleLang: _toggleLang,
+          onToggleTheme: _toggleTheme,
+          child: Builder(
+            builder: (context) {
+              final appProvider = AppProvider.of(context);
+              return MaterialApp.router(
+                title: 'VIVUM Digital Agency',
+                debugShowCheckedModeBanner: false,
+                scrollBehavior: const MaterialScrollBehavior().copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.mouse,
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.trackpad
+                  },
+                ),
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: appProvider.themeMode,
+                locale: Locale(appProvider.lang),
+                routerConfig: _router,
+                builder: (context, child) {
+                  return Directionality(
+                    textDirection: appProvider.isAr ? TextDirection.rtl : TextDirection.ltr,
+                    child: child!,
                   );
                 },
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

@@ -38,38 +38,25 @@ class _VivumButtonState extends State<VivumButton> {
     final shadowColor = isAmber ? VivumColors.amber : isTeal ? VivumColors.teal : theme.colorScheme.onSurface;
 
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) {
-        if (mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _hovered = true);
-          });
-        }
+        if (mounted) setState(() => _hovered = true);
       },
       onExit: (_) {
-        if (mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _hovered = false);
-          });
-        }
+        if (mounted) setState(() => _hovered = false);
       },
       child: GestureDetector(
         onTapDown: (_) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _pressed = true);
-          });
+          if (mounted) setState(() => _pressed = true);
         },
         onTapUp: (_) { 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() => _pressed = false);
-              widget.onTap();
-            }
-          });
+          if (mounted) {
+            setState(() => _pressed = false);
+          }
+          widget.onTap();
         },
         onTapCancel: () {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _pressed = false);
-          });
+          if (mounted) setState(() => _pressed = false);
         },
         child: AnimatedScale(
           scale: _pressed ? 0.97 : 1.0,

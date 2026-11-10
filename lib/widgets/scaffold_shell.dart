@@ -16,6 +16,7 @@ class ScaffoldShell extends StatefulWidget {
 
 class _ScaffoldShellState extends State<ScaffoldShell> {
   final ScrollController _scrollController = ScrollController();
+  BuildContext? _scrollableContext;
   bool _showBackToTop = false;
 
   @override
@@ -26,10 +27,23 @@ class _ScaffoldShellState extends State<ScaffoldShell> {
 
   void _onScroll() {
     if (!mounted) return;
-    if (_scrollController.offset > 400 && !_showBackToTop) {
-      setState(() => _showBackToTop = true);
-    } else if (_scrollController.offset <= 400 && _showBackToTop) {
-      setState(() => _showBackToTop = false);
+    if (_scrollController.hasClients) {
+      final shouldShow = _scrollController.offset > 400;
+      if (shouldShow != _showBackToTop) {
+        setState(() => _showBackToTop = shouldShow);
+      }
+    }
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(0, duration: 800.ms, curve: Curves.easeOutCubic);
+    } else if (_scrollableContext != null) {
+      Scrollable.maybeOf(_scrollableContext!)?.position.animateTo(
+        0,
+        duration: 800.ms,
+        curve: Curves.easeOutCubic,
+      );
     }
   }
 
@@ -71,13 +85,29 @@ class _ScaffoldShellState extends State<ScaffoldShell> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       endDrawer: _MobileDrawer(lp: lp),
-      body: Column(
-        children: [
-          const VivumNavbar(),
-          Expanded(
-            child: widget.child,
-          ),
-        ],
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          if (notification.metrics.axis == Axis.vertical) {
+            _scrollableContext = notification.context;
+            final shouldShow = notification.metrics.pixels > 400;
+            if (shouldShow != _showBackToTop) {
+              setState(() => _showBackToTop = shouldShow);
+            }
+          }
+          return false;
+        },
+        child: Column(
+          children: [
+            const VivumNavbar(),
+            Expanded(
+              child: PrimaryScrollController(
+                controller: _scrollController,
+                automaticallyInheritForPlatforms: TargetPlatform.values.toSet(),
+                child: widget.child,
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: AnimatedSlide(
         offset: _showBackToTop ? Offset.zero : const Offset(0, 2),
@@ -89,7 +119,7 @@ class _ScaffoldShellState extends State<ScaffoldShell> {
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: () => _scrollController.animateTo(0, duration: 800.ms, curve: Curves.easeOutCubic),
+              onTap: _scrollToTop,
               child: Container(
                 width: 50, height: 50,
                 decoration: BoxDecoration(

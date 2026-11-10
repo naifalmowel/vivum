@@ -8,33 +8,33 @@ class VivumColors {
   static const amber = Color(0xFFF5A61A);
   static const amberLight = Color(0xFFF7B84B);
 
-  // Dark Theme Palette - Soft Slate Charcoal (More eye-friendly)
-  static const darkBG = Color(0xFF15171E); 
-  static const darkSurface = Color(0xFF1C1F26);
-  static const darkCard = Color(0xFF232730);
-  static const darkBorder = Color(0xFF2E333D);
-  static const darkMuted = Color(0xFF9499B8);
-  static const darkWhite = Color(0xFFE2E4E9); // Softened white text
+  // ─── Dark Theme: "Midnight Slate" — warmer & softer, not too black
+  static const darkBG = Color(0xFF0F1117);      // رئيسي: أعمق بقليل لتباين أوضح
+  static const darkSurface = Color(0xFF181B23); // كروت وسطح: دافئ أكثر
+  static const darkCard = Color(0xFF1E2130);    // كروت داخلية: لون مائل للبنفسجي
+  static const darkBorder = Color(0xFF2A2F3E);  // حدود: أوضح قليلاً
+  static const darkMuted = Color(0xFFADB5D0);   // نص ثانوي: أفتح للقراءة
+  static const darkWhite = Color(0xFFEEF0F5);   // نص رئيسي: أقرب للأبيض النقي
 
-  // Light Theme Palette - Professional Soft Icy Blue
-  static const lightBG = Color(0xFFF0F4F8); 
-  static const lightBGAlt = Color(0xFFE1E7EC); 
+  // ─── Light Theme: "Warm Cloud" — كريمي دافئ بدلاً من البارد الجليدي
+  static const lightBG = Color(0xFFF5F6FA);     // خلفية: دفء بدلاً من الأزرق
+  static const lightBGAlt = Color(0xFFEBEDF5);  // خلفية بديلة
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightCard = Color(0xFFFFFFFF);
-  static const lightBorder = Color(0xFFD9E2EC); 
-  static const lightMuted = Color(0xFF627D98); 
-  static const lightText = Color(0xFF102A43);
+  static const lightBorder = Color(0xFFDDE0EE); // حدود: واضحة أكثر
+  static const lightMuted = Color(0xFF5A6480);  // نص ثانوي: داكن للقراءة
+  static const lightText = Color(0xFF0D1B2E);   // نص رئيسي: navy داكن
 
   static LinearGradient heroGradient(bool isDark) => isDark
       ? const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF15171E), Color(0xFF1E2129), Color(0xFF15171E)],
+          colors: [Color(0xFF0F1117), Color(0xFF161A27), Color(0xFF0F1117)],
         )
       : const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF0F4F8), Color(0xFFD9E2EC), Color(0xFFF0F4F8)],
+          colors: [Color(0xFFF5F6FA), Color(0xFFEBEDF5), Color(0xFFF5F6FA)],
         );
 
   static const LinearGradient tealGradient = LinearGradient(
@@ -49,12 +49,12 @@ class VivumColors {
       ? const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF232730), Color(0xFF1C1F26)],
+          colors: [Color(0xFF1E2130), Color(0xFF181B23)],
         )
       : const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xFFF0F4F8)],
+          colors: [Color(0xFFFFFFFF), Color(0xFFF5F6FA)],
         );
 }
 
@@ -76,7 +76,7 @@ class AppTheme {
             onSecondary: Colors.white,
             onSurface: VivumColors.darkWhite,
             outline: VivumColors.darkBorder,
-            shadow: Colors.black,
+            shadow: Color(0xBB000000),
           )
         : const ColorScheme.light(
             primary: VivumColors.teal,
@@ -86,7 +86,7 @@ class AppTheme {
             onSecondary: Colors.white,
             onSurface: VivumColors.lightText,
             outline: VivumColors.lightBorder,
-            shadow: Color(0x330F172A), // Increased shadow opacity (20%)
+            shadow: Color(0x1A0D1B2E),
           );
 
     final textColor = isDark ? VivumColors.darkWhite : VivumColors.lightText;
@@ -129,12 +129,20 @@ class AppTheme {
           fontSize: 20, fontWeight: FontWeight.bold,
           color: textColor,
         ),
+        titleMedium: TextStyle(
+          fontSize: 16, fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
         bodyLarge: TextStyle(
           fontSize: 16, fontWeight: FontWeight.normal,
-          color: mutedColor, height: 1.7,
+          color: mutedColor, height: 1.75,
         ),
         bodyMedium: TextStyle(
           fontSize: 14, fontWeight: FontWeight.normal,
+          color: mutedColor, height: 1.65,
+        ),
+        bodySmall: TextStyle(
+          fontSize: 13, fontWeight: FontWeight.normal,
           color: mutedColor, height: 1.6,
         ),
         labelLarge: TextStyle(

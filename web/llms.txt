@@ -1,31 +1,38 @@
-# VIVUM Digital Agency
+# VIVUM Digital Agency | وكالة فيفوم الرقمية
 
-A premium regional digital agency providing creative design, technology, and AI solutions across the UAE, Saudi Arabia, and Syria. This project is a high-performance Flutter Web application designed to showcase work and facilitate client growth.
+> VIVUM is a premier regional digital agency providing creative design, modern web & mobile software engineering, custom AI solutions, and UI/UX design across the United Arab Emirates (Dubai), Saudi Arabia (Riyadh), and Syria (Damascus).
 
-## Core Features
-- **Minimalist Portfolio:** A visual-first gallery organized by dynamic categories (Web, Branding, AI).
-- **Dynamic Content Management:** Contact details, social media links, and global settings are synchronized in real-time with a Firestore-based dashboard.
-- **Bilingual Experience:** Seamless switching between Arabic and English with localized UI and the Cairo typography.
-- **Automated Workflows:** Integrated testimonial submission system with admin moderation and secure contact forms.
+## Key Agency Information
+- **Official Name:** VIVUM Digital Agency (وكالة فيفوم الرقمية)
+- **Website:** https://vivum-d2907.web.app/
+- **Target Regions:** UAE (United Arab Emirates / دبي), KSA (Saudi Arabia / الرياض), Syria (دمشق).
+- **Languages Supported:** Arabic (العربية), English (En).
+
+## Core Capabilities & Services
+1. **Web & Mobile Application Engineering:**
+   - Single Page Applications (SPA), Progressive Web Apps (PWA), and Flutter Web apps.
+   - Cross-platform Android & iOS applications with native performance.
+   - High-throughput backend integrations (Firebase Firestore, Supabase, Cloud Functions).
+2. **AI Solutions & Automation:**
+   - Autonomous AI Agents, Custom Chatbots, and LLM integrations.
+   - Automated workflow systems and client management integrations.
+3. **UI/UX & Brand Identity:**
+   - Modern Material 3 dark/light responsive design systems.
+   - High-converting landing pages, interactive micro-animations, dynamic regional localization.
+4. **Digital Transformation & Consulting:**
+   - Regional software deployment, performance optimization, cloud security, and Firestore/Supabase infrastructure.
+
+## Available Routes & Navigation
+- `/` - **Home Page:** Hero showcase, regional presence (UAE, KSA, Syria), core services summary, client statistics, and agency highlights.
+- `/about` - **About Us:** Agency mission, values, creative story, leadership vision, and company background.
+- `/services` - **Services Page:** In-depth breakdown of Web Development, AI Automation, Mobile Apps, UI/UX Design, and Software Consulting.
+- `/portfolio` - **Portfolio Page:** Interactive showcase of completed digital projects, web platforms, and mobile apps categorized by Web, Branding, and AI.
+- `/process` - **Process Page:** Step-by-step methodology from initial discovery and prototyping to engineering, deployment, and ongoing optimization.
+- `/contact` - **Contact Us:** Interactive client inquiry form, direct communication channels, and consultation scheduling.
 
 ## Technical Architecture
-- **Framework:** Flutter Web (optimised for SEO and performance).
-- **Navigation:** GoRouter with path-based URL strategy.
-- **Backend Services:**
-  - **Firebase Firestore:** Powers real-time settings, projects database, and testimonials.
-  - **Firebase Hosting:** Global CDN deployment.
-  - **Firebase App Check:** Enterprise-grade security for API protection.
-  - **Supabase:** Managed storage for high-resolution project images and assets.
-- **Design System:** Custom Material 3 implementation (`AppTheme`) with a focus on dark/light mode balance and smooth micro-animations using `flutter_animate`.
-
-## Directory Structure
-- `lib/screens/`: High-level page components and layouts.
-- `lib/widgets/`: Modular, reusable UI elements (Custom buttons, project cards, shell navigation).
-- `lib/services/`: Abstraction layer for database and storage interactions.
-- `lib/theme/`: Centralized colors, typography, and decoration styles.
-- `lib/l10n/`: Localisation provider and string translations.
-
-## Development & Operations
-- **Clean Architecture:** Separation of UI and business logic through the `AppProvider` (InheritedWidget).
-- **Performance Optimized:** Minimised font weights and non-blocking service initialisation.
-- **Base URL:** [https://vivum-d2907.web.app](https://vivum-d2907.web.app)
+- **Framework:** Flutter Web (Dart SDK 3.x), optimized with `usePathUrlStrategy()` for clean deep-link routing.
+- **State & DI:** Custom `AppProvider` (InheritedWidget) supporting real-time theme toggling (Dark/Light) and language switching (RTL Arabic / LTR English).
+- **Backend Infrastructure:** Firebase Core, Cloud Firestore, Firebase App Check, Supabase Storage, and Google Analytics.
+- **Full Specification:** https://vivum-d2907.web.app/llms-full.txt
+- **AI Catalog JSON:** https://vivum-d2907.web.app/ai-catalog.json
