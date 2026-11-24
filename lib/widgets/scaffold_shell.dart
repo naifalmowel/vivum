@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:web/web.dart' as web;
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import 'navbar.dart';
@@ -23,6 +25,14 @@ class _ScaffoldShellState extends State<ScaffoldShell> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (kIsWeb) {
+        try {
+          web.window.dispatchEvent(web.Event('flutter-first-frame'));
+        } catch (_) {}
+      }
+    });
   }
 
   void _onScroll() {

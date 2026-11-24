@@ -137,12 +137,20 @@ class DatabaseService {
 
   // Get contact & social settings with cache
   static Stream<Map<String, dynamic>> getSettingsStream() {
-    return _db.collection('settings').doc('contact_info').snapshots().map((doc) {
-      if (doc.exists) {
-        _cachedSettings = doc.data()!;
-        return _cachedSettings!;
-      }
-      return {};
-    });
+    try {
+      return _db.collection('settings').doc('contact_info').snapshots().map((doc) {
+        if (doc.exists && doc.data() != null) {
+          _cachedSettings = doc.data()!;
+          return _cachedSettings!;
+        }
+        return <String, dynamic>{};
+      }).handleError((e) {
+        debugPrint('Error loading settings stream: $e');
+        return <String, dynamic>{};
+      });
+    } catch (e) {
+      debugPrint('Error getting settings stream: $e');
+      return Stream.value(<String, dynamic>{});
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../widgets/project_widgets.dart';
 import '../services/database_service.dart';
+import '../services/seo_helper.dart';
 import '../theme/app_theme.dart';
 import '../l10n/translations.dart';
 import '../widgets/footer.dart';
@@ -29,6 +30,13 @@ class ProjectDetailsScreen extends StatelessWidget {
           return const _NotFoundView();
         }
         final p = Project.fromMap(projectMap);
+        if (kIsWeb) {
+          SeoHelper.updateSEO(
+            title: '${p.title} | VIVUM Portfolio',
+            description: p.challenge.isNotEmpty ? p.challenge : 'مشروع ${p.title} المنفذ بواسطة وكالة فيفوم الرقمية.',
+            path: '/project/$projectId',
+          );
+        }
         return _ProjectDetailsView(project: p);
       },
     );

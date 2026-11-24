@@ -27,5 +27,4 @@ Allow: /
 User-agent: Applebot
 Allow: /
 
-Sitemap: https://vivum-d2907.web.app/sitemap.xml
-LLM-Doc: https://vivum-d2907.web.app/llms.txt
+Sitemap: https://vivumdigital.com/sitemap.xml

@@ -4,7 +4,7 @@
 
 ## Key Agency Information
 - **Official Name:** VIVUM Digital Agency (وكالة فيفوم الرقمية)
-- **Website:** https://vivum-d2907.web.app/
+- **Website:** https://vivumdigital.com/
 - **Target Regions:** UAE (United Arab Emirates / دبي), KSA (Saudi Arabia / الرياض), Syria (دمشق).
 - **Languages Supported:** Arabic (العربية), English (En).
 
@@ -34,5 +34,5 @@
 - **Framework:** Flutter Web (Dart SDK 3.x), optimized with `usePathUrlStrategy()` for clean deep-link routing.
 - **State & DI:** Custom `AppProvider` (InheritedWidget) supporting real-time theme toggling (Dark/Light) and language switching (RTL Arabic / LTR English).
 - **Backend Infrastructure:** Firebase Core, Cloud Firestore, Firebase App Check, Supabase Storage, and Google Analytics.
-- **Full Specification:** https://vivum-d2907.web.app/llms-full.txt
-- **AI Catalog JSON:** https://vivum-d2907.web.app/ai-catalog.json
+- **Full Specification:** https://vivumdigital.com/llms-full.txt
+- **AI Catalog JSON:** https://vivumdigital.com/ai-catalog.json
